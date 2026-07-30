@@ -1,0 +1,17 @@
+{
+"name": "TNC7 MERGE Desktop",
+"short_name": "TNC7 MERGE",
+"description": "Video Merger Lokal Cepat dan Aman",
+"start_url": "index.html",
+"display": "standalone",
+"background_color": "#0b0c0e",
+"theme_color": "#e52e2e",
+"icons": [
+{
+"src": "https://cdn-icons-png.flaticon.com/512/4204/4204085.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any maskable"
+}
+]
+}
