@@ -1,67 +1,50 @@
 const CACHE_NAME = 'tnc7-merge-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  './',
+  './index.html',
+  './manifest.json'
 ];
 
-// Install Event - Cache file dasar
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
+        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
   );
-  self.skipWaiting(); // Memaksa service worker baru langsung aktif
+  // Memaksa service worker baru langsung aktif
+  self.skipWaiting(); 
 });
 
-// Activate Event - Bersihkan cache lama jika ada
 self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.filter(cacheName => {
-          return cacheName !== CACHE_NAME;
-        }).map(cacheName => {
-          return caches.delete(cacheName);
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
         })
       );
     })
   );
-  self.clients.claim(); // Langsung mengambil alih kontrol halaman
+  self.clients.claim();
 });
 
-// Fetch Event - Menggunakan strategi Cache First, lalu Network
 self.addEventListener('fetch', event => {
   // Hanya proses request GET
   if (event.request.method !== 'GET') return;
 
+  // Lewati caching untuk resource FFmpeg eksternal agar engine selalu mendapat versi terbaik
+  if (event.request.url.includes('unpkg.com/@ffmpeg') || event.request.url.includes('blob:')) {
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Kembalikan dari cache jika ada
-        if (response) {
-          return response;
-        }
-        // Jika tidak ada di cache, ambil dari network
-        return fetch(event.request).then(
-          function(networkResponse) {
-            // Jangan cache jika tidak valid
-            if(!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-              return networkResponse;
-            }
-
-            // Simpan ke cache untuk ke depannya (opsional, bisa dimatikan jika tidak ingin cache file besar)
-            var responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME)
-              .then(function(cache) {
-                cache.put(event.request, responseToCache);
-              });
-
-            return networkResponse;
-          }
-        );
-      })
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
+    })
   );
 });
