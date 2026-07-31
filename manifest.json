@@ -1,24 +1,21 @@
 {
 "name": "TNC7 MERGE",
 "short_name": "TNC7 MERGE",
-"description": "Aplikasi penggabung video super cepat berbasis web",
-"start_url": "./",
+"description": "Aplikasi penggabung video lokal yang cepat dan mudah digunakan.",
+"start_url": "./index.html",
 "display": "standalone",
 "background_color": "#0b0c0e",
-"theme_color": "#e52e2e",
-"orientation": "portrait-primary",
+"theme_color": "#ffb000",
 "icons": [
 {
 "src": "https://placehold.co/192x192/e52e2e/ffffff.png?text=TNC7",
 "sizes": "192x192",
-"type": "image/png",
-"purpose": "any maskable"
+"type": "image/png"
 },
 {
 "src": "https://placehold.co/512x512/e52e2e/ffffff.png?text=TNC7",
 "sizes": "512x512",
-"type": "image/png",
-"purpose": "any maskable"
+"type": "image/png"
 }
 ]
 }
