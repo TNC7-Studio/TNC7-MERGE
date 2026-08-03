@@ -1,71 +1,52 @@
 const CACHE_NAME = 'tnc7-merge-v1';
-const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  // Kita tidak me-cache ffmpeg core karena ukurannya besar dan butuh Cross-Origin-Opener-Policy
-  // yang sering bermasalah jika disajikan dari cache sederhana tanpa header yang tepat.
+const ASSETS_TO_CACHE = [
+    './',
+    './index.html',
+    './manifest.json',
+    'https://cdn.tailwindcss.com',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+    'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'
+    // Catatan: Library FFmpeg WebAssembly (ffmpeg.min.js & core) berukuran cukup besar,
+    // Disarankan tidak di-cache secara agresif di service worker sederhana ini agar RAM tidak penuh, 
+    // melainkan mengandalkan cache browser bawaan.
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
-  );
-});
-
-self.addEventListener('fetch', event => {
-  // Hanya intercept request GET
-  if (event.request.method !== 'GET') return;
-
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cache if found
-        if (response) {
-          return response;
-        }
-        
-        // Fetch from network if not in cache
-        return fetch(event.request).then(
-          function(response) {
-            // Check if we received a valid response
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clone the response because it's a stream and can only be consumed once
-            var responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(function(cache) {
-                // Jangan cache script CDN/external disini secara membabi buta 
-                // untuk menghindari masalah CORS. Khususkan untuk origin yang sama.
-                if (event.request.url.startsWith(self.location.origin)) {
-                     cache.put(event.request, responseToCache);
-                }
-              });
-
-            return response;
-          }
-        );
-      })
-  );
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('Opened cache');
+                return cache.addAll(ASSETS_TO_CACHE);
+            })
+    );
 });
 
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
+    const cacheWhitelist = [CACHE_NAME];
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
         })
-      );
-    })
-  );
+    );
+});
+
+self.addEventListener('fetch', event => {
+    // Abaikan requests dengan skema yang tidak didukung, misal chrome-extension://
+    if (!(event.request.url.indexOf('http') === 0)) return; 
+    
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                if (response) {
+                    return response; // Return dari Cache jika ada
+                }
+                return fetch(event.request); // Ambil dari internet jika belum ada di Cache
+            })
+    );
 });
