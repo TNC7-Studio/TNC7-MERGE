@@ -7,7 +7,7 @@
     
     <!-- PWA Manifest & Theme -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffb000"> <!-- Diubah ke kuning agar serasi -->
+    <meta name="theme-color" content="#ffb000"> 
     <link rel="apple-touch-icon" href="https://placehold.co/192x192/e52e2e/ffffff.png?text=TNC7">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -54,13 +54,12 @@
             border: 1px solid #2a2e3d;
             cursor: grab;
             transition: all 0.2s ease;
-            margin-bottom: 2px !important; /* Memperkecil jarak antar list */
+            margin-bottom: 2px !important; 
         }
         .video-item:active {
             cursor: grabbing;
         }
 
-        /* Styling khusus saat list ditarik/drag */
         .video-item.is-dragging {
             background-color: rgba(16, 185, 129, 0.25) !important;
             border-color: #10b981 !important;
@@ -70,7 +69,6 @@
             z-index: 50;
         }
 
-        /* Highlight area saat didrag */
         .video-item.is-hovered-target {
             background-color: rgba(16, 185, 129, 0.35) !important;
             border-color: #10b981 !important;
@@ -78,13 +76,11 @@
             transform: scale(1.02);
         }
 
-        /* Styling setelah dilepas (drop) */
         .video-item.just-moved {
             background-color: rgba(16, 185, 129, 0.15) !important;
             border-color: #10b981 !important;
         }
 
-        /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -119,36 +115,35 @@
         </div>
     </header>
 
-    <!-- Main Workspace (3 Panels Layout) -->
-    <main class="flex-grow max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-5 items-stretch overflow-hidden pb-4 px-2 md:px-4">
+    <!-- Main Workspace (Grid Layout 10 Kolom) -->
+    <main class="flex-grow max-w-[1800px] w-full mx-auto grid grid-cols-1 lg:grid-cols-10 md:grid-cols-2 gap-4 lg:gap-5 items-stretch overflow-hidden pb-4 px-2 md:px-4">
         
-        <!-- Panel Kiri: Semua Kontrol Input & Aksi -->
-        <section class="w-full dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
+        <!-- Panel Kiri: Canvas & Kontrol (Mengambil 6 dari 10 kolom = 60%) -->
+        <section class="w-full lg:col-span-6 md:col-span-2 dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-4 overflow-hidden h-full">
             
-            <!-- Video Preview Canvas & Title -->
-            <div class="flex flex-col gap-2 w-full flex-shrink-0">
-                <div id="video-preview-container" class="w-full bg-[#08090b] rounded-xl overflow-hidden border border-slate-700/80 aspect-video relative shadow-inner flex items-center justify-center">
-                    <div id="preview-placeholder" class="flex flex-col items-center justify-center text-slate-600 transition-colors pointer-events-none">
-                        <i class="fas fa-desktop text-3xl mb-2 opacity-40"></i>
-                        <p class="text-[10px] font-medium tracking-widest uppercase">Canvas Preview</p>
+            <!-- Video Preview Canvas & Drop Zone Combined -->
+            <div class="flex flex-col gap-3 w-full flex-grow overflow-hidden min-h-0">
+                <div id="drop-zone" class="w-full bg-[#08090b] rounded-xl overflow-hidden border-2 border-dashed border-slate-700/80 relative shadow-inner flex flex-col items-center justify-center transition-all duration-200 cursor-pointer group flex-grow h-full min-h-0">
+                    
+                    <!-- Placeholder & Drop Instructions -->
+                    <div id="preview-placeholder" class="flex flex-col items-center justify-center text-slate-500 transition-colors pointer-events-none group-hover:scale-105 duration-300">
+                        <div class="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3 shadow-sm">
+                            <i class="fas fa-cloud-upload-alt text-lg text-slate-300"></i>
+                        </div>
+                        <p class="text-sm font-bold text-slate-200 mb-1">Klik atau Drag File Video</p>
+                        <p class="text-[10px] text-slate-500 tracking-wider mb-4">MENDUKUNG MP4, WEBM, MOV</p>
+                        <span class="px-3 py-1 bg-[#14161d] border border-slate-700/80 text-[9px] font-bold tracking-widest text-slate-400 rounded-md shadow-sm">CANVAS PREVIEW</span>
                     </div>
-                    <video id="video-player" class="absolute inset-0 w-full h-full object-contain hidden bg-black" controls controlsList="nodownload">
+
+                    <!-- Video Player (Hidden by default) -->
+                    <video id="video-player" class="absolute inset-0 w-full h-full object-contain hidden bg-black z-10" controls controlsList="nodownload">
                         Browser Anda tidak mendukung tag video.
                     </video>
+                    
+                    <!-- Hidden File Input -->
+                    <input type="file" id="file-input" multiple accept="video/*" class="hidden">
                 </div>
-                <div id="preview-title" class="px-3 py-2 bg-[#14161d] border border-slate-800/80 text-emerald-400 text-[11px] truncate rounded-lg font-medium text-center shadow-sm min-h-[34px]">Judul Video Preview</div>
-            </div>
-
-            <!-- Drop Zone -->
-            <div id="drop-zone" class="drop-area rounded-xl p-5 text-center flex flex-col items-center justify-center gap-3 cursor-pointer group flex-grow">
-                <div class="w-12 h-12 rounded-full bg-slate-800/60 border border-slate-700/60 flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
-                    <i class="fas fa-cloud-upload-alt text-xl text-slate-300"></i>
-                </div>
-                <div class="text-center">
-                    <p class="text-sm font-medium text-slate-300 mb-1">Klik, Drag, atau Paste File Video</p>
-                    <p class="text-[10px] text-slate-500">Mendukung MP4, WEBM, MOV</p>
-                </div>
-                <input type="file" id="file-input" multiple accept="video/*" class="hidden">
+                <div id="preview-title" class="px-3 py-2 bg-[#14161d] border border-slate-800/80 text-emerald-400 text-[11px] truncate rounded-lg font-medium text-center shadow-sm min-h-[34px] flex-shrink-0">Judul Video Preview</div>
             </div>
 
             <!-- Config / Fast Switch - Minimized -->
@@ -157,34 +152,34 @@
             </div>
 
             <!-- Custom Output Name Input -->
-            <div class="bg-[#14161d] border border-slate-800/80 rounded-lg flex items-center px-3 py-2.5 transition-colors focus-within:border-red-500/50">
+            <div class="bg-[#14161d] border border-slate-800/80 rounded-lg flex items-center px-3 py-2.5 transition-colors focus-within:border-red-500/50 flex-shrink-0">
                 <i class="fas fa-pen text-slate-500 text-[10px] mr-2"></i>
                 <input type="text" id="custom-output-name" placeholder="Judul manual (kosongkan u/ otomatis)..." class="w-full bg-transparent border-none outline-none text-xs text-slate-300 placeholder-slate-600">
                 <span class="text-[10px] text-slate-500 font-medium bg-slate-800 px-1.5 py-0.5 rounded ml-2">.mp4</span>
             </div>
 
             <!-- Action Buttons -->
-            <div class="mt-1 flex flex-row gap-2">
-                <button id="preview-all-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold py-2.5 px-3 rounded-lg text-xs transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Play Semua Video Berurutan" disabled>
+            <div class="mt-1 flex flex-row gap-2 flex-shrink-0">
+                <button id="preview-all-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold py-2.5 px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Play Semua Video Berurutan" disabled>
                     <i class="fas fa-play"></i>
                 </button>
-                <button id="shuffle-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 rounded-lg text-xs transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Acak Urutan Video" disabled>
+                <button id="shuffle-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Acak Urutan Video" disabled>
                     <i class="fas fa-random"></i>
                 </button>
-                <button id="clear-all-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 rounded-lg text-xs transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Hapus Semua" disabled>
+                <button id="clear-all-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Hapus Semua" disabled>
                     <i class="fas fa-trash"></i>
                 </button>
-                <button id="merge-btn" class="btn-red text-white font-bold py-2.5 px-4 rounded-lg flex-1 flex items-center justify-center gap-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none transition" disabled>
-                    <i class="fas fa-bolt text-xs text-yellow-300"></i>
-                    <span>Mulai Merge & Unduh</span>
+                <button id="merge-btn" class="btn-red text-white font-bold py-2 px-4 rounded-lg flex-1 flex flex-col items-center justify-center gap-0.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none transition" disabled>
+                    <div class="flex items-center gap-1.5 text-yellow-300 text-[11px]">
+                        <i class="fas fa-bolt"></i> Mulai
+                    </div>
+                    <span class="text-[13px] leading-tight">Merge & Unduh</span>
                 </button>
             </div>
         </section>
 
-        <!-- Panel Tengah: Khusus List Video -->
-        <section class="w-full dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-2 overflow-hidden">
-            
-            <!-- List Section Header -->
+        <!-- Panel Tengah: Daftar Video (Mengambil 2 dari 10 kolom = 20%) -->
+        <section class="w-full lg:col-span-2 md:col-span-1 dark-card rounded-2xl p-3 md:p-4 flex flex-col gap-2 overflow-hidden h-full">
             <div class="flex items-center justify-between border-b border-slate-800/60 pb-3 flex-shrink-0">
                 <h3 class="font-bold text-[13px] tracking-wide text-white uppercase flex items-center gap-2">
                     Daftar Video
@@ -194,8 +189,6 @@
                     SIAP
                 </span>
             </div>
-
-            <!-- Video List -->
             <ul id="video-list" class="space-y-0.5 flex-grow overflow-y-auto custom-scrollbar pr-1">
                 <li id="empty-state" class="text-center text-slate-500 py-6 flex flex-col items-center justify-center h-full border border-dashed border-slate-800 rounded-xl min-h-[200px]">
                     <i class="fas fa-film text-xl mb-2 opacity-30"></i>
@@ -204,10 +197,8 @@
             </ul>
         </section>
 
-        <!-- Panel Kanan: Khusus Teks List Judul -->
-        <section class="w-full dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-2 overflow-hidden h-full">
-            
-            <!-- List Judul Header -->
+        <!-- Panel Kanan: List Teks Judul (Mengambil 2 dari 10 kolom = 20%) -->
+        <section class="w-full lg:col-span-2 md:col-span-1 dark-card rounded-2xl p-3 md:p-4 flex flex-col gap-2 overflow-hidden h-full">
             <div class="flex items-center justify-between border-b border-slate-800/60 pb-3 flex-shrink-0">
                 <h3 class="font-bold text-[13px] tracking-wide text-white uppercase flex items-center gap-2">
                     <i class="fas fa-file-alt text-slate-400"></i> List Teks Judul
@@ -216,10 +207,7 @@
                     <i class="fas fa-copy"></i> Copy List
                 </button>
             </div>
-
-            <!-- Text Area -->
             <textarea id="titles-text-area" readonly class="w-full flex-grow bg-[#0d0e12] border border-slate-700/60 rounded-xl p-3 text-[11px] text-slate-300 custom-scrollbar resize-none outline-none focus:border-slate-500 transition-colors leading-relaxed" placeholder="Daftar judul video akan otomatis muncul di sini..."></textarea>
-            
         </section>
     </main>
 
@@ -257,7 +245,6 @@
     </footer>
 
     <script>
-        // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
@@ -270,10 +257,8 @@
         let isProcessing = false;
         let ffmpegInstance = null;
         let isFFmpegLoading = false;
-        // Penanda status loading files untuk mencegah update progress tumpang tindih
         let isFileLoadingPhase = false; 
 
-        // Elements
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const videoList = document.getElementById('video-list');
@@ -286,7 +271,6 @@
         const statusBadge = document.getElementById('status-badge');
         const customOutputNameInput = document.getElementById('custom-output-name');
 
-        const videoPreviewContainer = document.getElementById('video-preview-container');
         const videoPlayer = document.getElementById('video-player');
         const previewTitle = document.getElementById('preview-title');
         const previewPlaceholder = document.getElementById('preview-placeholder');
@@ -299,7 +283,6 @@
         const progressBar = document.getElementById('progress-bar');
         const progressPercent = document.getElementById('progress-percent');
 
-        // Preload FFmpeg Engine
         window.addEventListener('DOMContentLoaded', () => {
             initFFmpegInBackground();
         });
@@ -316,7 +299,6 @@
                     log: false
                 });
                 ffmpegInstance.setProgress(({ ratio }) => {
-                    // Hanya update progress FFmpeg jika TIDAK sedang memuat file (fase loading selesai)
                     if (!isFileLoadingPhase) {
                         const now = Date.now();
                         if (now - lastProgressTime > 100) {
@@ -336,7 +318,11 @@
             }
         }
 
-        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('click', (e) => {
+            if (e.target !== videoPlayer) {
+                fileInput.click();
+            }
+        });
 
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
             dropZone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
@@ -423,7 +409,6 @@
                 mergeBtn.disabled = validCount < 2;
 
                 const validVideos = videos.filter(v => v.isValid !== false);
-                // Selalu update nama input dengan video valid teratas jika daftar tidak kosong
                 if (validVideos.length > 0) {
                     const firstVideoName = validVideos[0].name;
                     customOutputNameInput.value = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
@@ -514,10 +499,7 @@
                     previewPlaceholder.classList.remove('hidden');
                 }
                 URL.revokeObjectURL(videos[idx].url);
-                
                 videos.splice(idx, 1);
-                
-                // Update UI akan secara otomatis mengisi input dengan video teratas baru, atau mengosongkannya jika habis
                 updateUI();
             }
         }
@@ -532,9 +514,7 @@
 
             videos.forEach(v => URL.revokeObjectURL(v.url));
             videos = [];
-            
             customOutputNameInput.value = '';
-            
             updateUI();
         });
 
@@ -685,7 +665,7 @@
             }
 
             isProcessing = true;
-            isFileLoadingPhase = true; // Tandai bahwa kita sedang dalam fase memuat file
+            isFileLoadingPhase = true; 
             mergeBtn.disabled = true;
             statusOverlay.classList.remove('hidden');
             updateProgress(0, "Mempersiapkan Engine...");
@@ -725,7 +705,6 @@
                 
                 updateProgress(10, "Membaca file ke RAM...");
                 
-                // Menghitung persentase porsi untuk memuat video (dari 10% hingga 95%)
                 const startLoadPct = 10;
                 const endLoadPct = 95;
                 const loadPctRange = endLoadPct - startLoadPct;
@@ -740,15 +719,12 @@
                     ffmpegInstance.FS('writeFile', fname, new Uint8Array(arrayBuffer));
                     
                     readCount++;
-                    // Perbaikan logika kalkulasi persentase, memastikan max di endLoadPct
                     const rawReadPct = startLoadPct + ((readCount / validVideos.length) * loadPctRange);
-                    // Dapatkan hanya satu digit di belakang koma untuk konsistensi tampilan
                     const readPct = parseFloat(rawReadPct.toFixed(1));
                     
                     updateProgress(Math.min(readPct, endLoadPct), `Memuat video ${readCount}/${validVideos.length}`);
                 }
 
-                // Fase memuat file selesai, biarkan setProgress FFmpeg mengambil alih progress bar
                 isFileLoadingPhase = false; 
 
                 const concatList = fileNames.map(f => `file '${f}'`).join('\n');
@@ -771,7 +747,7 @@
                     await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency', '-crf', '30', '-threads', cpuCores, internalOutputName);
                 }
 
-                isFileLoadingPhase = true; // Kunci kembali agar progress FFmpeg yang terakhir tidak overlap
+                isFileLoadingPhase = true;
                 updateProgress(98, "Menyimpan ke perangkat...");
                 
                 const data = ffmpegInstance.FS('readFile', internalOutputName);
