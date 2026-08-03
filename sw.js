@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tnc7-merge-v1';
+const CACHE_NAME = 'tnc7-merge-v2'; // Ubah angka di bagian belakang ini
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
