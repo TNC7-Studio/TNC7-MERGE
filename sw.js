@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tnc7-merge-v2'; // Ubah angka di bagian belakang ini
+const CACHE_NAME = 'tnc7-merge-v3'; // <--- INI SAYA NAIKKAN JADI V3 AGAR BROWSER MEMUAT ULANG
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
