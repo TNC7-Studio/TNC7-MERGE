@@ -1,11 +1,11 @@
 {
 "name": "TNC7 MERGE",
-"short_name": "TNC7 MERGE",
+"short_name": "TNC7",
+"description": "Alat penggabung video lokal dengan kecepatan tinggi, aman dan privat.",
 "start_url": "./index.html",
 "display": "standalone",
 "background_color": "#0b0c0e",
 "theme_color": "#ffb000",
-"description": "Aplikasi Web Penggabung Video Lokal dengan FFmpeg",
 "icons": [
 {
 "src": "https://placehold.co/192x192/e52e2e/ffffff.png?text=TNC7",
