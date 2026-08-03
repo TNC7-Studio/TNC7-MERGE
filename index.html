@@ -270,6 +270,8 @@
         let isProcessing = false;
         let ffmpegInstance = null;
         let isFFmpegLoading = false;
+        // Penanda status loading files untuk mencegah update progress tumpang tindih
+        let isFileLoadingPhase = false; 
 
         // Elements
         const dropZone = document.getElementById('drop-zone');
@@ -314,12 +316,15 @@
                     log: false
                 });
                 ffmpegInstance.setProgress(({ ratio }) => {
-                    const now = Date.now();
-                    if (now - lastProgressTime > 100) {
-                        const rawPct = Math.min(Math.max(ratio * 100, 0), 100);
-                        const pct = parseFloat(rawPct.toFixed(1)); 
-                        updateProgress(pct, `Menggabungkan File...`);
-                        lastProgressTime = now;
+                    // Hanya update progress FFmpeg jika TIDAK sedang memuat file (fase loading selesai)
+                    if (!isFileLoadingPhase) {
+                        const now = Date.now();
+                        if (now - lastProgressTime > 100) {
+                            const rawPct = Math.min(Math.max(ratio * 100, 0), 100);
+                            const pct = parseFloat(rawPct.toFixed(1)); 
+                            updateProgress(pct, `Menggabungkan File...`);
+                            lastProgressTime = now;
+                        }
                     }
                 });
                 await ffmpegInstance.load();
@@ -408,6 +413,7 @@
                 mergeBtn.disabled = true;
                 statusBadge.innerText = "SIAP";
                 statusBadge.className = "bg-emerald-950/60 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded border border-emerald-800/60 tracking-wider";
+                customOutputNameInput.value = '';
             } else {
                 clearAllBtn.disabled = false;
                 shuffleBtn.disabled = false;
@@ -415,6 +421,13 @@
                 
                 const validCount = videos.filter(v => v.isValid !== false).length;
                 mergeBtn.disabled = validCount < 2;
+
+                const validVideos = videos.filter(v => v.isValid !== false);
+                // Selalu update nama input dengan video valid teratas jika daftar tidak kosong
+                if (validVideos.length > 0) {
+                    const firstVideoName = validVideos[0].name;
+                    customOutputNameInput.value = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
+                }
 
                 videos.forEach((vid, index) => {
                     const li = document.createElement('li');
@@ -501,7 +514,10 @@
                     previewPlaceholder.classList.remove('hidden');
                 }
                 URL.revokeObjectURL(videos[idx].url);
+                
                 videos.splice(idx, 1);
+                
+                // Update UI akan secara otomatis mengisi input dengan video teratas baru, atau mengosongkannya jika habis
                 updateUI();
             }
         }
@@ -516,6 +532,9 @@
 
             videos.forEach(v => URL.revokeObjectURL(v.url));
             videos = [];
+            
+            customOutputNameInput.value = '';
+            
             updateUI();
         });
 
@@ -666,6 +685,7 @@
             }
 
             isProcessing = true;
+            isFileLoadingPhase = true; // Tandai bahwa kita sedang dalam fase memuat file
             mergeBtn.disabled = true;
             statusOverlay.classList.remove('hidden');
             updateProgress(0, "Mempersiapkan Engine...");
@@ -683,26 +703,33 @@
                         log: false
                     });
                     ffmpegInstance.setProgress(({ ratio }) => {
-                        const now = Date.now();
-                        if (now - lastProgressTime > 100) {
-                            const rawPct = Math.min(Math.max(ratio * 100, 0), 100);
-                            const pct = parseFloat(rawPct.toFixed(1)); 
-                            updateProgress(pct, `Menggabungkan File...`);
-                            lastProgressTime = now;
+                        if (!isFileLoadingPhase) {
+                            const now = Date.now();
+                            if (now - lastProgressTime > 100) {
+                                const rawPct = Math.min(Math.max(ratio * 100, 0), 100);
+                                const pct = parseFloat(rawPct.toFixed(1)); 
+                                updateProgress(pct, `Menggabungkan File...`);
+                                lastProgressTime = now;
+                            }
                         }
                     });
                 }
 
                 if (!ffmpegInstance.isLoaded()) {
-                    updateProgress(10, "Memuat Modul Utama...");
+                    updateProgress(5, "Memuat Modul Utama...");
                     await ffmpegInstance.load();
                 }
 
                 const fileNames = [];
                 let readCount = 0;
                 
-                updateProgress(15, "Membaca file ke RAM...");
+                updateProgress(10, "Membaca file ke RAM...");
                 
+                // Menghitung persentase porsi untuk memuat video (dari 10% hingga 95%)
+                const startLoadPct = 10;
+                const endLoadPct = 95;
+                const loadPctRange = endLoadPct - startLoadPct;
+
                 for (let i = 0; i < validVideos.length; i++) {
                     const vid = validVideos[i];
                     const ext = vid.file.name.split('.').pop() || 'mp4';
@@ -713,9 +740,16 @@
                     ffmpegInstance.FS('writeFile', fname, new Uint8Array(arrayBuffer));
                     
                     readCount++;
-                    const readPct = parseFloat(((readCount / validVideos.length) * 20).toFixed(1));
-                    updateProgress(15 + readPct, `Memuat video ${readCount}/${validVideos.length}`);
+                    // Perbaikan logika kalkulasi persentase, memastikan max di endLoadPct
+                    const rawReadPct = startLoadPct + ((readCount / validVideos.length) * loadPctRange);
+                    // Dapatkan hanya satu digit di belakang koma untuk konsistensi tampilan
+                    const readPct = parseFloat(rawReadPct.toFixed(1));
+                    
+                    updateProgress(Math.min(readPct, endLoadPct), `Memuat video ${readCount}/${validVideos.length}`);
                 }
+
+                // Fase memuat file selesai, biarkan setProgress FFmpeg mengambil alih progress bar
+                isFileLoadingPhase = false; 
 
                 const concatList = fileNames.map(f => `file '${f}'`).join('\n');
                 ffmpegInstance.FS('writeFile', 'concat.txt', concatList);
@@ -723,7 +757,7 @@
                 const cpuCores = String(navigator.hardwareConcurrency || 4);
 
                 if (mode === 'fast') {
-                    updateProgress(40, "Proses Merge Cepat...");
+                    updateProgress(95, "Memulai Proses Merge...");
                     try {
                         await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c', 'copy', '-map', '0:v?', '-map', '0:a?', '-map_metadata', '0', '-fflags', '+genpts+fastseek', '-avoid_negative_ts', 'make_zero', internalOutputName);
                         const stat = ffmpegInstance.FS('stat', internalOutputName);
@@ -737,7 +771,9 @@
                     await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency', '-crf', '30', '-threads', cpuCores, internalOutputName);
                 }
 
-                updateProgress(95, "Menyimpan ke perangkat...");
+                isFileLoadingPhase = true; // Kunci kembali agar progress FFmpeg yang terakhir tidak overlap
+                updateProgress(98, "Menyimpan ke perangkat...");
+                
                 const data = ffmpegInstance.FS('readFile', internalOutputName);
 
                 fileNames.forEach(f => { try { ffmpegInstance.FS('unlink', f); } catch(e){} });
@@ -782,6 +818,7 @@
                 showModal("Gagal", "Terjadi kesalahan saat menggabungkan video. Format mungkin tidak didukung.");
             } finally {
                 isProcessing = false;
+                isFileLoadingPhase = false;
                 mergeBtn.disabled = videos.filter(v => v.isValid !== false).length < 2;
                 statusOverlay.classList.add('hidden');
 
