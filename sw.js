@@ -1,22 +1,61 @@
-const CACHE_NAME = 'tnc7-merge-v3'; // <--- INI SAYA NAIKKAN JADI V3 AGAR BROWSER MEMUAT ULANG
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'tnc7-merge-cache-v1';
+
+// File utama yang harus di-cache untuk penggunaan offline (App Shell)
+const urlsToCache = [
     './',
     './index.html',
-    './manifest.json',
-    'https://cdn.tailwindcss.com',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-    'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'
-    // Catatan: Library FFmpeg WebAssembly (ffmpeg.min.js & core) berukuran cukup besar,
-    // Disarankan tidak di-cache secara agresif di service worker sederhana ini agar RAM tidak penuh, 
-    // melainkan mengandalkan cache browser bawaan.
+    './manifest.json'
 ];
 
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Opened cache');
-                return cache.addAll(ASSETS_TO_CACHE);
+                console.log('[Service Worker] Membuka cache dan menyimpan aset utama');
+                return cache.addAll(urlsToCache);
+            })
+    );
+    // Langsung aktif tanpa menunggu tab ditutup
+    self.skipWaiting();
+});
+
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                // Jika file ditemukan di cache, kembalikan dari cache (Cache Hit)
+                if (response) {
+                    return response;
+                }
+                
+                // Clone request karena fetch request adalah stream yang hanya bisa dipakai sekali
+                const fetchRequest = event.request.clone();
+
+                return fetch(fetchRequest).then(
+                    response => {
+                        // Pastikan response valid
+                        if(!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
+
+                        // Clone response untuk disimpan di cache
+                        const responseToCache = response.clone();
+
+                        // Cache file secara dinamis (opsional, dibatasi pada origin yang sama agar tidak menuhin memori dengan file FFmpeg external)
+                        if(event.request.url.startsWith(self.location.origin)) {
+                            caches.open(CACHE_NAME)
+                                .then(cache => {
+                                    cache.put(event.request, responseToCache);
+                                });
+                        }
+
+                        return response;
+                    }
+                ).catch(() => {
+                    // Jika fetch gagal (misal karena offline), dan requestnya adalah HTML, 
+                    // kita bisa mengembalikan fallback page di sini jika ada.
+                    console.log('[Service Worker] Fetch gagal, mungkin Anda sedang offline.');
+                });
             })
     );
 });
@@ -27,26 +66,13 @@ self.addEventListener('activate', event => {
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cacheName => {
+                    // Hapus cache versi lama jika ada pembaruan
                     if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        console.log('[Service Worker] Menghapus cache lama:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
-        })
-    );
-});
-
-self.addEventListener('fetch', event => {
-    // Abaikan requests dengan skema yang tidak didukung, misal chrome-extension://
-    if (!(event.request.url.indexOf('http') === 0)) return; 
-    
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                if (response) {
-                    return response; // Return dari Cache jika ada
-                }
-                return fetch(event.request); // Ambil dari internet jika belum ada di Cache
-            })
+        }).then(() => self.clients.claim()) // Mengambil alih kontrol klien (halaman) segera
     );
 });
