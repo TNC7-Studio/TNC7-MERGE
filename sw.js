@@ -1,51 +1,49 @@
-const CACHE_NAME = 'tnc7-merge-cache-v1';
+const CACHE_NAME = 'tnc7-merge-v1';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap',
-  'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
-  'https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js'
+  // Kita tidak me-cache ffmpeg core karena ukurannya besar dan butuh Cross-Origin-Opener-Policy
+  // yang sering bermasalah jika disajikan dari cache sederhana tanpa header yang tepat.
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
   );
 });
 
 self.addEventListener('fetch', event => {
+  // Hanya intercept request GET
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Cache hit - return response
+        // Return cache if found
         if (response) {
           return response;
         }
-
-        // Clone the request for fetch
-        const fetchRequest = event.request.clone();
-
-        return fetch(fetchRequest).then(
-          response => {
-            // Check if valid response
+        
+        // Fetch from network if not in cache
+        return fetch(event.request).then(
+          function(response) {
+            // Check if we received a valid response
             if(!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
 
-            // Clone the response for cache
-            const responseToCache = response.clone();
+            // Clone the response because it's a stream and can only be consumed once
+            var responseToCache = response.clone();
 
             caches.open(CACHE_NAME)
-              .then(cache => {
-                // Jangan cache range requests (untuk video preview)
-                if (!event.request.headers.has('range')) {
+              .then(function(cache) {
+                // Jangan cache script CDN/external disini secara membabi buta 
+                // untuk menghindari masalah CORS. Khususkan untuk origin yang sama.
+                if (event.request.url.startsWith(self.location.origin)) {
                      cache.put(event.request, responseToCache);
                 }
               });
