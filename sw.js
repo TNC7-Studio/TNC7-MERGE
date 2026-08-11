@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tnc7-merge-cache-v1';
+const CACHE_NAME = 'tnc7-merge-cache-v2';
 
 // File utama yang harus di-cache untuk penggunaan offline (App Shell)
 const urlsToCache = [
