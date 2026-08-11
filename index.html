@@ -118,7 +118,7 @@
     <!-- Main Workspace (Grid Layout 10 Kolom) -->
     <main class="flex-grow max-w-[1800px] w-full mx-auto grid grid-cols-1 lg:grid-cols-10 md:grid-cols-2 gap-4 lg:gap-5 items-stretch overflow-hidden pb-4 px-2 md:px-4">
         
-        <!-- Panel Kiri: Canvas & Kontrol (Mengambil 6 dari 10 kolom = 60%) -->
+        <!-- Panel Kiri: Canvas & Kontrol (Mengambil 6 dari 10 kolom = 60%, Fixed tanpa scroll) -->
         <section class="w-full lg:col-span-6 md:col-span-2 dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-4 overflow-hidden h-full">
             
             <!-- Video Preview Canvas & Drop Zone Combined -->
@@ -259,6 +259,8 @@
         let isFFmpegLoading = false;
         let isFileLoadingPhase = false; 
 
+        const { createFFmpeg, fetchFile } = FFmpeg;
+
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const videoList = document.getElementById('video-list');
@@ -292,12 +294,12 @@
             isFFmpegLoading = true;
             try {
                 let lastProgressTime = 0;
-                const { createFFmpeg } = FFmpeg;
                 ffmpegInstance = createFFmpeg({
                     mainName: 'main',
                     corePath: 'https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js',
                     log: false
                 });
+                
                 ffmpegInstance.setProgress(({ ratio }) => {
                     if (!isFileLoadingPhase) {
                         const now = Date.now();
@@ -309,10 +311,12 @@
                         }
                     }
                 });
+                
                 await ffmpegInstance.load();
                 console.log("FFmpeg engine preloaded & ready.");
             } catch (err) {
                 console.warn("Background FFmpeg preload deferral:", err);
+                ffmpegInstance = null;
             } finally {
                 isFFmpegLoading = false;
             }
@@ -654,6 +658,27 @@
             try {
                 if ('showDirectoryPicker' in window) {
                     dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    
+                    let fileExists = true;
+                    let counter = 1;
+                    let finalOutputName = outputName;
+                    const baseName = outputName.replace(/\.mp4$/i, '');
+                    
+                    while (fileExists) {
+                        try {
+                            // Coba akses file. Jika berhasil berarti file sudah ada.
+                            await dirHandle.getFileHandle(finalOutputName);
+                            // Buat nama baru dengan menambahkan angka (1), (2), dst.
+                            finalOutputName = `${baseName} (${counter}).mp4`;
+                            counter++;
+                        } catch (e) {
+                            // Jika terjadi error (biasanya NotFoundError), berarti nama aman digunakan
+                            fileExists = false;
+                        }
+                    }
+                    // Terapkan nama unik yang sudah terverifikasi
+                    outputName = finalOutputName;
+                    
                     fileHandle = await dirHandle.getFileHandle(outputName, { create: true });
                 } else {
                     useFallback = true;
@@ -674,36 +699,19 @@
             const internalOutputName = `out_${Date.now()}.mp4`;
 
             try {
-                if (!ffmpegInstance) {
-                    let lastProgressTime = 0;
-                    const { createFFmpeg } = FFmpeg;
-                    ffmpegInstance = createFFmpeg({
-                        mainName: 'main',
-                        corePath: 'https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js',
-                        log: false
-                    });
-                    ffmpegInstance.setProgress(({ ratio }) => {
-                        if (!isFileLoadingPhase) {
-                            const now = Date.now();
-                            if (now - lastProgressTime > 100) {
-                                const rawPct = Math.min(Math.max(ratio * 100, 0), 100);
-                                const pct = parseFloat(rawPct.toFixed(1)); 
-                                updateProgress(pct, `Menggabungkan File...`);
-                                lastProgressTime = now;
-                            }
-                        }
-                    });
+                if (!ffmpegInstance || !ffmpegInstance.isLoaded()) {
+                    updateProgress(5, "Memuat Modul Utama...");
+                    await initFFmpegInBackground();
                 }
 
-                if (!ffmpegInstance.isLoaded()) {
-                    updateProgress(5, "Memuat Modul Utama...");
-                    await ffmpegInstance.load();
+                if (!ffmpegInstance || !ffmpegInstance.isLoaded()) {
+                    throw new Error("FFmpeg engine failed to load.");
                 }
 
                 const fileNames = [];
                 let readCount = 0;
                 
-                updateProgress(10, "Membaca file ke RAM...");
+                updateProgress(10, "Membaca file (Optimasi RAM)...");
                 
                 const startLoadPct = 10;
                 const endLoadPct = 95;
@@ -712,11 +720,12 @@
                 for (let i = 0; i < validVideos.length; i++) {
                     const vid = validVideos[i];
                     const ext = vid.file.name.split('.').pop() || 'mp4';
-                    const fname = `file_${i}.${ext}`;
+                    // Use unique names to prevent demuxer conflicts if things go wrong
+                    const fname = `file_${Date.now()}_${i}.${ext}`;
                     fileNames[i] = fname;
                     
-                    const arrayBuffer = await vid.file.arrayBuffer();
-                    ffmpegInstance.FS('writeFile', fname, new Uint8Array(arrayBuffer));
+                    // FetchFile is optimal for potato PC memory management
+                    ffmpegInstance.FS('writeFile', fname, await fetchFile(vid.file));
                     
                     readCount++;
                     const rawReadPct = startLoadPct + ((readCount / validVideos.length) * loadPctRange);
@@ -727,34 +736,33 @@
 
                 isFileLoadingPhase = false; 
 
+                const concatFileName = `concat_${Date.now()}.txt`;
                 const concatList = fileNames.map(f => `file '${f}'`).join('\n');
-                ffmpegInstance.FS('writeFile', 'concat.txt', concatList);
+                ffmpegInstance.FS('writeFile', concatFileName, concatList);
 
-                const cpuCores = String(navigator.hardwareConcurrency || 4);
+                // CPU Throttling: Leave 1 core for browser responsiveness (Potato PC optimization)
+                const cpuCores = String(Math.max(1, (navigator.hardwareConcurrency || 4) - 1));
 
                 if (mode === 'fast') {
                     updateProgress(95, "Memulai Proses Merge...");
                     try {
-                        await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c', 'copy', '-map', '0:v?', '-map', '0:a?', '-map_metadata', '0', '-fflags', '+genpts+fastseek', '-avoid_negative_ts', 'make_zero', internalOutputName);
+                        await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', concatFileName, '-c', 'copy', '-map', '0:v?', '-map', '0:a?', '-map_metadata', '0', '-fflags', '+genpts+fastseek', '-avoid_negative_ts', 'make_zero', internalOutputName);
                         const stat = ffmpegInstance.FS('stat', internalOutputName);
                         if (!stat || stat.size === 0) throw new Error("Kosong");
                     } catch (e) {
+                        console.warn("Fast merge failed, falling back to re-encoding:", e);
                         updateProgress(50, "Penyesuaian Format Video...");
-                        await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency', '-crf', '30', '-threads', cpuCores, internalOutputName);
+                        await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', concatFileName, '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency', '-crf', '28', '-threads', cpuCores, internalOutputName);
                     }
                 } else {
                     updateProgress(40, "Re-encoding Video...");
-                    await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency', '-crf', '30', '-threads', cpuCores, internalOutputName);
+                    await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', concatFileName, '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency', '-crf', '28', '-threads', cpuCores, internalOutputName);
                 }
 
                 isFileLoadingPhase = true;
                 updateProgress(98, "Menyimpan ke perangkat...");
                 
                 const data = ffmpegInstance.FS('readFile', internalOutputName);
-
-                fileNames.forEach(f => { try { ffmpegInstance.FS('unlink', f); } catch(e){} });
-                try { ffmpegInstance.FS('unlink', 'concat.txt'); } catch(e){}
-                try { ffmpegInstance.FS('unlink', internalOutputName); } catch(e){}
 
                 const blob = new Blob([data.buffer], { type: 'video/mp4' });
                 const blobUrl = URL.createObjectURL(blob);
@@ -771,7 +779,7 @@
                         await writable.close();
                         
                         const folderName = dirHandle && dirHandle.name ? dirHandle.name : "pilihan Anda";
-                        showModal("Berhasil!", `Video berhasil disimpan langsung ke dalam folder "${folderName}" dengan nama "${outputName}".`);
+                        showModal("Berhasil!", `Video berhasil disimpan ke folder "${folderName}" dengan nama "${outputName}".`);
                     } else {
                         const a = document.createElement('a');
                         a.style.display = 'none';
@@ -798,17 +806,20 @@
                 mergeBtn.disabled = videos.filter(v => v.isValid !== false).length < 2;
                 statusOverlay.classList.add('hidden');
 
+                // Render ke-2 Fix: Kill the instance entirely to wipe memory clean,
+                // then boot a new one immediately in the background for turbo readiness.
                 if (ffmpegInstance) {
                     try {
-                        ffmpegInstance.exit();
+                        ffmpegInstance.exit(); 
                     } catch (e) {
-                        console.warn("Pembersihan memori sisa:", e);
+                        console.warn("Wiping instance memory:", e);
                     }
                     ffmpegInstance = null;
                     
+                    // Boot background instance for the next use.
                     setTimeout(() => {
                         initFFmpegInBackground();
-                    }, 1000);
+                    }, 500); 
                 }
             }
         }
