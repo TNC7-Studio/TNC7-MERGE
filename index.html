@@ -152,6 +152,15 @@
                 <button id="clear-all-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Hapus Semua" disabled>
                     <i class="fas fa-trash"></i>
                 </button>
+                
+                <!-- Tombol Undo & Redo -->
+                <button id="undo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Undo Urutan (Ctrl+Z)" disabled>
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button id="redo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Redo Urutan (Ctrl+Y)" disabled>
+                    <i class="fas fa-redo"></i>
+                </button>
+
                 <!-- Tombol Merge Hijau -->
                 <button id="merge-btn" class="btn-green text-white font-bold py-2 px-4 rounded-lg flex-1 flex flex-col items-center justify-center gap-0.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none transition" disabled>
                     <div class="flex items-center gap-1.5 text-emerald-100 text-[11px]">
@@ -207,7 +216,6 @@
         <div class="w-full max-w-xs bg-slate-800 rounded-full h-1.5 overflow-hidden mb-2">
             <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%"></div>
         </div>
-        <!-- Menampilkan persentase bulat -->
         <span id="progress-percent" class="text-xs font-bold text-emerald-400">0%</span>
     </div>
 
@@ -246,6 +254,10 @@
         let ffmpegInitPromise = null; 
         let pastFirstVideoIds = new Set(); 
 
+        // State variables untuk Undo / Redo
+        let history = [];
+        let historyIndex = -1;
+
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const videoList = document.getElementById('video-list');
@@ -254,6 +266,8 @@
         const previewAllBtn = document.getElementById('preview-all-btn');
         const shuffleBtn = document.getElementById('shuffle-btn');
         const clearAllBtn = document.getElementById('clear-all-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
         const mergeBtn = document.getElementById('merge-btn');
         const statusBadge = document.getElementById('status-badge');
         const customOutputNameInput = document.getElementById('custom-output-name');
@@ -268,7 +282,63 @@
         const progressPercent = document.getElementById('progress-percent');
 
         window.addEventListener('DOMContentLoaded', () => {
+            saveState(); // Simpan state awal kosong (empty array)
             initFFmpegInBackground();
+        });
+
+        function saveState() {
+            // Hapus jalur maju (redo path) jika membuat perubahan baru setelah undo
+            if (historyIndex < history.length - 1) {
+                history = history.slice(0, historyIndex + 1);
+            }
+            // Buat copy referensi array (bukan deep copy filenya)
+            const currentState = videos.map(v => ({...v}));
+            history.push(currentState);
+            historyIndex++;
+            
+            // Batasi panjang history (maks 20) untuk hemat memori
+            if (history.length > 20) {
+                history.shift();
+                historyIndex--;
+            }
+            updateUndoRedoButtons();
+        }
+
+        function updateUndoRedoButtons() {
+            // Jika index 0 (state awal), undo disable
+            undoBtn.disabled = historyIndex <= 0;
+            // Jika index sudah di ujung, redo disable
+            redoBtn.disabled = historyIndex >= history.length - 1;
+        }
+
+        undoBtn.addEventListener('click', () => {
+            if (historyIndex > 0) {
+                historyIndex--;
+                videos = history[historyIndex].map(v => ({...v}));
+                updateUI();
+                updateUndoRedoButtons();
+            }
+        });
+
+        redoBtn.addEventListener('click', () => {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                videos = history[historyIndex].map(v => ({...v}));
+                updateUI();
+                updateUndoRedoButtons();
+            }
+        });
+
+        // Shortcut Keyboard Undo (Ctrl+Z) dan Redo (Ctrl+Y)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'z') {
+                e.preventDefault();
+                if (!undoBtn.disabled) undoBtn.click();
+            }
+            if (e.ctrlKey && e.key === 'y') {
+                e.preventDefault();
+                if (!redoBtn.disabled) redoBtn.click();
+            }
         });
 
         async function initFFmpegInBackground() {
@@ -289,13 +359,12 @@
                         log: false
                     });
                     
-                    // Update Persentase Normal/Bulat
                     ffmpegInstance.setProgress(({ ratio }) => {
                         if (!isFileLoadingPhase) {
                             const now = Date.now();
                             if (now - lastProgressTime > 100) {
                                 const rawPct = Math.min(Math.max(ratio * 100, 0), 100);
-                                const pct = Math.round(rawPct); // Dibulatkan agar rapi
+                                const pct = Math.round(rawPct); 
                                 updateProgress(pct, `Menggabungkan File (Turbo Mode)...`);
                                 lastProgressTime = now;
                             }
@@ -350,6 +419,7 @@
             }));
 
             videos.push(...newVideos);
+            saveState(); // Update history dengan penambahan file baru
             updateUI();
             fileInput.value = '';
         }
@@ -477,6 +547,7 @@
                 }
                 URL.revokeObjectURL(videos[idx].url);
                 videos.splice(idx, 1);
+                saveState(); // Rekam event hapus ke Undo list
                 updateUI();
             }
         }
@@ -490,6 +561,7 @@
             videos = [];
             pastFirstVideoIds.clear();
             customOutputNameInput.value = '';
+            saveState(); // Rekam event clear semua ke Undo list
             updateUI();
         });
 
@@ -539,6 +611,7 @@
                     }
                 }
                 
+                saveState(); // Rekam event acak ke Undo list
                 updateUI();
                 
                 const listItems = document.querySelectorAll('.video-item');
@@ -547,7 +620,6 @@
                     setTimeout(() => item.classList.remove('just-moved'), 800);
                 });
 
-                // Menampilkan pemberitahuan modal jika siklus selesai
                 if (siklusSelesai) {
                     showModal("Info Pengacakan", "Semua video sudah pernah berada di urutan pertama. Riwayat posisi telah di-reset untuk siklus acak berikutnya.");
                 }
@@ -569,6 +641,7 @@
                 if (draggedIndex === null || draggedIndex === index) return;
                 const moved = videos.splice(draggedIndex, 1)[0];
                 videos.splice(index, 0, moved);
+                saveState(); // Rekam event pindah urutan ke Undo list
                 updateUI();
             });
         }
@@ -631,6 +704,10 @@
                     readCount++;
                     const currentProgress = Math.round(10 + ((readCount / validVideos.length) * 85));
                     updateProgress(Math.min(currentProgress, 95), `Memuat video ${readCount}/${validVideos.length}`);
+                    
+                    // ANTI-CRASH / OOM FIX: Memberi jeda (yield) pada Garbage Collection browser
+                    // Mencegah RAM menumpuk dan freeze saat merender 15 video sekaligus
+                    await new Promise(resolve => setTimeout(resolve, 50)); 
                 }
 
                 isFileLoadingPhase = false; 
@@ -640,7 +717,7 @@
 
                 updateProgress(95, "Memulai Proses Turbo Merge...");
                 
-                // Optimasi Perintah FFmpeg Tanpa Merubah Fitur (Super Cepat)
+                // Optimasi Perintah FFmpeg Tanpa Merubah Fitur (Tetap Super Cepat)
                 await ffmpegInstance.run(
                     '-f', 'concat', 
                     '-safe', '0', 
