@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TNC7 MERGE - Nikmati Prosesnya</title>
+    <title>TNC7 MARGE - Nikmati Prosesnya</title>
     
     <!-- PWA Manifest & Theme -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffb000"> 
-    <link rel="apple-touch-icon" href="https://placehold.co/192x192/e52e2e/ffffff.png?text=TNC7">
+    <meta name="theme-color" content="#10b981"> <!-- Warna tema menyesuaikan garis hijau -->
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/10b981/ffffff.png?text=TNC7">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -36,8 +36,8 @@
         }
 
         .drop-area.drag-active {
-            border-color: #ef4444 !important;
-            background-color: rgba(239, 68, 68, 0.05) !important;
+            border-color: #10b981 !important; /* Hijau saat drag file */
+            background-color: rgba(16, 185, 129, 0.05) !important;
         }
 
         .btn-red {
@@ -93,21 +93,21 @@
             border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #e52e2e; 
+            background: #10b981; 
         }
     </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col justify-between p-2 md:p-4 relative mt-1.5 md:mt-2">
 
-    <!-- List Kuning (Top Bar Accent) -->
-    <div class="fixed top-0 left-0 w-full h-1.5 md:h-2 bg-[#ffb000] z-50 shadow-[0_2px_15px_rgba(255,176,0,0.3)]"></div>
+    <!-- Garis Hijau di Atas (Permintaan User) -->
+    <div class="fixed top-0 left-0 w-full h-1.5 md:h-2 bg-emerald-500 z-50 shadow-[0_2px_15px_rgba(16,185,129,0.5)]"></div>
 
     <!-- Header / Brand Logo -->
     <header class="text-center py-3 flex-shrink-0">
         <div class="inline-flex flex-col items-center">
             <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-1">
-                <span class="text-red-600">TNC7</span>
-                <span class="text-white">MERGE</span>
+                <span class="text-emerald-500">TNC7</span>
+                <span class="text-white">MARGE</span>
             </h1>
             <p class="text-[9px] md:text-[10px] font-semibold text-slate-400 tracking-[0.3em] uppercase mt-0.5">
                 NIKMATI PROSESNYA
@@ -118,7 +118,7 @@
     <!-- Main Workspace (Grid Layout 10 Kolom) -->
     <main class="flex-grow max-w-[1800px] w-full mx-auto grid grid-cols-1 lg:grid-cols-10 md:grid-cols-2 gap-4 lg:gap-5 items-stretch overflow-hidden pb-4 px-2 md:px-4">
         
-        <!-- Panel Kiri: Canvas & Kontrol (Mengambil 6 dari 10 kolom = 60%, Fixed tanpa scroll) -->
+        <!-- Panel Kiri: Canvas & Kontrol (Mengambil 6 dari 10 kolom = 60%) -->
         <section class="w-full lg:col-span-6 md:col-span-2 dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-4 overflow-hidden h-full">
             
             <!-- Video Preview Canvas & Drop Zone Combined -->
@@ -127,8 +127,8 @@
                     
                     <!-- Placeholder & Drop Instructions -->
                     <div id="preview-placeholder" class="flex flex-col items-center justify-center text-slate-500 transition-colors pointer-events-none group-hover:scale-105 duration-300">
-                        <div class="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3 shadow-sm">
-                            <i class="fas fa-cloud-upload-alt text-lg text-slate-300"></i>
+                        <div class="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3 shadow-sm group-hover:text-emerald-500 transition-colors">
+                            <i class="fas fa-cloud-upload-alt text-lg"></i>
                         </div>
                         <p class="text-sm font-bold text-slate-200 mb-1">Klik atau Drag File Video</p>
                         <p class="text-[10px] text-slate-500 tracking-wider mb-4">MENDUKUNG MP4, WEBM, MOV</p>
@@ -152,7 +152,7 @@
             </div>
 
             <!-- Custom Output Name Input -->
-            <div class="bg-[#14161d] border border-slate-800/80 rounded-lg flex items-center px-3 py-2.5 transition-colors focus-within:border-red-500/50 flex-shrink-0">
+            <div class="bg-[#14161d] border border-slate-800/80 rounded-lg flex items-center px-3 py-2.5 transition-colors focus-within:border-emerald-500/50 flex-shrink-0">
                 <i class="fas fa-pen text-slate-500 text-[10px] mr-2"></i>
                 <input type="text" id="custom-output-name" placeholder="Judul manual (kosongkan u/ otomatis)..." class="w-full bg-transparent border-none outline-none text-xs text-slate-300 placeholder-slate-600">
                 <span class="text-[10px] text-slate-500 font-medium bg-slate-800 px-1.5 py-0.5 rounded ml-2">.mp4</span>
@@ -170,8 +170,8 @@
                     <i class="fas fa-trash"></i>
                 </button>
                 <button id="merge-btn" class="btn-red text-white font-bold py-2 px-4 rounded-lg flex-1 flex flex-col items-center justify-center gap-0.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none transition" disabled>
-                    <div class="flex items-center gap-1.5 text-yellow-300 text-[11px]">
-                        <i class="fas fa-bolt"></i> Mulai
+                    <div class="flex items-center gap-1.5 text-emerald-300 text-[11px]">
+                        <i class="fas fa-bolt"></i> Mode Turbo Aktif
                     </div>
                     <span class="text-[13px] leading-tight">Merge & Unduh</span>
                 </button>
@@ -207,49 +207,50 @@
                     <i class="fas fa-copy"></i> Copy List
                 </button>
             </div>
-            <textarea id="titles-text-area" readonly class="w-full flex-grow bg-[#0d0e12] border border-slate-700/60 rounded-xl p-3 text-[11px] text-slate-300 custom-scrollbar resize-none outline-none focus:border-slate-500 transition-colors leading-relaxed" placeholder="Daftar judul video akan otomatis muncul di sini..."></textarea>
+            <textarea id="titles-text-area" readonly class="w-full flex-grow bg-[#0d0e12] border border-slate-700/60 rounded-xl p-3 text-[11px] text-slate-300 custom-scrollbar resize-none outline-none focus:border-emerald-500 transition-colors leading-relaxed" placeholder="Daftar judul video akan otomatis muncul di sini..."></textarea>
         </section>
     </main>
 
     <!-- Overlay Processing Modal -->
     <div id="status-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center p-6 text-center">
         <div class="relative w-14 h-14 mb-4 flex items-center justify-center">
-            <div class="absolute inset-0 rounded-full border-4 border-slate-800 border-t-red-600 animate-spin"></div>
-            <i class="fas fa-layer-group text-red-500 text-base"></i>
+            <div class="absolute inset-0 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin"></div>
+            <i class="fas fa-layer-group text-emerald-400 text-base"></i>
         </div>
         <h3 id="status-text" class="text-base font-bold text-white mb-1">Memproses...</h3>
-        <p id="status-subtext" class="text-[11px] text-slate-400 mb-5">Proses berjalan lokal di perangkat Anda</p>
+        <p id="status-subtext" class="text-[11px] text-slate-400 mb-5">Proses berjalan lokal dengan Super Turbo Mode</p>
         
         <div class="w-full max-w-xs bg-slate-800 rounded-full h-1.5 overflow-hidden mb-2">
-            <div id="progress-bar" class="bg-red-600 h-full transition-all duration-300" style="width: 0%"></div>
+            <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%"></div>
         </div>
-        <span id="progress-percent" class="text-xs font-bold text-red-400">0%</span>
+        <span id="progress-percent" class="text-xs font-bold text-emerald-400">0%</span>
     </div>
 
     <!-- Message Modal -->
     <div id="message-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
         <div class="dark-card rounded-2xl p-5 max-w-[280px] w-full text-center border border-slate-800">
             <div id="modal-icon" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-check text-emerald-400 text-lg"></i>
+                <i class="fas fa-info-circle text-emerald-400 text-lg"></i>
             </div>
             <h4 id="modal-title" class="font-bold text-white mb-1 text-sm">Info</h4>
             <p id="modal-desc" class="text-[11px] text-slate-400 mb-5"></p>
-            <button id="modal-close-btn" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-lg text-xs transition">
+            <button id="modal-close-btn" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-lg text-xs transition border border-slate-700">
                 Tutup
             </button>
         </div>
     </div>
 
     <footer class="text-center py-2 text-[10px] text-slate-600 flex-shrink-0">
-        Laporkan konten tidak aman
+        Engine: Turbo FFmpeg WASM | TNC7 MARGE &copy; 2026
     </footer>
 
     <script>
+        // Mendaftarkan Service Worker untuk PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('ServiceWorker registered:', reg.scope))
-                    .catch(err => console.log('ServiceWorker registration failed:', err));
+                    .then(reg => console.log('ServiceWorker siap untuk akses offline/cepat!'))
+                    .catch(err => console.log('ServiceWorker gagal:', err));
             });
         }
 
@@ -259,8 +260,7 @@
         let isFFmpegLoading = false;
         let isFileLoadingPhase = false; 
 
-        const { createFFmpeg, fetchFile } = FFmpeg;
-
+        // Elemen UI
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const videoList = document.getElementById('video-list');
@@ -272,14 +272,11 @@
         const mergeBtn = document.getElementById('merge-btn');
         const statusBadge = document.getElementById('status-badge');
         const customOutputNameInput = document.getElementById('custom-output-name');
-
         const videoPlayer = document.getElementById('video-player');
         const previewTitle = document.getElementById('preview-title');
         const previewPlaceholder = document.getElementById('preview-placeholder');
-
         const titlesTextArea = document.getElementById('titles-text-area');
         const copyTitlesBtn = document.getElementById('copy-titles-btn');
-
         const statusOverlay = document.getElementById('status-overlay');
         const statusText = document.getElementById('status-text');
         const progressBar = document.getElementById('progress-bar');
@@ -294,38 +291,36 @@
             isFFmpegLoading = true;
             try {
                 let lastProgressTime = 0;
+                const { createFFmpeg } = FFmpeg;
                 ffmpegInstance = createFFmpeg({
                     mainName: 'main',
                     corePath: 'https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js',
                     log: false
                 });
-                
                 ffmpegInstance.setProgress(({ ratio }) => {
                     if (!isFileLoadingPhase) {
                         const now = Date.now();
                         if (now - lastProgressTime > 100) {
                             const rawPct = Math.min(Math.max(ratio * 100, 0), 100);
                             const pct = parseFloat(rawPct.toFixed(1)); 
-                            updateProgress(pct, `Menggabungkan File...`);
+                            updateProgress(pct, `Menggabungkan File (Turbo Mode)...`);
                             lastProgressTime = now;
                         }
                     }
                 });
-                
                 await ffmpegInstance.load();
-                console.log("FFmpeg engine preloaded & ready.");
+                console.log("FFmpeg Turbo Engine siap!");
             } catch (err) {
-                console.warn("Background FFmpeg preload deferral:", err);
+                console.warn("Gagal memuat FFmpeg di awal:", err);
                 ffmpegInstance = null;
             } finally {
                 isFFmpegLoading = false;
             }
         }
 
+        // Event listener Drag & Drop
         dropZone.addEventListener('click', (e) => {
-            if (e.target !== videoPlayer) {
-                fileInput.click();
-            }
+            if (e.target !== videoPlayer) fileInput.click();
         });
 
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
@@ -354,14 +349,9 @@
                 try {
                     return await extractVideoMetadata(file);
                 } catch (err) {
-                    console.error("Gagal memuat video:", file.name, err);
                     return {
                         id: 'vid_' + Math.random().toString(36).substr(2, 9),
-                        file: file,
-                        url: '',
-                        name: file.name,
-                        duration: 0,
-                        isValid: false
+                        file: file, url: '', name: file.name, duration: 0, isValid: false
                     };
                 }
             }));
@@ -381,11 +371,7 @@
                 tempVideo.onloadedmetadata = () => {
                     resolve({
                         id: 'vid_' + Math.random().toString(36).substr(2, 9),
-                        file: file,
-                        url: videoURL,
-                        name: file.name,
-                        duration: tempVideo.duration || 0,
-                        isValid: true
+                        file: file, url: videoURL, name: file.name, duration: tempVideo.duration || 0, isValid: true
                     });
                 };
                 tempVideo.onerror = () => reject("Error loading file");
@@ -459,8 +445,7 @@
         function updateTitlesTextArea() {
             if (!titlesTextArea) return;
             if (videos.length === 0) {
-                titlesTextArea.value = '';
-                return;
+                titlesTextArea.value = ''; return;
             }
             titlesTextArea.value = videos.map((v, i) => {
                 const cleanName = v.name.replace(/\.[^/.]+$/, "");
@@ -485,9 +470,7 @@
                 videoPlayer.play();
                 previewTitle.textContent = "Preview: " + vid.name;
                 
-                if (window.innerWidth < 768) {
-                    document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
-                }
+                if (window.innerWidth < 768) document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
             }
         }
 
@@ -509,13 +492,10 @@
         }
 
         clearAllBtn.addEventListener('click', () => {
-            videoPlayer.pause();
-            videoPlayer.removeAttribute('src');
-            videoPlayer.load();
+            videoPlayer.pause(); videoPlayer.removeAttribute('src'); videoPlayer.load();
             videoPlayer.classList.add('hidden');
             previewTitle.textContent = "Judul Video Preview";
             previewPlaceholder.classList.remove('hidden');
-
             videos.forEach(v => URL.revokeObjectURL(v.url));
             videos = [];
             customOutputNameInput.value = '';
@@ -526,11 +506,9 @@
             if (titlesTextArea && titlesTextArea.value) {
                 titlesTextArea.select();
                 document.execCommand('copy');
-                
                 const originalHtml = copyTitlesBtn.innerHTML;
                 copyTitlesBtn.innerHTML = '<i class="fas fa-check text-emerald-400"></i> Copied!';
                 copyTitlesBtn.classList.add('border-emerald-500/50', 'text-emerald-400');
-                
                 setTimeout(() => {
                     copyTitlesBtn.innerHTML = originalHtml;
                     copyTitlesBtn.classList.remove('border-emerald-500/50', 'text-emerald-400');
@@ -538,44 +516,26 @@
             }
         });
 
-        previewAllBtn.addEventListener('click', () => {
-            const validVideos = videos.filter(v => v.isValid !== false);
-            if (validVideos.length === 0) return;
-            
-            let currentIndex = 0;
-            
-            function playNext() {
-                if (currentIndex >= validVideos.length) {
-                    previewTitle.textContent = "Preview Selesai";
-                    return;
-                }
-                const vid = validVideos[currentIndex];
-                previewPlaceholder.classList.add('hidden');
-                videoPlayer.classList.remove('hidden');
-                videoPlayer.src = vid.url;
-                videoPlayer.play();
-                previewTitle.textContent = `Preview (${currentIndex + 1}/${validVideos.length}): ${vid.name}`;
-                
-                if (window.innerWidth < 768) {
-                    document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
-                }
-                
-                videoPlayer.onended = () => {
-                    currentIndex++;
-                    playNext();
-                };
-            }
-            playNext();
-        });
-
+        // Fitur Pengacakan yang Disempurnakan (Anti nomor 1 tetap nomor 1)
         shuffleBtn.addEventListener('click', () => {
             if (videos.length > 1) {
+                const oldFirstVideoId = videos[0].id;
+                
+                // Fisher-Yates Shuffle
                 for (let i = videos.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [videos[i], videos[j]] = [videos[j], videos[i]];
                 }
+
+                // Cek dan Pastikan video yang tadinya nomor 1 tidak jadi nomor 1 lagi
+                if (videos[0].id === oldFirstVideoId) {
+                    const randomIndex = Math.floor(Math.random() * (videos.length - 1)) + 1;
+                    [videos[0], videos[randomIndex]] = [videos[randomIndex], videos[0]];
+                }
+                
                 updateUI();
                 
+                // Efek visual setelah acak
                 const listItems = document.querySelectorAll('.video-item');
                 listItems.forEach(item => {
                     item.classList.add('just-moved');
@@ -586,23 +546,13 @@
 
         let draggedIndex = null;
         function setupReordering(item, index) {
-            item.addEventListener('dragstart', () => { 
-                draggedIndex = index; 
-                item.classList.add('is-dragging'); 
-            });
-            item.addEventListener('dragend', () => { 
-                draggedIndex = null; 
-                item.classList.remove('is-dragging'); 
-            });
+            item.addEventListener('dragstart', () => { draggedIndex = index; item.classList.add('is-dragging'); });
+            item.addEventListener('dragend', () => { draggedIndex = null; item.classList.remove('is-dragging'); });
             item.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                if (draggedIndex !== null && draggedIndex !== index) {
-                    item.classList.add('is-hovered-target');
-                }
+                if (draggedIndex !== null && draggedIndex !== index) item.classList.add('is-hovered-target');
             });
-            item.addEventListener('dragleave', () => {
-                item.classList.remove('is-hovered-target');
-            });
+            item.addEventListener('dragleave', () => item.classList.remove('is-hovered-target'));
             item.addEventListener('drop', (e) => {
                 e.preventDefault();
                 item.classList.remove('is-hovered-target');
@@ -610,33 +560,16 @@
                 const moved = videos.splice(draggedIndex, 1)[0];
                 videos.splice(index, 0, moved);
                 updateUI();
-                
-                const listItems = document.querySelectorAll('.video-item');
-                if (listItems[index]) {
-                    listItems[index].classList.add('just-moved');
-                    setTimeout(() => {
-                        if (listItems[index]) listItems[index].classList.remove('just-moved');
-                    }, 1200);
-                }
             });
         }
 
         mergeBtn.addEventListener('click', startMergeProcess);
 
         async function startMergeProcess() {
-            if (videoPlayer) {
-                videoPlayer.pause();
-                videoPlayer.onended = null;
-            }
-
+            if (videoPlayer) { videoPlayer.pause(); videoPlayer.onended = null; }
             const validVideos = videos.filter(v => v.isValid !== false);
             
-            if (validVideos.length < 2 || isProcessing) {
-                if (validVideos.length < 2 && videos.length >= 2) {
-                    showModal('Info', 'Minimal butuh 2 video valid (tanda centang hijau) untuk diproses. Silakan hapus file bermasalah (merah).');
-                }
-                return;
-            }
+            if (validVideos.length < 2 || isProcessing) return;
 
             let outputName = `TNC7_MERGE_${Date.now()}.mp4`;
             if (validVideos.length > 0) {
@@ -644,12 +577,8 @@
                 const nameWithoutExt = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
                 outputName = `${nameWithoutExt}.mp4`;
             }
-            
             const customName = customOutputNameInput.value.trim();
-            if (customName) {
-                const cleanName = customName.replace(/\.mp4$/i, '');
-                outputName = `${cleanName}.mp4`;
-            }
+            if (customName) outputName = `${customName.replace(/\.mp4$/i, '')}.mp4`;
 
             let fileHandle = null;
             let dirHandle = null;
@@ -658,34 +587,10 @@
             try {
                 if ('showDirectoryPicker' in window) {
                     dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-                    
-                    let fileExists = true;
-                    let counter = 1;
-                    let finalOutputName = outputName;
-                    const baseName = outputName.replace(/\.mp4$/i, '');
-                    
-                    while (fileExists) {
-                        try {
-                            // Coba akses file. Jika berhasil berarti file sudah ada.
-                            await dirHandle.getFileHandle(finalOutputName);
-                            // Buat nama baru dengan menambahkan angka (1), (2), dst.
-                            finalOutputName = `${baseName} (${counter}).mp4`;
-                            counter++;
-                        } catch (e) {
-                            // Jika terjadi error (biasanya NotFoundError), berarti nama aman digunakan
-                            fileExists = false;
-                        }
-                    }
-                    // Terapkan nama unik yang sudah terverifikasi
-                    outputName = finalOutputName;
-                    
                     fileHandle = await dirHandle.getFileHandle(outputName, { create: true });
-                } else {
-                    useFallback = true;
-                }
+                } else { useFallback = true; }
             } catch (err) {
                 if (err.name === 'AbortError') return; 
-                console.warn("API Directory Picker gagal:", err);
                 useFallback = true;
             }
 
@@ -693,76 +598,53 @@
             isFileLoadingPhase = true; 
             mergeBtn.disabled = true;
             statusOverlay.classList.remove('hidden');
-            updateProgress(0, "Mempersiapkan Engine...");
+            updateProgress(0, "Mempersiapkan Turbo Engine...");
 
-            const mode = document.querySelector('input[name="merge-mode"]:checked').value;
             const internalOutputName = `out_${Date.now()}.mp4`;
 
             try {
-                if (!ffmpegInstance || !ffmpegInstance.isLoaded()) {
+                if (!ffmpegInstance) await initFFmpegInBackground();
+                if (!ffmpegInstance.isLoaded()) {
                     updateProgress(5, "Memuat Modul Utama...");
-                    await initFFmpegInBackground();
-                }
-
-                if (!ffmpegInstance || !ffmpegInstance.isLoaded()) {
-                    throw new Error("FFmpeg engine failed to load.");
+                    await ffmpegInstance.load();
                 }
 
                 const fileNames = [];
                 let readCount = 0;
-                
-                updateProgress(10, "Membaca file (Optimasi RAM)...");
-                
-                const startLoadPct = 10;
-                const endLoadPct = 95;
-                const loadPctRange = endLoadPct - startLoadPct;
+                updateProgress(10, "Membaca file ke RAM...");
 
                 for (let i = 0; i < validVideos.length; i++) {
                     const vid = validVideos[i];
                     const ext = vid.file.name.split('.').pop() || 'mp4';
-                    // Use unique names to prevent demuxer conflicts if things go wrong
-                    const fname = `file_${Date.now()}_${i}.${ext}`;
+                    const fname = `file_${i}.${ext}`;
                     fileNames[i] = fname;
                     
-                    // FetchFile is optimal for potato PC memory management
-                    ffmpegInstance.FS('writeFile', fname, await fetchFile(vid.file));
+                    const arrayBuffer = await vid.file.arrayBuffer();
+                    ffmpegInstance.FS('writeFile', fname, new Uint8Array(arrayBuffer));
                     
                     readCount++;
-                    const rawReadPct = startLoadPct + ((readCount / validVideos.length) * loadPctRange);
-                    const readPct = parseFloat(rawReadPct.toFixed(1));
-                    
-                    updateProgress(Math.min(readPct, endLoadPct), `Memuat video ${readCount}/${validVideos.length}`);
+                    updateProgress(Math.min(10 + ((readCount / validVideos.length) * 85), 95), `Memuat video ${readCount}/${validVideos.length}`);
                 }
 
                 isFileLoadingPhase = false; 
 
-                const concatFileName = `concat_${Date.now()}.txt`;
                 const concatList = fileNames.map(f => `file '${f}'`).join('\n');
-                ffmpegInstance.FS('writeFile', concatFileName, concatList);
+                ffmpegInstance.FS('writeFile', 'concat.txt', concatList);
 
-                // CPU Throttling: Leave 1 core for browser responsiveness (Potato PC optimization)
-                const cpuCores = String(Math.max(1, (navigator.hardwareConcurrency || 4) - 1));
-
-                if (mode === 'fast') {
-                    updateProgress(95, "Memulai Proses Merge...");
-                    try {
-                        await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', concatFileName, '-c', 'copy', '-map', '0:v?', '-map', '0:a?', '-map_metadata', '0', '-fflags', '+genpts+fastseek', '-avoid_negative_ts', 'make_zero', internalOutputName);
-                        const stat = ffmpegInstance.FS('stat', internalOutputName);
-                        if (!stat || stat.size === 0) throw new Error("Kosong");
-                    } catch (e) {
-                        console.warn("Fast merge failed, falling back to re-encoding:", e);
-                        updateProgress(50, "Penyesuaian Format Video...");
-                        await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', concatFileName, '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency', '-crf', '28', '-threads', cpuCores, internalOutputName);
-                    }
-                } else {
-                    updateProgress(40, "Re-encoding Video...");
-                    await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', concatFileName, '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency', '-crf', '28', '-threads', cpuCores, internalOutputName);
-                }
+                updateProgress(95, "Memulai Proses Turbo Merge...");
+                
+                // Mode Fast Copy
+                await ffmpegInstance.run('-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c', 'copy', '-map', '0:v?', '-map', '0:a?', '-map_metadata', '0', '-fflags', '+genpts+fastseek', '-avoid_negative_ts', 'make_zero', internalOutputName);
 
                 isFileLoadingPhase = true;
-                updateProgress(98, "Menyimpan ke perangkat...");
+                updateProgress(98, "Menyimpan file output...");
                 
                 const data = ffmpegInstance.FS('readFile', internalOutputName);
+
+                // PENANGANAN MEMORY LEAK: Hapus semua file sampah agar bisa di-run ratusan kali
+                fileNames.forEach(f => { try { ffmpegInstance.FS('unlink', f); } catch(e){} });
+                try { ffmpegInstance.FS('unlink', 'concat.txt'); } catch(e){}
+                try { ffmpegInstance.FS('unlink', internalOutputName); } catch(e){}
 
                 const blob = new Blob([data.buffer], { type: 'video/mp4' });
                 const blobUrl = URL.createObjectURL(blob);
@@ -772,55 +654,32 @@
 
                 updateProgress(100, "Selesai!");
                 
-                try {
-                    if (fileHandle && !useFallback) {
-                        const writable = await fileHandle.createWritable();
-                        await writable.write(blob);
-                        await writable.close();
-                        
-                        const folderName = dirHandle && dirHandle.name ? dirHandle.name : "pilihan Anda";
-                        showModal("Berhasil!", `Video berhasil disimpan ke folder "${folderName}" dengan nama "${outputName}".`);
-                    } else {
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = blobUrl;
-                        a.download = outputName;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        
-                        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-                        showModal("Berhasil!", `Video berhasil diunduh sebagai "${outputName}".`);
-                    }
-                } catch (err) {
-                    console.error("Direct write error:", err);
-                    showModal("Info", "Izin menulis file gagal atau koneksi ke folder terputus.", 'error');
+                if (fileHandle && !useFallback) {
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    showModal("Berhasil!", `Video disimpan di "${dirHandle.name || 'Folder Anda'}" sebagai "${outputName}".`);
+                } else {
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = blobUrl;
+                    a.download = outputName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                    showModal("Berhasil!", `Video berhasil diunduh.`);
                 }
 
             } catch (error) {
                 console.error("Error Processing:", error);
-                showModal("Gagal", "Terjadi kesalahan saat menggabungkan video. Format mungkin tidak didukung.");
+                showModal("Gagal", "Terjadi kesalahan saat menggabungkan video. Format mungkin tidak seragam.");
             } finally {
                 isProcessing = false;
                 isFileLoadingPhase = false;
                 mergeBtn.disabled = videos.filter(v => v.isValid !== false).length < 2;
                 statusOverlay.classList.add('hidden');
-
-                // Render ke-2 Fix: Kill the instance entirely to wipe memory clean,
-                // then boot a new one immediately in the background for turbo readiness.
-                if (ffmpegInstance) {
-                    try {
-                        ffmpegInstance.exit(); 
-                    } catch (e) {
-                        console.warn("Wiping instance memory:", e);
-                    }
-                    ffmpegInstance = null;
-                    
-                    // Boot background instance for the next use.
-                    setTimeout(() => {
-                        initFFmpegInBackground();
-                    }, 500); 
-                }
+                // Engine TIDAK di-exit() agar tidak error untuk penggunaan selanjutnya
             }
         }
 
@@ -842,6 +701,20 @@
         }
 
         modalCloseBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+        // Anti-Clone / Nonaktifkan Klik Kanan & Inspect Element
+        document.addEventListener('contextmenu', (event) => {
+            event.preventDefault(); // Mematikan klik kanan
+        });
+
+        document.addEventListener('keydown', (e) => {
+            // Mematikan F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (e.keyCode === 123 || // F12
+               (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || // Ctrl+Shift+I atau J
+               (e.ctrlKey && e.keyCode === 85)) { // Ctrl+U (View Source)
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
