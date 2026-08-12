@@ -1,7 +1,7 @@
 {
-"name": "TNC7 MARGE - Nikmati Prosesnya",
-"short_name": "TNC7 MARGE",
-"description": "Aplikasi turbo penggabung video lokal super cepat, tanpa batas, anti error.",
+"name": "TNC7 MARGE",
+"short_name": "TNC7",
+"description": "Aplikasi turbo merger video berbasis WebAssembly",
 "start_url": "./index.html",
 "display": "standalone",
 "background_color": "#0b0c0e",
@@ -10,8 +10,7 @@
 {
 "src": "https://placehold.co/192x192/10b981/ffffff.png?text=TNC7",
 "sizes": "192x192",
-"type": "image/png",
-"purpose": "any maskable"
+"type": "image/png"
 },
 {
 "src": "https://placehold.co/512x512/10b981/ffffff.png?text=TNC7",
