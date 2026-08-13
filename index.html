@@ -670,6 +670,34 @@
             try {
                 if ('showDirectoryPicker' in window) {
                     dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    
+                    let finalOutputName = outputName;
+                    let fileExists = true;
+                    let counter = 1;
+                    const nameParts = outputName.split('.');
+                    const ext = nameParts.pop();
+                    const baseName = nameParts.join('.');
+
+                    // Loop untuk mengecek apakah file sudah ada, jika ya tambahkan penanda angka
+                    while (fileExists) {
+                        try {
+                            await dirHandle.getFileHandle(finalOutputName);
+                            // Jika berhasil didapatkan, berarti file sudah ada, tambahkan counter
+                            finalOutputName = `${baseName} (${counter}).${ext}`;
+                            counter++;
+                        } catch (error) {
+                            if (error.name === 'NotFoundError') {
+                                // Jika file tidak ditemukan, berarti nama ini aman digunakan
+                                fileExists = false;
+                            } else {
+                                // Error lain terjadi, hentikan loop untuk mencegah infinite loop
+                                console.error("Error saat mengecek ketersediaan file:", error);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    outputName = finalOutputName;
                     fileHandle = await dirHandle.getFileHandle(outputName, { create: true });
                 } else { useFallback = true; }
             } catch (err) {
