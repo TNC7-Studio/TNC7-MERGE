@@ -113,19 +113,29 @@
         </div>
     </header>
 
-    <main class="flex-grow max-w-[1800px] w-full mx-auto grid grid-cols-1 lg:grid-cols-10 md:grid-cols-2 gap-4 lg:gap-5 items-stretch overflow-hidden pb-4 px-2 md:px-4">
+    <main class="flex-grow max-w-[1800px] w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5 items-stretch overflow-hidden pb-4 px-2 md:px-4">
         
         <!-- Panel Kiri: Canvas & Kontrol -->
-        <section class="w-full lg:col-span-6 md:col-span-2 dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-4 overflow-hidden h-full">
+        <section class="w-full lg:col-span-2 dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-4 overflow-hidden h-full">
             <div class="flex flex-col gap-3 w-full flex-grow overflow-hidden min-h-0">
                 <div id="drop-zone" class="w-full bg-[#08090b] rounded-xl overflow-hidden border-2 border-dashed border-slate-700/80 relative shadow-inner flex flex-col items-center justify-center transition-all duration-200 cursor-pointer group flex-grow h-full min-h-0">
-                    <div id="preview-placeholder" class="flex flex-col items-center justify-center text-slate-500 transition-colors pointer-events-none group-hover:scale-105 duration-300">
-                        <div class="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3 shadow-sm group-hover:text-emerald-500 transition-colors">
-                            <i class="fas fa-cloud-upload-alt text-lg"></i>
+                    <div id="preview-placeholder" class="flex flex-col items-center justify-center text-slate-500 transition-colors pointer-events-none group-hover:scale-105 duration-300 w-full px-2">
+                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-slate-800/80 flex items-center justify-center mb-3 shadow-sm group-hover:text-emerald-500 transition-colors">
+                            <i class="fas fa-cloud-upload-alt text-xl md:text-2xl"></i>
                         </div>
-                        <p class="text-sm font-bold text-slate-200 mb-1">Klik atau Drag File Video</p>
-                        <p class="text-[10px] text-slate-500 tracking-wider mb-4">MENDUKUNG MP4, WEBM, MOV</p>
-                        <span class="px-3 py-1 bg-[#14161d] border border-slate-700/80 text-[9px] font-bold tracking-widest text-slate-400 rounded-md shadow-sm">CANVAS PREVIEW</span>
+                        <p class="text-xl md:text-2xl font-extrabold text-white mb-2 text-center drop-shadow-md">Klik atau Drag File Video</p>
+                        <p class="text-[10px] md:text-xs text-slate-400 tracking-wider mb-5 text-center">MENDUKUNG MP4, WEBM, MOV</p>
+                        
+                        <div class="flex flex-col gap-2 mb-5 w-full max-w-[320px]">
+                            <div class="w-full text-center px-3 py-1.5 border-2 border-[#064e3b] rounded-lg bg-[#022c22]/80 shadow-md">
+                                <span class="text-[#34d399] text-[11px] md:text-xs font-bold tracking-wide">Maximal 15 Video Untuk Bitrate 3.0</span>
+                            </div>
+                            <div class="w-full text-center px-3 py-1.5 border-2 border-[#78350f] rounded-lg bg-[#431407]/80 shadow-md">
+                                <span class="text-[#f59e0b] text-[10px] md:text-[11px] font-bold tracking-wide leading-tight block">Setelah render 15x selesai, close APL dan Buka Kembali</span>
+                            </div>
+                        </div>
+
+                        <span class="px-5 py-2 bg-[#14161d] border border-slate-700 text-[10px] md:text-[11px] font-bold tracking-widest text-slate-400 rounded-lg shadow-inner">CANVAS PREVIEW</span>
                     </div>
                     <video id="video-player" class="absolute inset-0 w-full h-full object-contain hidden bg-black z-10" controls controlsList="nodownload">
                         Browser Anda tidak mendukung tag video.
@@ -143,36 +153,40 @@
             </div>
 
             <div class="mt-1 flex flex-row gap-2 flex-shrink-0">
-                <button id="preview-all-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold py-2.5 px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Play Semua Video Berurutan" disabled>
+                <button id="preview-all-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Play Semua Video Berurutan" disabled>
                     <i class="fas fa-play"></i>
                 </button>
-                <button id="shuffle-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Acak Urutan Video" disabled>
+                <button id="shuffle-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Acak Urutan Video" disabled>
                     <i class="fas fa-random"></i>
                 </button>
-                <button id="clear-all-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Hapus Semua" disabled>
+                <button id="clear-all-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Hapus Semua" disabled>
                     <i class="fas fa-trash"></i>
                 </button>
-                
-                <!-- Tombol Undo & Redo -->
-                <button id="undo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Undo Urutan (Ctrl+Z)" disabled>
+                <button id="undo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Kembali (Undo)" disabled>
                     <i class="fas fa-undo"></i>
                 </button>
-                <button id="redo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Redo Urutan (Ctrl+Y)" disabled>
+                <button id="redo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Maju (Redo)" disabled>
                     <i class="fas fa-redo"></i>
                 </button>
-
-                <!-- Tombol Merge Hijau -->
-                <button id="merge-btn" class="btn-green text-white font-bold py-2 px-4 rounded-lg flex-1 flex flex-col items-center justify-center gap-0.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none transition" disabled>
-                    <div class="flex items-center gap-1.5 text-emerald-100 text-[11px]">
-                        <i class="fas fa-bolt"></i> Mode Turbo Aktif
+                <!-- Tombol Auto Render -->
+                <button id="auto-render-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2 rounded-lg flex-1 flex flex-col items-center justify-center gap-0.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed transition border border-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.2)]" disabled title="Render otomatis seluruh kombinasi">
+                    <div class="flex items-center gap-1 text-blue-100 text-[10px]">
+                        <i class="fas fa-robot"></i> Auto Render
                     </div>
-                    <span class="text-[13px] leading-tight">Merge & Unduh</span>
+                    <span class="text-[12px] leading-tight">Full Siklus</span>
+                </button>
+                <!-- Tombol Merge Hijau -->
+                <button id="merge-btn" class="btn-green text-white font-bold py-2 px-2 rounded-lg flex-1 flex flex-col items-center justify-center gap-0.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none transition" disabled>
+                    <div class="flex items-center gap-1 text-emerald-100 text-[10px]">
+                        <i class="fas fa-bolt"></i> Manual Merge
+                    </div>
+                    <span class="text-[12px] leading-tight">Simpan 1x</span>
                 </button>
             </div>
         </section>
 
-        <!-- Panel Tengah: Daftar Video -->
-        <section class="w-full lg:col-span-2 md:col-span-1 dark-card rounded-2xl p-3 md:p-4 flex flex-col gap-2 overflow-hidden h-full">
+        <!-- Panel Kanan: Daftar Video -->
+        <section class="w-full lg:col-span-1 dark-card rounded-2xl p-3 md:p-4 flex flex-col gap-2 overflow-hidden h-full">
             <div class="flex items-center justify-between border-b border-slate-800/60 pb-3 flex-shrink-0">
                 <h3 class="font-bold text-[13px] tracking-wide text-white uppercase flex items-center gap-2">
                     Daftar Video
@@ -189,19 +203,6 @@
                 </li>
             </ul>
         </section>
-
-        <!-- Panel Kanan: List Teks Judul -->
-        <section class="w-full lg:col-span-2 md:col-span-1 dark-card rounded-2xl p-3 md:p-4 flex flex-col gap-2 overflow-hidden h-full">
-            <div class="flex items-center justify-between border-b border-slate-800/60 pb-3 flex-shrink-0">
-                <h3 class="font-bold text-[13px] tracking-wide text-white uppercase flex items-center gap-2">
-                    <i class="fas fa-file-alt text-slate-400"></i> List Teks Judul
-                </h3>
-                <button id="copy-titles-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold px-2.5 py-1.5 rounded-lg text-[10px] transition border border-slate-700 flex items-center gap-1 shadow-sm">
-                    <i class="fas fa-copy"></i> Copy List
-                </button>
-            </div>
-            <textarea id="titles-text-area" readonly class="w-full flex-grow bg-[#0d0e12] border border-slate-700/60 rounded-xl p-3 text-[11px] text-slate-300 custom-scrollbar resize-none outline-none focus:border-emerald-500 transition-colors leading-relaxed" placeholder="Daftar judul video akan otomatis muncul di sini..."></textarea>
-        </section>
     </main>
 
     <!-- Overlay Processing Modal -->
@@ -216,6 +217,7 @@
         <div class="w-full max-w-xs bg-slate-800 rounded-full h-1.5 overflow-hidden mb-2">
             <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%"></div>
         </div>
+        <!-- Menampilkan persentase bulat -->
         <span id="progress-percent" class="text-xs font-bold text-emerald-400">0%</span>
     </div>
 
@@ -253,8 +255,8 @@
         let isFileLoadingPhase = false; 
         let ffmpegInitPromise = null; 
         let pastFirstVideoIds = new Set(); 
-
-        // State variables untuk Undo / Redo
+        let manualRenderCounter = 0; // Variabel baru untuk melacak jumlah render manual
+        
         let history = [];
         let historyIndex = -1;
 
@@ -268,78 +270,79 @@
         const clearAllBtn = document.getElementById('clear-all-btn');
         const undoBtn = document.getElementById('undo-btn');
         const redoBtn = document.getElementById('redo-btn');
+        const autoRenderBtn = document.getElementById('auto-render-btn');
         const mergeBtn = document.getElementById('merge-btn');
         const statusBadge = document.getElementById('status-badge');
         const customOutputNameInput = document.getElementById('custom-output-name');
         const videoPlayer = document.getElementById('video-player');
         const previewTitle = document.getElementById('preview-title');
         const previewPlaceholder = document.getElementById('preview-placeholder');
-        const titlesTextArea = document.getElementById('titles-text-area');
-        const copyTitlesBtn = document.getElementById('copy-titles-btn');
         const statusOverlay = document.getElementById('status-overlay');
         const statusText = document.getElementById('status-text');
         const progressBar = document.getElementById('progress-bar');
         const progressPercent = document.getElementById('progress-percent');
 
         window.addEventListener('DOMContentLoaded', () => {
-            saveState(); // Simpan state awal kosong (empty array)
             initFFmpegInBackground();
+            saveState(); // Inisialisasi state awal
         });
 
         function saveState() {
-            // Hapus jalur maju (redo path) jika membuat perubahan baru setelah undo
             if (historyIndex < history.length - 1) {
                 history = history.slice(0, historyIndex + 1);
             }
-            // Buat copy referensi array (bukan deep copy filenya)
-            const currentState = videos.map(v => ({...v}));
-            history.push(currentState);
+            history.push(videos.map(v => ({...v})));
             historyIndex++;
-            
-            // Batasi panjang history (maks 20) untuk hemat memori
-            if (history.length > 20) {
-                history.shift();
-                historyIndex--;
-            }
             updateUndoRedoButtons();
         }
 
         function updateUndoRedoButtons() {
-            // Jika index 0 (state awal), undo disable
-            undoBtn.disabled = historyIndex <= 0;
-            // Jika index sudah di ujung, redo disable
-            redoBtn.disabled = historyIndex >= history.length - 1;
+            if(undoBtn) undoBtn.disabled = historyIndex <= 0;
+            if(redoBtn) redoBtn.disabled = historyIndex >= history.length - 1;
         }
 
         undoBtn.addEventListener('click', () => {
             if (historyIndex > 0) {
                 historyIndex--;
-                videos = history[historyIndex].map(v => ({...v}));
-                updateUI();
-                updateUndoRedoButtons();
+                restoreState(historyIndex);
             }
         });
 
         redoBtn.addEventListener('click', () => {
             if (historyIndex < history.length - 1) {
                 historyIndex++;
-                videos = history[historyIndex].map(v => ({...v}));
-                updateUI();
-                updateUndoRedoButtons();
+                restoreState(historyIndex);
             }
         });
 
-        // Shortcut Keyboard Undo (Ctrl+Z) dan Redo (Ctrl+Y)
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'z') {
-                e.preventDefault();
-                if (!undoBtn.disabled) undoBtn.click();
+        function restoreState(index) {
+            // Revoke current object urls to prevent memory leak
+            videos.forEach(v => {
+                if (v.url) {
+                    try { URL.revokeObjectURL(v.url); } catch(e) {}
+                }
+            });
+
+            videos = history[index].map(v => {
+                let newUrl = v.url;
+                if (v.isValid && v.file) {
+                    try { newUrl = URL.createObjectURL(v.file); } catch(e) {}
+                }
+                return { ...v, url: newUrl };
+            });
+            
+            if (videoPlayer) {
+                videoPlayer.pause();
+                videoPlayer.removeAttribute('src');
+                videoPlayer.load();
+                videoPlayer.classList.add('hidden');
+                previewTitle.textContent = "Judul Video Preview";
+                previewPlaceholder.classList.remove('hidden');
             }
-            if (e.ctrlKey && e.key === 'y') {
-                e.preventDefault();
-                if (!redoBtn.disabled) redoBtn.click();
-            }
-        });
+            
+            updateUI();
+            updateUndoRedoButtons();
+        }
 
         async function initFFmpegInBackground() {
             if (ffmpegInstance && ffmpegInstance.isLoaded()) return;
@@ -359,12 +362,13 @@
                         log: false
                     });
                     
+                    // Update Persentase Normal/Bulat
                     ffmpegInstance.setProgress(({ ratio }) => {
                         if (!isFileLoadingPhase) {
                             const now = Date.now();
                             if (now - lastProgressTime > 100) {
                                 const rawPct = Math.min(Math.max(ratio * 100, 0), 100);
-                                const pct = Math.round(rawPct); 
+                                const pct = Math.round(rawPct); // Dibulatkan agar rapi
                                 updateProgress(pct, `Menggabungkan File (Turbo Mode)...`);
                                 lastProgressTime = now;
                             }
@@ -419,8 +423,8 @@
             }));
 
             videos.push(...newVideos);
-            saveState(); // Update history dengan penambahan file baru
             updateUI();
+            saveState();
             fileInput.value = '';
         }
 
@@ -449,6 +453,7 @@
                 shuffleBtn.disabled = true;
                 previewAllBtn.disabled = true;
                 mergeBtn.disabled = true;
+                if(autoRenderBtn) autoRenderBtn.disabled = true;
                 statusBadge.innerText = "SIAP";
                 statusBadge.className = "bg-emerald-950/60 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded border border-emerald-800/60 tracking-wider";
                 customOutputNameInput.value = '';
@@ -459,6 +464,7 @@
                 
                 const validCount = videos.filter(v => v.isValid !== false).length;
                 mergeBtn.disabled = validCount < 2;
+                if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
 
                 const validVideos = videos.filter(v => v.isValid !== false);
                 if (validVideos.length > 0) {
@@ -500,19 +506,6 @@
                 });
             }
             videoCountEl.innerText = videos.length;
-            updateTitlesTextArea();
-        }
-
-        function updateTitlesTextArea() {
-            if (!titlesTextArea) return;
-            if (videos.length === 0) {
-                titlesTextArea.value = ''; return;
-            }
-            titlesTextArea.value = videos.map((v, i) => {
-                const cleanName = v.name.replace(/\.[^/.]+$/, "");
-                const num = String(i + 1).padStart(2, '0');
-                return `${num}. ${cleanName}`;
-            }).join('\n');
         }
 
         function formatTime(seconds) {
@@ -547,8 +540,8 @@
                 }
                 URL.revokeObjectURL(videos[idx].url);
                 videos.splice(idx, 1);
-                saveState(); // Rekam event hapus ke Undo list
                 updateUI();
+                saveState();
             }
         }
 
@@ -560,26 +553,13 @@
             videos.forEach(v => URL.revokeObjectURL(v.url));
             videos = [];
             pastFirstVideoIds.clear();
+            manualRenderCounter = 0; // Reset angka kembali ke 0 saat list dihapus
             customOutputNameInput.value = '';
-            saveState(); // Rekam event clear semua ke Undo list
             updateUI();
+            saveState();
         });
 
-        copyTitlesBtn.addEventListener('click', () => {
-            if (titlesTextArea && titlesTextArea.value) {
-                titlesTextArea.select();
-                document.execCommand('copy');
-                const originalHtml = copyTitlesBtn.innerHTML;
-                copyTitlesBtn.innerHTML = '<i class="fas fa-check text-emerald-400"></i> Copied!';
-                copyTitlesBtn.classList.add('border-emerald-500/50', 'text-emerald-400');
-                setTimeout(() => {
-                    copyTitlesBtn.innerHTML = originalHtml;
-                    copyTitlesBtn.classList.remove('border-emerald-500/50', 'text-emerald-400');
-                }, 1500);
-            }
-        });
-
-        shuffleBtn.addEventListener('click', () => {
+        function performShuffle(showNotification = true) {
             if (videos.length > 1) {
                 pastFirstVideoIds.add(videos[0].id);
 
@@ -611,8 +591,8 @@
                     }
                 }
                 
-                saveState(); // Rekam event acak ke Undo list
                 updateUI();
+                saveState();
                 
                 const listItems = document.querySelectorAll('.video-item');
                 listItems.forEach(item => {
@@ -620,11 +600,14 @@
                     setTimeout(() => item.classList.remove('just-moved'), 800);
                 });
 
-                if (siklusSelesai) {
+                // Menampilkan pemberitahuan modal jika siklus selesai
+                if (siklusSelesai && showNotification) {
                     showModal("Info Pengacakan", "Semua video sudah pernah berada di urutan pertama. Riwayat posisi telah di-reset untuk siklus acak berikutnya.");
                 }
             }
-        });
+        }
+
+        shuffleBtn.addEventListener('click', () => performShuffle(true));
 
         let draggedIndex = null;
         function setupReordering(item, index) {
@@ -641,75 +624,59 @@
                 if (draggedIndex === null || draggedIndex === index) return;
                 const moved = videos.splice(draggedIndex, 1)[0];
                 videos.splice(index, 0, moved);
-                saveState(); // Rekam event pindah urutan ke Undo list
                 updateUI();
+                saveState();
             });
         }
 
-        mergeBtn.addEventListener('click', startMergeProcess);
+        mergeBtn.addEventListener('click', () => startMergeProcess());
 
-        async function startMergeProcess() {
+        async function startMergeProcess(autoDirHandle = null, autoFileName = null, isAutoMode = false, cycleInfo = "") {
             if (videoPlayer) { videoPlayer.pause(); videoPlayer.onended = null; }
             const validVideos = videos.filter(v => v.isValid !== false);
             
-            if (validVideos.length < 2 || isProcessing) return;
+            if (validVideos.length < 2 || isProcessing) return false;
 
-            let outputName = `TNC7_MERGE_${Date.now()}.mp4`;
-            if (validVideos.length > 0) {
-                const firstVideoName = validVideos[0].name;
-                const nameWithoutExt = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
-                outputName = `${nameWithoutExt}.mp4`;
+            let outputName = autoFileName;
+            // Jika bukan Auto Render (Manual), beri angka berurutan di depan
+            if (!autoFileName) {
+                manualRenderCounter++; // Tambah angka urutan setiap kali render manual
+                let baseName = "TNC7_MERGE";
+                if (validVideos.length > 0) {
+                    const firstVideoName = validVideos[0].name;
+                    baseName = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
+                }
+                const customName = customOutputNameInput.value.trim();
+                if (customName) baseName = customName.replace(/\.mp4$/i, '');
+                
+                const numStr = String(manualRenderCounter).padStart(2, '0');
+                outputName = `${numStr}_${baseName}.mp4`;
             }
-            const customName = customOutputNameInput.value.trim();
-            if (customName) outputName = `${customName.replace(/\.mp4$/i, '')}.mp4`;
 
             let fileHandle = null;
-            let dirHandle = null;
+            let dirHandle = autoDirHandle;
             let useFallback = false;
             
             try {
-                if ('showDirectoryPicker' in window) {
+                if (!dirHandle && 'showDirectoryPicker' in window) {
                     dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-                    
-                    let finalOutputName = outputName;
-                    let fileExists = true;
-                    let counter = 1;
-                    const nameParts = outputName.split('.');
-                    const ext = nameParts.pop();
-                    const baseName = nameParts.join('.');
-
-                    // Loop untuk mengecek apakah file sudah ada, jika ya tambahkan penanda angka
-                    while (fileExists) {
-                        try {
-                            await dirHandle.getFileHandle(finalOutputName);
-                            // Jika berhasil didapatkan, berarti file sudah ada, tambahkan counter
-                            finalOutputName = `${baseName} (${counter}).${ext}`;
-                            counter++;
-                        } catch (error) {
-                            if (error.name === 'NotFoundError') {
-                                // Jika file tidak ditemukan, berarti nama ini aman digunakan
-                                fileExists = false;
-                            } else {
-                                // Error lain terjadi, hentikan loop untuk mencegah infinite loop
-                                console.error("Error saat mengecek ketersediaan file:", error);
-                                break;
-                            }
-                        }
-                    }
-                    
-                    outputName = finalOutputName;
+                }
+                if (dirHandle) {
                     fileHandle = await dirHandle.getFileHandle(outputName, { create: true });
-                } else { useFallback = true; }
+                } else { 
+                    useFallback = true; 
+                }
             } catch (err) {
-                if (err.name === 'AbortError') return; 
+                if (err.name === 'AbortError') return false; 
                 useFallback = true;
             }
 
             isProcessing = true;
             isFileLoadingPhase = true; 
             mergeBtn.disabled = true;
+            if(autoRenderBtn) autoRenderBtn.disabled = true;
             statusOverlay.classList.remove('hidden');
-            updateProgress(0, "Mempersiapkan Turbo Engine...");
+            updateProgress(0, `Mempersiapkan Turbo Engine... ${cycleInfo}`);
 
             const internalOutputName = `out_${Date.now()}.mp4`;
 
@@ -718,7 +685,7 @@
 
                 const fileNames = [];
                 let readCount = 0;
-                updateProgress(10, "Membaca file ke RAM...");
+                updateProgress(10, `Membaca file ke RAM... ${cycleInfo}`);
 
                 for (let i = 0; i < validVideos.length; i++) {
                     const vid = validVideos[i];
@@ -731,11 +698,9 @@
                     
                     readCount++;
                     const currentProgress = Math.round(10 + ((readCount / validVideos.length) * 85));
-                    updateProgress(Math.min(currentProgress, 95), `Memuat video ${readCount}/${validVideos.length}`);
+                    updateProgress(Math.min(currentProgress, 95), `Memuat video ${readCount}/${validVideos.length} ${cycleInfo}`);
                     
-                    // ANTI-CRASH / OOM FIX: Memberi jeda (yield) pada Garbage Collection browser
-                    // Mencegah RAM menumpuk dan freeze saat merender 15 video sekaligus
-                    await new Promise(resolve => setTimeout(resolve, 50)); 
+                    await new Promise(r => setTimeout(r, 1)); 
                 }
 
                 isFileLoadingPhase = false; 
@@ -743,10 +708,12 @@
                 const concatList = fileNames.map(f => `file '${f}'`).join('\n');
                 ffmpegInstance.FS('writeFile', 'concat.txt', concatList);
 
-                updateProgress(95, "Memulai Proses Turbo Merge...");
+                updateProgress(95, `Memulai Proses Turbo Merge... ${cycleInfo}`);
                 
-                // Optimasi Perintah FFmpeg Tanpa Merubah Fitur (Tetap Super Cepat)
                 await ffmpegInstance.run(
+                    '-y',                  // Timpa file jika ada tanpa konfirmasi internal
+                    '-hide_banner',        // Sembunyikan banner identitas FFmpeg
+                    '-loglevel', 'error',  // Matikan log text (hanya tampilkan error fatal) - mempercepat proses CPU
                     '-f', 'concat', 
                     '-safe', '0', 
                     '-i', 'concat.txt', 
@@ -757,7 +724,7 @@
                 );
 
                 isFileLoadingPhase = true;
-                updateProgress(98, "Menyimpan file output...");
+                updateProgress(98, `Menyimpan file output... ${cycleInfo}`);
                 
                 const data = ffmpegInstance.FS('readFile', internalOutputName);
 
@@ -771,14 +738,34 @@
                 statusBadge.innerText = "SELESAI";
                 statusBadge.className = "bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded tracking-wider shadow-lg shadow-emerald-900/30";
 
-                updateProgress(100, "Selesai!");
+                updateProgress(100, `Selesai! ${cycleInfo}`);
                 
+                // --- PERUBAHAN: Generate File Teks (List Lagu) otomatis untuk Manual & Auto ---
+                const textOutputName = outputName.replace(/\.mp4$/i, '.txt');
+                const currentTitles = videos.map((v, idx) => {
+                    return `${String(idx + 1).padStart(2, '0')}. ${v.name.replace(/\.[^/.]+$/, "")}`;
+                }).join('\n');
+                const tracklistContent = `Daftar Lagu untuk ${outputName}:\n\n${currentTitles}`;
+
                 if (fileHandle && !useFallback) {
+                    // Simpan Video
                     const writable = await fileHandle.createWritable();
                     await writable.write(blob);
                     await writable.close();
-                    showModal("Berhasil!", `Video disimpan di "${dirHandle.name || 'Folder Anda'}" sebagai "${outputName}".`);
+                    
+                    // Simpan File Teks
+                    try {
+                        const txtHandle = await dirHandle.getFileHandle(textOutputName, { create: true });
+                        const txtWritable = await txtHandle.createWritable();
+                        await txtWritable.write(tracklistContent);
+                        await txtWritable.close();
+                    } catch (e) {
+                        console.warn("Gagal menyimpan file teks", e);
+                    }
+
+                    if (!isAutoMode) showModal("Berhasil!", `Video dan File Teks (List Lagu) berhasil disimpan di "${dirHandle.name || 'Folder Anda'}".`);
                 } else {
+                    // Download Video Fallback
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = blobUrl;
@@ -787,17 +774,39 @@
                     a.click();
                     document.body.removeChild(a);
                     setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-                    showModal("Berhasil!", `Video berhasil diunduh.`);
-                }
 
+                    // Download File Teks Fallback
+                    const txtBlob = new Blob([tracklistContent], { type: 'text/plain' });
+                    const txtUrl = URL.createObjectURL(txtBlob);
+                    const txtA = document.createElement('a');
+                    txtA.style.display = 'none';
+                    txtA.href = txtUrl;
+                    txtA.download = textOutputName;
+                    document.body.appendChild(txtA);
+                    txtA.click();
+                    document.body.removeChild(txtA);
+                    setTimeout(() => URL.revokeObjectURL(txtUrl), 10000);
+
+                    if (!isAutoMode) showModal("Berhasil!", `Video dan File Teks (List Lagu) berhasil diunduh.`);
+                }
+                
+                return true;
             } catch (error) {
                 console.error("Error Processing:", error);
-                showModal("Gagal", "Terjadi kesalahan saat menggabungkan video. Pastikan format file seragam atau file tidak rusak.");
+                if (!isAutoMode) showModal("Gagal", "Terjadi kesalahan saat menggabungkan video. Pastikan format file seragam atau file tidak rusak.");
+                return false;
             } finally {
                 isProcessing = false;
                 isFileLoadingPhase = false;
-                mergeBtn.disabled = videos.filter(v => v.isValid !== false).length < 2;
-                statusOverlay.classList.add('hidden');
+                
+                // Jika bukan mode Auto, normalkan kembali UI (tutup overlay & nyalakan tombol)
+                // Jika mode Auto, biarkan overlay tetap terbuka untuk siklus berikutnya
+                if (!isAutoMode) {
+                    const validCount = videos.filter(v => v.isValid !== false).length;
+                    mergeBtn.disabled = validCount < 2;
+                    if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
+                    statusOverlay.classList.add('hidden');
+                }
                 
                 if (ffmpegInstance) {
                     try { ffmpegInstance.exit(); } catch (e) { console.warn("Cleanup engine:", e); }
@@ -805,6 +814,70 @@
                     setTimeout(() => { initFFmpegInBackground(); }, 500); 
                 }
             }
+        }
+        
+        if (autoRenderBtn) {
+            autoRenderBtn.addEventListener('click', async () => {
+                const validVideos = videos.filter(v => v.isValid !== false);
+                if (validVideos.length < 2 || isProcessing) return;
+
+                let dirHandle = null;
+                if ('showDirectoryPicker' in window) {
+                    try {
+                        dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    } catch (err) {
+                        return; // Batal jika user close picker
+                    }
+                } else {
+                    showModal("Tidak Didukung", "Fitur Auto Render membutuhkan akses Folder sistem. Gunakan Google Chrome atau Edge versi Desktop.");
+                    return;
+                }
+
+                const totalCycles = validVideos.length;
+                pastFirstVideoIds.clear(); // Reset riwayat dari acak manual
+                
+                // Tampilkan overlay sejak awal dan pertahankan selama auto render berlangsung
+                statusOverlay.classList.remove('hidden');
+                updateProgress(0, `Memulai Auto Render...`);
+                
+                for (let i = 0; i < totalCycles; i++) {
+                    performShuffle(false);
+                    
+                    const firstVideoName = videos[0].name;
+                    const nameWithoutExt = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
+                    
+                    // Format penamaan Auto Render: Angka (2 digit) di depan
+                    const cycleNum = String(i + 1).padStart(2, '0');
+                    const outputName = `${cycleNum}_${nameWithoutExt}.mp4`;
+                    const cycleInfo = `(Siklus ${i+1} dari ${totalCycles})`;
+                    
+                    try {
+                        const success = await startMergeProcess(dirHandle, outputName, true, cycleInfo);
+                        if (!success) {
+                            showModal("Auto Render Terhenti", `Proses gagal atau dibatalkan pada siklus ke-${i+1}.`);
+                            break;
+                        }
+                    } catch (err) {
+                        console.error("Auto render error:", err);
+                        showModal("Error Auto Render", `Proses terhenti pada siklus ke-${i+1}.`);
+                        break;
+                    }
+                    
+                    // Jeda sejenak sebelum siklus render berikutnya agar CPU bisa istirahat
+                    if (i < totalCycles - 1) {
+                        updateProgress(100, `Menyiapkan siklus ${i+2} dari ${totalCycles}...`);
+                        await new Promise(r => setTimeout(r, 1500));
+                    }
+                }
+                
+                // Tutup overlay dan kembalikan state tombol
+                statusOverlay.classList.add('hidden');
+                const validCount = videos.filter(v => v.isValid !== false).length;
+                mergeBtn.disabled = validCount < 2;
+                if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
+                
+                showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nFile teks (.txt) berisi Daftar Judul untuk MASING-MASING video telah otomatis tersimpan berdampingan di folder yang sama!`);
+            });
         }
 
         function updateProgress(percent, text) {
