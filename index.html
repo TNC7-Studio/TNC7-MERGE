@@ -607,6 +607,36 @@
             }
         }
 
+        // Fungsi baru khusus untuk Auto Render agar urutan pertama dijamin unik tiap siklus
+        function arrangeForAutoRenderCycle(cycleIndex, totalCycles) {
+            if (videos.length < 2) return;
+            
+            // Simpan referensi ke urutan asli sebelum diacak untuk siklus ini
+            // cycleIndex menentukan video mana yang akan ditaruh di depan
+            
+            // Pindahkan video pada index cycleIndex ke posisi pertama (index 0)
+            if (cycleIndex > 0 && cycleIndex < videos.length) {
+                const videoToFront = videos.splice(cycleIndex, 1)[0];
+                videos.unshift(videoToFront);
+            }
+            
+            // Acak HANYA video dari urutan ke-2 hingga terakhir (index 1 ke atas)
+            // agar variasi video di belakangnya tetap berbeda-beda
+            for (let i = videos.length - 1; i > 1; i--) {
+                const j = 1 + Math.floor(Math.random() * i); // random index dari 1 sampai i
+                [videos[i], videos[j]] = [videos[j], videos[i]];
+            }
+            
+            updateUI();
+            saveState();
+            
+            const listItems = document.querySelectorAll('.video-item');
+            listItems.forEach(item => {
+                item.classList.add('just-moved');
+                setTimeout(() => item.classList.remove('just-moved'), 800);
+            });
+        }
+
         shuffleBtn.addEventListener('click', () => performShuffle(true));
 
         let draggedIndex = null;
@@ -641,7 +671,7 @@
             // Jika bukan Auto Render (Manual), beri angka berurutan di depan
             if (!autoFileName) {
                 manualRenderCounter++; // Tambah angka urutan setiap kali render manual
-                let baseName = "TNC7_MERGE";
+                let baseName = "TNC7-MERGE";
                 if (validVideos.length > 0) {
                     const firstVideoName = validVideos[0].name;
                     baseName = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
@@ -650,7 +680,7 @@
                 if (customName) baseName = customName.replace(/\.mp4$/i, '');
                 
                 const numStr = String(manualRenderCounter).padStart(2, '0');
-                outputName = `${numStr}_${baseName}.mp4`;
+                outputName = `${numStr}-${baseName}.mp4`;
             }
 
             let fileHandle = null;
@@ -840,15 +870,24 @@
                 statusOverlay.classList.remove('hidden');
                 updateProgress(0, `Memulai Auto Render...`);
                 
+                // Simpan salinan urutan video yang valid saat ini sebagai base untuk memastikan
+                // setiap video dapat giliran di urutan pertama secara akurat
+                const baseVideos = [...videos];
+                
                 for (let i = 0; i < totalCycles; i++) {
-                    performShuffle(false);
+                    // Kembalikan ke urutan awal (base) sebelum mengatur siklus ini
+                    // untuk memastikan index 'i' selalu merujuk pada video yang tepat yang belum pernah di depan
+                    videos = [...baseVideos];
+                    
+                    // Gunakan fungsi baru yang menjamin akurasi posisi pertama
+                    arrangeForAutoRenderCycle(i, totalCycles);
                     
                     const firstVideoName = videos[0].name;
                     const nameWithoutExt = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
                     
                     // Format penamaan Auto Render: Angka (2 digit) di depan
                     const cycleNum = String(i + 1).padStart(2, '0');
-                    const outputName = `${cycleNum}_${nameWithoutExt}.mp4`;
+                    const outputName = `${cycleNum}-${nameWithoutExt}.mp4`;
                     const cycleInfo = `(Siklus ${i+1} dari ${totalCycles})`;
                     
                     try {
@@ -876,7 +915,7 @@
                 mergeBtn.disabled = validCount < 2;
                 if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
                 
-                showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nFile teks (.txt) berisi Daftar Judul untuk MASING-MASING video telah otomatis tersimpan berdampingan di folder yang sama!`);
+                showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) berisi Daftar Judul untuk MASING-MASING video telah otomatis tersimpan!`);
             });
         }
 
