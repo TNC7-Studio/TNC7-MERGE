@@ -95,6 +95,20 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #10b981; 
         }
+        
+        /* Dark Mode untuk Select Option Dropdown */
+        select option {
+            background-color: #14161d;
+            color: #f3f4f6;
+        }
+        
+        select option:hover,
+        select option:focus,
+        select option:active,
+        select option:checked {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+        }
     </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col justify-between p-2 md:p-4 relative mt-1.5 md:mt-2">
@@ -153,39 +167,145 @@
         
         <!-- Panel Kiri: Canvas & Kontrol -->
         <section class="w-full lg:col-span-2 dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-4 overflow-hidden h-full">
-            <div class="flex flex-col gap-3 w-full flex-grow overflow-hidden min-h-0">
-                <div id="drop-zone" class="w-full bg-[#08090b] rounded-xl overflow-hidden border-2 border-dashed border-slate-700/80 relative shadow-inner flex flex-col items-center justify-center transition-all duration-200 cursor-pointer group flex-grow h-full min-h-0">
-                    <div id="preview-placeholder" class="flex flex-col items-center justify-center text-slate-500 transition-colors pointer-events-none group-hover:scale-105 duration-300 w-full px-2">
-                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-slate-800/80 flex items-center justify-center mb-3 shadow-sm group-hover:text-emerald-500 transition-colors">
-                            <i class="fas fa-cloud-upload-alt text-xl md:text-2xl"></i>
+            <div class="flex flex-col gap-3 w-full flex-grow overflow-hidden min-h-0 justify-center">
+                <!-- Area Preview Thumbnail (Kanvas) -->
+                <div class="w-full flex-grow overflow-hidden flex items-center justify-center min-h-0" style="container-type: size;">
+                    <div id="thumbnail-drop-zone" class="bg-[#08090b] rounded-xl overflow-hidden border-2 border-slate-700/50 relative shadow-inner flex flex-col items-center justify-center transition-all duration-200 group" style="aspect-ratio: 16/9; width: min(100%, calc(100cqh * 16 / 9)); max-height: 100%;">
+                        <div id="thumbnail-placeholder" class="flex flex-col items-center justify-center text-slate-500 transition-colors pointer-events-none duration-300 w-full px-2">
+                            <i class="fas fa-image text-4xl mb-3 opacity-20"></i>
+                            <span class="text-xs font-bold tracking-widest text-slate-500 opacity-50">AREA PREVIEW THUMBNAIL</span>
                         </div>
-                        <p class="text-xl md:text-2xl font-extrabold text-white mb-2 text-center drop-shadow-md">Klik atau Drag File Video</p>
-                        <p class="text-[10px] md:text-xs text-slate-400 tracking-wider mb-5 text-center">MENDUKUNG MP4, WEBM, MOV</p>
+                        <img id="thumbnail-preview" class="absolute inset-0 w-full h-full object-contain hidden z-10" alt="Thumbnail Preview">
                         
-                        <div class="flex flex-col gap-2 mb-5 w-full max-w-[320px]">
-                            <div class="w-full text-center px-3 py-1.5 border-2 border-[#064e3b] rounded-lg bg-[#022c22]/80 shadow-md">
-                                <span class="text-[#34d399] text-[11px] md:text-xs font-bold tracking-wide">Maximal 15 Video Untuk Bitrate 3.0</span>
+                        <div id="canvas-text-overlay-container" class="absolute inset-0 z-20 pointer-events-none hidden overflow-hidden" style="container-type: inline-size;">
+                            <div id="canvas-text-overlay" class="absolute bottom-3 md:bottom-5 left-3 md:left-5 text-white font-semibold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-left whitespace-pre-wrap max-h-[85%] pointer-events-auto cursor-move select-none p-1.5 border border-transparent hover:border-dashed hover:border-emerald-500/50 rounded transition-colors" title="Klik & geser untuk memindahkan teks."></div>
+                        </div>
+
+                        <input type="file" id="thumbnail-input" accept="image/jpeg, image/png, image/jpg" class="hidden">
+                    </div>
+                </div>
+                
+                <div class="flex gap-2 flex-shrink-0 w-full">
+                    <button id="upload-thumb-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold px-4 rounded-lg text-sm transition border border-slate-700 shadow-sm flex items-center justify-center" title="Impor Thumbnail (JPG/PNG)" onclick="document.getElementById('thumbnail-input').click()">
+                        <i class="fas fa-folder-open"></i>
+                    </button>
+                    <div id="thumbnail-title" class="px-3 py-2 bg-[#14161d] border border-slate-800/80 text-emerald-400 text-[11px] truncate rounded-lg font-medium text-center shadow-sm min-h-[34px] flex-grow flex items-center justify-center">Belum ada thumbnail</div>
+                    <button id="download-thumb-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shadow-sm" title="Unduh Thumbnail Hasil Edit" disabled>
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+                
+                <!-- Kontrol Font Teks Thumbnail & Setting Terintegrasi -->
+                <div class="flex flex-wrap md:flex-nowrap gap-2 items-stretch bg-[#14161d] border border-slate-800/80 rounded-lg px-3 py-2.5 shadow-sm flex-shrink-0 w-full">
+                    
+                    <!-- Area Kiri: Font, Toolbar, & Judul (Digabung 1 Kolom vertikal) -->
+                    <div class="flex flex-col justify-center gap-1.5 w-32 md:w-44 lg:w-48 flex-shrink-0">
+                        
+                        <!-- Baris 1: Area Font -->
+                        <div class="bg-[#0b0c0e] border border-slate-700/50 rounded flex items-center px-2 py-1 transition-colors focus-within:border-emerald-500/50 w-full">
+                            <i class="fas fa-font text-slate-500 text-[9px] mr-1.5 flex-shrink-0"></i>
+                            <select id="font-family-select" class="bg-transparent border-none outline-none text-[10px] text-slate-300 w-full truncate cursor-pointer focus:ring-0 p-0" style="min-width: 0;">
+                                <option value="Calibri, sans-serif">Calibri</option>
+                                <option value="Arial, sans-serif">Arial</option>
+                                <option value="'Times New Roman', serif">Times New Roman</option>
+                                <option value="Impact, sans-serif">Impact</option>
+                                <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                            </select>
+                        </div>
+
+                        <!-- Baris 2: Toolbar Format Teks -->
+                        <div class="flex items-center justify-between w-full px-1 gap-1">
+                            <div class="flex items-center gap-1.5">
+                                <input type="color" id="text-color-picker" value="#ffffff" class="w-5 h-5 rounded cursor-pointer bg-transparent border-none p-0 outline-none" title="Warna Teks">
+                                <button id="bold-btn" class="text-slate-500 hover:text-emerald-400 transition" title="Bold (Tebal)">
+                                    <i class="fas fa-bold text-[9px]"></i>
+                                </button>
+                                <button id="italic-btn" class="text-slate-500 hover:text-emerald-400 transition" title="Italic (Miring)">
+                                    <i class="fas fa-italic text-[9px]"></i>
+                                </button>
                             </div>
-                            <div class="w-full text-center px-3 py-1.5 border-2 border-[#78350f] rounded-lg bg-[#431407]/80 shadow-md">
-                                <span class="text-[#f59e0b] text-[10px] md:text-[11px] font-bold tracking-wide leading-tight block">Setelah render 15x selesai, close APL dan Buka Kembali</span>
+                            <div class="w-px h-3 bg-slate-700/50"></div>
+                            <div class="flex items-center gap-1">
+                                <button id="uppercase-btn" class="text-slate-500 hover:text-emerald-400 transition text-[9px] font-bold px-0.5" title="Uppercase (Huruf Besar)">AA</button>
+                                <button id="titlecase-btn" class="text-slate-500 hover:text-emerald-400 transition text-[10px] font-bold px-0.5" title="Title Case (Kapital Awal Kata)">Aa</button>
+                            </div>
+                            <div class="w-px h-3 bg-slate-700/50"></div>
+                            <div class="flex items-center gap-1.5">
+                                <button id="align-left-btn" class="text-emerald-400 hover:text-emerald-300 transition" title="Rata Kiri">
+                                    <i class="fas fa-align-left text-[9px]"></i>
+                                </button>
+                                <button id="align-center-btn" class="text-slate-500 hover:text-emerald-400 transition" title="Rata Tengah">
+                                    <i class="fas fa-align-center text-[9px]"></i>
+                                </button>
+                                <button id="align-right-btn" class="text-slate-500 hover:text-emerald-400 transition" title="Rata Kanan">
+                                    <i class="fas fa-align-right text-[9px]"></i>
+                                </button>
                             </div>
                         </div>
 
-                        <span class="px-5 py-2 bg-[#14161d] border border-slate-700 text-[10px] md:text-[11px] font-bold tracking-widest text-slate-400 rounded-lg shadow-inner">CANVAS PREVIEW</span>
+                        <!-- Baris 3: Area Judul Manual -->
+                        <div class="bg-[#0b0c0e] border border-slate-700/50 rounded flex items-center px-2 py-1 transition-colors focus-within:border-emerald-500/50 w-full" title="Judul manual (kosongkan u/ otomatis)...">
+                            <i class="fas fa-pen text-slate-500 text-[9px] mr-1.5 flex-shrink-0"></i>
+                            <input type="text" id="custom-output-name" placeholder="Judul manual..." class="w-full bg-transparent border-none outline-none text-[10px] text-slate-300 placeholder-slate-600 truncate" style="min-width: 0;">
+                            <span class="text-[9px] text-slate-500 font-medium bg-slate-800 px-1 py-0.5 rounded ml-1 flex-shrink-0">.mp4</span>
+                        </div>
                     </div>
-                    <video id="video-player" class="absolute inset-0 w-full h-full object-contain hidden bg-black z-10" controls controlsList="nodownload">
-                        Browser Anda tidak mendukung tag video.
-                    </video>
-                    <input type="file" id="file-input" multiple accept="video/*" class="hidden">
-                </div>
-                <div id="preview-title" class="px-3 py-2 bg-[#14161d] border border-slate-800/80 text-emerald-400 text-[11px] truncate rounded-lg font-medium text-center shadow-sm min-h-[34px] flex-shrink-0">Judul Video Preview</div>
-            </div>
+                    
+                    <!-- Area Slider Dilebarkan Penuh (Kolom Terpisah agar Slider Panjang & Nyaman) -->
+                    <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-3 border-t md:border-t-0 md:border-l border-slate-700/50 pt-2 md:pt-0 md:pl-4 flex-1 w-full overflow-hidden">
+                        
+                        <!-- Fitur Size (Scale) -->
+                        <div class="flex flex-col justify-center gap-1 flex-1 min-w-[50px]">
+                            <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase ml-5">Size</span>
+                            <div class="flex items-center gap-1.5" title="Ukuran Teks (Font Size)">
+                                <i class="fas fa-text-height text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
+                                <input type="range" id="font-scale-slider" min="0.5" max="3.5" step="0.05" value="1" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
+                                <span id="font-scale-val" class="text-[10px] text-slate-400 font-mono w-5 text-right flex-shrink-0">1.0</span>
+                            </div>
+                        </div>
 
-            <!-- Kontrol Aksi -->
-            <div class="bg-[#14161d] border border-slate-800/80 rounded-lg flex items-center px-3 py-2.5 transition-colors focus-within:border-emerald-500/50 flex-shrink-0">
-                <i class="fas fa-pen text-slate-500 text-[10px] mr-2"></i>
-                <input type="text" id="custom-output-name" placeholder="Judul manual (kosongkan u/ otomatis)..." class="w-full bg-transparent border-none outline-none text-xs text-slate-300 placeholder-slate-600">
-                <span class="text-[10px] text-slate-500 font-medium bg-slate-800 px-1.5 py-0.5 rounded ml-2">.mp4</span>
+                        <!-- Fitur Scale Width -->
+                        <div class="border-l border-slate-700/50 pl-3 flex flex-col justify-center gap-1 flex-1 min-w-[50px]">
+                            <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase ml-5">Scale W</span>
+                            <div class="flex items-center gap-1.5" title="Lebar Teks (Scale Width)">
+                                <i class="fas fa-text-width text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
+                                <input type="range" id="scale-width-slider" min="0.5" max="3" step="0.1" value="1" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
+                                <span id="scale-width-val" class="text-[10px] text-slate-400 font-mono w-5 text-right flex-shrink-0">1.0</span>
+                            </div>
+                        </div>
+
+                        <!-- Fitur Scale Height -->
+                        <div class="border-l border-slate-700/50 pl-3 flex flex-col justify-center gap-1 flex-1 min-w-[50px]">
+                            <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase ml-5">Scale H</span>
+                            <div class="flex items-center gap-1.5" title="Tinggi Teks (Scale Height)">
+                                <i class="fas fa-arrows-alt-v text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
+                                <input type="range" id="scale-height-slider" min="0.5" max="3" step="0.1" value="1" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
+                                <span id="scale-height-val" class="text-[10px] text-slate-400 font-mono w-5 text-right flex-shrink-0">1.0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Fitur Stroke (Outline) -->
+                        <div class="border-l border-slate-700/50 pl-3 flex flex-col justify-center gap-1 flex-1 min-w-[50px]">
+                            <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase ml-5 md:ml-6">Stroke</span>
+                            <div class="flex items-center gap-1.5" title="Garis Tepi (Stroke & Warna)">
+                                <i class="fas fa-border-all text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
+                                <input type="color" id="stroke-color-picker" value="#000000" class="w-5 h-5 rounded cursor-pointer bg-transparent border-none p-0 outline-none flex-shrink-0">
+                                <input type="range" id="stroke-width-slider" min="0" max="20" step="1" value="0" class="w-full min-w-[20px] accent-emerald-500 cursor-pointer">
+                                <span id="stroke-width-val" class="text-[10px] text-slate-400 font-mono w-4 text-right flex-shrink-0">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Fitur Shadow Intensity -->
+                        <div class="border-l border-slate-700/50 pl-3 flex flex-col justify-center gap-1 flex-1 min-w-[50px]">
+                            <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase ml-5">Shadow</span>
+                            <div class="flex items-center gap-1.5" title="Intensitas Bayangan (Shadow)">
+                                <i class="fas fa-cloud-moon text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
+                                <input type="range" id="shadow-intensity-slider" min="0" max="100" step="1" value="50" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
+                                <span id="shadow-intensity-val" class="text-[10px] text-slate-400 font-mono w-6 text-right flex-shrink-0">50%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="mt-1 flex flex-row gap-2 flex-shrink-0">
@@ -222,28 +342,34 @@
         </section>
 
         <!-- Panel Kanan: Daftar Video -->
-        <section class="w-full lg:col-span-1 dark-card rounded-2xl p-3 md:p-4 flex flex-col gap-2 overflow-hidden h-full">
+        <section id="video-list-section" class="w-full lg:col-span-1 dark-card rounded-2xl p-3 md:p-4 flex flex-col gap-2 overflow-hidden h-full relative">
             <div class="flex items-center justify-between border-b border-slate-800/60 pb-3 flex-shrink-0">
                 <h3 class="font-bold text-[13px] tracking-wide text-white uppercase flex items-center gap-2">
                     Daftar Video
                     <span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-md font-bold" id="video-count">0</span>
+                    <button onclick="document.getElementById('file-input').click()" class="ml-1 text-emerald-500 hover:text-emerald-400 transition" title="Tambah Video">
+                        <i class="fas fa-plus-circle text-base"></i>
+                    </button>
                 </h3>
                 <span id="status-badge" class="bg-emerald-950/60 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded border border-emerald-800/60 tracking-wider">
                     SIAP
                 </span>
             </div>
-            <ul id="video-list" class="space-y-0.5 flex-grow overflow-y-auto custom-scrollbar pr-1">
-                <li id="empty-state" class="text-center text-slate-500 py-6 flex flex-col items-center justify-center h-full border border-dashed border-slate-800 rounded-xl min-h-[200px]">
-                    <i class="fas fa-film text-xl mb-2 opacity-30"></i>
-                    <p class="text-[11px]">Belum ada video ditambahkan</p>
+
+            <ul id="video-list" class="space-y-0.5 flex-grow overflow-y-auto custom-scrollbar pr-1 mt-2">
+                <li id="empty-state" class="text-center text-slate-500 py-6 flex flex-col items-center justify-center h-full border border-dashed border-slate-800 rounded-xl min-h-[200px] cursor-pointer hover:bg-slate-800/50 transition-colors" onclick="document.getElementById('file-input').click()">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3 shadow-sm text-emerald-500 transition-colors">
+                        <i class="fas fa-cloud-upload-alt text-xl"></i>
+                    </div>
+                    <p class="text-sm md:text-base font-extrabold text-white mb-2 text-center drop-shadow-md">Klik atau Drag File Video</p>
+                    <p class="text-[9px] md:text-[10px] text-slate-400 tracking-wider mb-5 text-center">MENDUKUNG MP4, WEBM, MOV</p>
+                    <span class="px-4 py-1.5 bg-[#14161d] border border-slate-700 text-[9px] md:text-[10px] font-bold tracking-widest text-slate-400 rounded-lg shadow-inner">AREA DROP VIDEO</span>
                 </li>
             </ul>
-    </section>
-</main>
-
-    </div> <!-- Penutup Wrapper Utama -->
-
-<!-- Overlay Processing Modal -->
+            <input type="file" id="file-input" multiple accept="video/*" class="hidden">
+        </section>
+    </main>
+    
     <div id="status-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center p-6 text-center">
         <div class="relative w-14 h-14 mb-4 flex items-center justify-center">
             <div class="absolute inset-0 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin"></div>
@@ -274,135 +400,135 @@
     </div>
 
     <footer class="text-center py-2 text-[10px] text-slate-600 flex-shrink-0">
-    Engine: Turbo FFmpeg WASM | TNC7 MARGE &copy; 2026
-</footer>
+        Engine: Turbo FFmpeg WASM | TNC7 MARGE &copy; 2026
+    </footer>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // FIREBASE CONFIG SUDAH TERPASANG:
-    const firebaseConfig = {
-        apiKey: "AIzaSyA1hxTceWANgQU8vwKpXDCJABvYpWQQNmk", 
-        authDomain: "tnc7-visualizer.firebaseapp.com", 
-        projectId: "tnc7-visualizer",                  
-        storageBucket: "tnc7-visualizer.firebasestorage.app",  
-        messagingSenderId: "1098792876538",
-        appId: "1:1098792876538:web:28304ee128f7d156190c43"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app); // Inisialisasi Database
+        // FIREBASE CONFIG SUDAH TERPASANG:
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1hxTceWANgQU8vwKpXDCJABvYpWQQNmk", 
+            authDomain: "tnc7-visualizer.firebaseapp.com", 
+            projectId: "tnc7-visualizer",                  
+            storageBucket: "tnc7-visualizer.firebasestorage.app",  
+            messagingSenderId: "1098792876538",
+            appId: "1:1098792876538:web:28304ee128f7d156190c43"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app); // Inisialisasi Database
 
-    const authOverlay = document.getElementById('auth-overlay');
-    const mainApp = document.getElementById('main-app-container');
-    const authForm = document.getElementById('auth-form');
-    const emailInput = document.getElementById('auth-email');
-    const passwordInput = document.getElementById('auth-password');
-    const errorDiv = document.getElementById('auth-error');
-    const toggleModeBtn = document.getElementById('auth-mode-toggle');
-    const submitBtn = document.getElementById('auth-submit');
-    const logoutBtn = document.getElementById('logout-btn');
-    
-    let isLoginMode = true;
+        const authOverlay = document.getElementById('auth-overlay');
+        const mainApp = document.getElementById('main-app-container');
+        const authForm = document.getElementById('auth-form');
+        const emailInput = document.getElementById('auth-email');
+        const passwordInput = document.getElementById('auth-password');
+        const errorDiv = document.getElementById('auth-error');
+        const toggleModeBtn = document.getElementById('auth-mode-toggle');
+        const submitBtn = document.getElementById('auth-submit');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        let isLoginMode = true;
 
-    toggleModeBtn.addEventListener('click', () => {
-        isLoginMode = !isLoginMode;
-        if(isLoginMode) {
-            submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
-            toggleModeBtn.innerText = 'Belum punya akun? Daftar disini';
-        } else {
-            submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Daftar';
-            toggleModeBtn.innerText = 'Sudah punya akun? Masuk disini';
-        }
-        errorDiv.classList.add('hidden');
-    });
-
-    authForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        errorDiv.classList.add('hidden');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
-        try {
-            let userCredential;
-            if (isLoginMode) {
-                userCredential = await signInWithEmailAndPassword(auth, email, password);
+        toggleModeBtn.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            if(isLoginMode) {
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
+                toggleModeBtn.innerText = 'Belum punya akun? Daftar disini';
             } else {
-                userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Daftar';
+                toggleModeBtn.innerText = 'Sudah punya akun? Masuk disini';
             }
+            errorDiv.classList.add('hidden');
+        });
 
-            // --- CATAT RIWAYAT LOGIN KE FIRESTORE ---
-            const user = userCredential.user;
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            errorDiv.classList.add('hidden');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
             try {
-                const now = new Date();
-                const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
-                const formattedTime = now.toLocaleDateString('en-US', options).replace(',', ' at');
+                let userCredential;
+                if (isLoginMode) {
+                    userCredential = await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                }
+
+                // --- CATAT RIWAYAT LOGIN KE FIRESTORE ---
+                const user = userCredential.user;
+                try {
+                    const now = new Date();
+                    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
+                    const formattedTime = now.toLocaleDateString('en-US', options).replace(',', ' at');
+                    
+                    await addDoc(collection(db, "login_history"), {
+                        aplikasi: "TNC7 MARGE", // Penanda dari aplikasi mana
+                        bahasa: navigator.language || "id-ID",
+                        email: user.email,
+                        platform: navigator.platform || "Unknown",
+                        resolusi_layar: `${window.screen.width}x${window.screen.height}`,
+                        uid: user.uid,
+                        user_agent: navigator.userAgent,
+                        waktu_login: formattedTime,
+                        zona_waktu: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Jakarta"
+                    });
+                    console.log("Riwayat login MARGE berhasil dicatat.");
+                } catch (err) {
+                    console.warn("Gagal mencatat riwayat login, pastikan Rules Firestore mengizinkan write.", err);
+                }
+
+            } catch (error) {
+                let errorMsg = "Terjadi kesalahan. Coba lagi.";
+                if(error.code === 'auth/invalid-credential') errorMsg = "Email atau password salah.";
+                else if(error.code === 'auth/email-already-in-use') errorMsg = "Email sudah terdaftar.";
+                else if(error.code === 'auth/weak-password') errorMsg = "Password minimal 6 karakter.";
+                else if(error.code === 'auth/invalid-email') errorMsg = "Format email tidak valid.";
                 
-                await addDoc(collection(db, "login_history"), {
-                    aplikasi: "TNC7 MARGE", // Penanda dari aplikasi mana
-                    bahasa: navigator.language || "id-ID",
-                    email: user.email,
-                    platform: navigator.platform || "Unknown",
-                    resolusi_layar: `${window.screen.width}x${window.screen.height}`,
-                    uid: user.uid,
-                    user_agent: navigator.userAgent,
-                    waktu_login: formattedTime,
-                    zona_waktu: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Jakarta"
-                });
-                console.log("Riwayat login MARGE berhasil dicatat.");
-            } catch (err) {
-                console.warn("Gagal mencatat riwayat login, pastikan Rules Firestore mengizinkan write.", err);
+                errorDiv.innerText = errorMsg;
+                errorDiv.classList.remove('hidden');
+                submitBtn.innerHTML = isLoginMode ? '<i class="fas fa-sign-in-alt"></i> Masuk' : '<i class="fas fa-user-plus"></i> Daftar';
+                submitBtn.disabled = false;
             }
+        });
 
-        } catch (error) {
-            let errorMsg = "Terjadi kesalahan. Coba lagi.";
-            if(error.code === 'auth/invalid-credential') errorMsg = "Email atau password salah.";
-            else if(error.code === 'auth/email-already-in-use') errorMsg = "Email sudah terdaftar.";
-            else if(error.code === 'auth/weak-password') errorMsg = "Password minimal 6 karakter.";
-            else if(error.code === 'auth/invalid-email') errorMsg = "Format email tidak valid.";
-            
-            errorDiv.innerText = errorMsg;
-            errorDiv.classList.remove('hidden');
-            submitBtn.innerHTML = isLoginMode ? '<i class="fas fa-sign-in-alt"></i> Masuk' : '<i class="fas fa-user-plus"></i> Daftar';
-            submitBtn.disabled = false;
-        }
-    });
+        logoutBtn.addEventListener('click', () => signOut(auth));
 
-    logoutBtn.addEventListener('click', () => signOut(auth));
-
-    // Monitor State Login secara Real-time
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            // Jika berhasil masuk, buka gembok app
-            authOverlay.classList.add('hidden');
-            mainApp.classList.remove('hidden');
-            mainApp.classList.add('flex'); 
-            emailInput.value = '';
-            passwordInput.value = '';
-        } else {
-            // Jika belum login, tampilkan layar login
-            authOverlay.classList.remove('hidden');
-            mainApp.classList.add('hidden');
-            mainApp.classList.remove('flex');
-            submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
-            submitBtn.disabled = false;
-            
-            // Seamless token login fallback untuk environment ini
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                // Kita nonaktifkan auto-login custom token agar memakai auth murni dari project Anda
-                // signInWithCustomToken(auth, __initial_auth_token).catch(console.error);
+        // Monitor State Login secara Real-time
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Jika berhasil masuk, buka gembok app
+                authOverlay.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                mainApp.classList.add('flex'); 
+                emailInput.value = '';
+                passwordInput.value = '';
+            } else {
+                // Jika belum login, tampilkan layar login
+                authOverlay.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+                mainApp.classList.remove('flex');
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
+                submitBtn.disabled = false;
+                
+                // Seamless token login fallback untuk environment ini
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    // Kita nonaktifkan auto-login custom token agar memakai auth murni dari project Anda
+                    // signInWithCustomToken(auth, __initial_auth_token).catch(console.error);
+                }
             }
-        }
-    });
-</script>
+        });
+    </script>
 
-<script>
-    if ('serviceWorker' in navigator) {
+    <script>
+        if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
                     .then(reg => console.log('ServiceWorker siap untuk akses offline/cepat!'))
@@ -421,8 +547,12 @@
         
         let history = [];
         let historyIndex = -1;
+        
+        let thumbnailFileObj = null;
 
-        const dropZone = document.getElementById('drop-zone');
+        const thumbnailDropZone = document.getElementById('thumbnail-drop-zone');
+        const thumbnailInput = document.getElementById('thumbnail-input');
+        const videoListSection = document.getElementById('video-list-section');
         const fileInput = document.getElementById('file-input');
         const videoList = document.getElementById('video-list');
         const emptyState = document.getElementById('empty-state');
@@ -436,9 +566,87 @@
         const mergeBtn = document.getElementById('merge-btn');
         const statusBadge = document.getElementById('status-badge');
         const customOutputNameInput = document.getElementById('custom-output-name');
-        const videoPlayer = document.getElementById('video-player');
-        const previewTitle = document.getElementById('preview-title');
-        const previewPlaceholder = document.getElementById('preview-placeholder');
+        
+        const downloadThumbBtn = document.getElementById('download-thumb-btn');
+
+        const fontFamilySelect = document.getElementById('font-family-select');
+        const textColorPicker = document.getElementById('text-color-picker');
+        
+        const fontScaleSlider = document.getElementById('font-scale-slider');
+        const fontScaleVal = document.getElementById('font-scale-val');
+        const scaleWidthSlider = document.getElementById('scale-width-slider');
+        const scaleWidthVal = document.getElementById('scale-width-val');
+        const strokeColorPicker = document.getElementById('stroke-color-picker');
+        const strokeWidthSlider = document.getElementById('stroke-width-slider');
+        const strokeWidthVal = document.getElementById('stroke-width-val');
+        const shadowIntensitySlider = document.getElementById('shadow-intensity-slider');
+        const shadowIntensityVal = document.getElementById('shadow-intensity-val');
+        const scaleHeightSlider = document.getElementById('scale-height-slider');
+        const scaleHeightVal = document.getElementById('scale-height-val');
+        const boldBtn = document.getElementById('bold-btn');
+        const italicBtn = document.getElementById('italic-btn');
+        const uppercaseBtn = document.getElementById('uppercase-btn');
+        const titlecaseBtn = document.getElementById('titlecase-btn');
+        const alignLeftBtn = document.getElementById('align-left-btn');
+        const alignCenterBtn = document.getElementById('align-center-btn');
+        const alignRightBtn = document.getElementById('align-right-btn');
+
+        let currentFontFamily = "Calibri, sans-serif";
+        let currentFontScale = 1.0;
+        let currentTextColor = "#ffffff";
+        let currentScaleWidth = 1.0;
+        let currentScaleHeight = 1.0;
+        let currentStrokeColor = "#000000";
+        let currentStrokeWidth = 0;
+        let currentShadowIntensity = 0.5; // Default 50%
+        let isBold = false;
+        let currentFontWeight = "600";
+        let isItalic = false;
+        let currentFontStyle = "normal";
+        let currentTextTransform = "none";
+        let currentTextAlign = "left";
+        window.textOffset = { x: 0.035, y: -1 }; // y = -1 menandakan posisi default (bawah)
+
+        // --- STREAMING_CHUNK:Defining text formatting helpers... ---
+        // Fungsi untuk memastikan transformasi huruf bekerja sempurna (hard-replace teks)
+        function formatTextCase(text, transform) {
+            if (transform === 'uppercase') return text.toUpperCase();
+            if (transform === 'capitalize') {
+                return text.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+            }
+            return text;
+        }
+
+        // Fungsi untuk menyegarkan teks preview saat tombol case diklik
+        function refreshTextPreview() {
+            const canvasTextOverlay = document.getElementById('canvas-text-overlay');
+            if (canvasTextOverlay) {
+                const validVideos = videos.filter(v => v.isValid !== false);
+                let tracklistArray = validVideos.map((vid, index) => {
+                    let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
+                    return formatTextCase(rawText, currentTextTransform);
+                });
+                canvasTextOverlay.innerText = tracklistArray.join('\n');
+                applyTextStyles();
+            }
+        }
+
+        // --- SISTEM CACHE METRIK UI ---
+        window.cachedRenderMetrics = { isValid: false };
+
+        function updateUIMetricsCache() {
+            // Dikosongkan: Rendering kini 100% menggunakan rasio persentase mutlak
+            // Ini menjamin posisi & ukuran font tidak bergeser biarpun layar dikecilkan
+            // atau tab berjalan di latar belakang (Minimize/Background Tabs).
+        }
+
+        // Pastikan cache selalu diperbarui saat layar di-resize
+        window.addEventListener('resize', updateUIMetricsCache);
+
+        const thumbnailPreview = document.getElementById('thumbnail-preview');
+        const thumbnailTitle = document.getElementById('thumbnail-title');
+        const thumbnailPlaceholder = document.getElementById('thumbnail-placeholder');
+        
         const statusOverlay = document.getElementById('status-overlay');
         const statusText = document.getElementById('status-text');
         const progressBar = document.getElementById('progress-bar');
@@ -449,6 +657,199 @@
             saveState(); // Inisialisasi state awal
         });
 
+        // --- STREAMING_CHUNK:Attaching event listeners for text controls... ---
+        // Event Listener untuk Kontrol Font
+        fontFamilySelect.addEventListener('change', (e) => {
+            currentFontFamily = e.target.value;
+            applyTextStyles();
+        });
+
+        textColorPicker.addEventListener('input', (e) => {
+            currentTextColor = e.target.value;
+            applyTextStyles();
+        });
+
+        fontScaleSlider.addEventListener('input', (e) => {
+            currentFontScale = parseFloat(e.target.value);
+            fontScaleVal.innerText = currentFontScale.toFixed(2);
+            applyTextStyles();
+        });
+
+        scaleWidthSlider.addEventListener('input', (e) => {
+            currentScaleWidth = parseFloat(e.target.value);
+            scaleWidthVal.innerText = currentScaleWidth.toFixed(1);
+            applyTextStyles();
+        });
+
+        scaleHeightSlider.addEventListener('input', (e) => {
+            currentScaleHeight = parseFloat(e.target.value);
+            scaleHeightVal.innerText = currentScaleHeight.toFixed(1);
+            applyTextStyles();
+        });
+
+        boldBtn.addEventListener('click', () => {
+            isBold = !isBold;
+            boldBtn.classList.toggle('text-emerald-400', isBold);
+            boldBtn.classList.toggle('text-slate-500', !isBold);
+            currentFontWeight = isBold ? "800" : "600";
+            applyTextStyles();
+        });
+
+        italicBtn.addEventListener('click', () => {
+            isItalic = !isItalic;
+            italicBtn.classList.toggle('text-emerald-400', isItalic);
+            italicBtn.classList.toggle('text-slate-500', !isItalic);
+            currentFontStyle = isItalic ? "italic" : "normal";
+            applyTextStyles();
+        });
+
+        uppercaseBtn.addEventListener('click', () => {
+            currentTextTransform = currentTextTransform === "uppercase" ? "none" : "uppercase";
+            updateTextTransformUI();
+            refreshTextPreview();
+        });
+
+        titlecaseBtn.addEventListener('click', () => {
+            currentTextTransform = currentTextTransform === "capitalize" ? "none" : "capitalize";
+            updateTextTransformUI();
+            refreshTextPreview();
+        });
+
+        function updateTextTransformUI() {
+            uppercaseBtn.classList.toggle('text-emerald-400', currentTextTransform === "uppercase");
+            uppercaseBtn.classList.toggle('text-slate-500', currentTextTransform !== "uppercase");
+            titlecaseBtn.classList.toggle('text-emerald-400', currentTextTransform === "capitalize");
+            titlecaseBtn.classList.toggle('text-slate-500', currentTextTransform !== "capitalize");
+        }
+
+        function setAlign(align) {
+            currentTextAlign = align;
+            alignLeftBtn.classList.toggle('text-emerald-400', align === 'left');
+            alignLeftBtn.classList.toggle('text-slate-500', align !== 'left');
+            alignCenterBtn.classList.toggle('text-emerald-400', align === 'center');
+            alignCenterBtn.classList.toggle('text-slate-500', align !== 'center');
+            alignRightBtn.classList.toggle('text-emerald-400', align === 'right');
+            alignRightBtn.classList.toggle('text-slate-500', align !== 'right');
+            applyTextStyles();
+        }
+
+        alignLeftBtn.addEventListener('click', () => setAlign('left'));
+        alignCenterBtn.addEventListener('click', () => setAlign('center'));
+        alignRightBtn.addEventListener('click', () => setAlign('right'));
+
+        strokeColorPicker.addEventListener('input', (e) => {
+            currentStrokeColor = e.target.value;
+            applyTextStyles();
+        });
+
+        strokeWidthSlider.addEventListener('input', (e) => {
+            currentStrokeWidth = parseFloat(e.target.value);
+            strokeWidthVal.innerText = currentStrokeWidth;
+            applyTextStyles();
+        });
+
+        shadowIntensitySlider.addEventListener('input', (e) => {
+            let val = parseInt(e.target.value);
+            currentShadowIntensity = val / 100;
+            shadowIntensityVal.innerText = `${val}%`;
+            applyTextStyles();
+        });
+
+        // --- STREAMING_CHUNK:Implementing text rendering application logic... ---
+        function applyTextStyles() {
+            const canvasTextOverlay = document.getElementById('canvas-text-overlay');
+            if (canvasTextOverlay) {
+                canvasTextOverlay.style.fontFamily = currentFontFamily;
+                // Menggunakan cqi (container query) agar ukuran teks meresize dinamis sempurna 
+                // mengikuti lebar kontainer, sehingga proporsi dengan gambar selalu sama (Fix-locked)
+                canvasTextOverlay.style.fontSize = `calc(1.4cqi * ${currentFontScale})`;
+                canvasTextOverlay.style.color = currentTextColor;
+                canvasTextOverlay.style.fontWeight = currentFontWeight;
+                canvasTextOverlay.style.fontStyle = currentFontStyle;
+                canvasTextOverlay.style.textAlign = currentTextAlign;
+                
+                // Scale Width, Scale Height & Stroke
+                let effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
+                let effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
+                canvasTextOverlay.style.transform = `scale(${effectiveScaleWidth}, ${effectiveScaleHeight})`;
+                canvasTextOverlay.style.transformOrigin = "left top";
+                // Intensitas stroke sangat halus (dibagi 4 dari hitungan awal)
+                canvasTextOverlay.style.webkitTextStroke = `${currentStrokeWidth * 0.00125}cqi ${currentStrokeColor}`;
+                
+                // Shadow Intensity
+                // Jarak dan penyebaran bayangan dinaikkan total 1.5x 
+                canvasTextOverlay.style.textShadow = `
+                    0px max(2.25px, 0.315cqi) max(4.5px, 0.4725cqi) rgba(0, 0, 0, ${currentShadowIntensity})
+                `;
+            }
+        }
+
+        // --- Logika Scroll Mouse untuk Ganti Font (Masih berjalan jika scroll tepat di select box) ---
+        fontFamilySelect.addEventListener('wheel', (e) => {
+            e.preventDefault(); 
+            const options = fontFamilySelect.options;
+            let selectedIndex = fontFamilySelect.selectedIndex;
+            if (e.deltaY > 0) {
+                selectedIndex = Math.min(options.length - 1, selectedIndex + 1);
+            } else {
+                selectedIndex = Math.max(0, selectedIndex - 1);
+            }
+            if (fontFamilySelect.selectedIndex !== selectedIndex) {
+                fontFamilySelect.selectedIndex = selectedIndex;
+                fontFamilySelect.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // --- STREAMING_CHUNK:Setting up canvas drag and drop interactions... ---
+        // --- Logika Drag and Drop Text di Atas Canvas ---
+        const textOverlayElement = document.getElementById('canvas-text-overlay');
+        const overlayContainerElement = document.getElementById('canvas-text-overlay-container');
+        let isDraggingText = false;
+        let startDragX = 0;
+        let startDragY = 0;
+
+        if (textOverlayElement && overlayContainerElement) {
+            textOverlayElement.addEventListener('mousedown', (e) => {
+                isDraggingText = true;
+                const rect = textOverlayElement.getBoundingClientRect();
+                startDragX = e.clientX - rect.left;
+                startDragY = e.clientY - rect.top;
+                e.preventDefault(); // Mencegah block text selection default
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDraggingText) return;
+                const containerRect = overlayContainerElement.getBoundingClientRect();
+                const textRect = textOverlayElement.getBoundingClientRect(); // Membaca batas teks yang sudah discaling
+                
+                let newLeft = e.clientX - startDragX - containerRect.left;
+                let newTop = e.clientY - startDragY - containerRect.top;
+
+                // Membatasi pergerakan agar teks tidak keluar dari area container (clamp bounds dengan textRect baru)
+                newLeft = Math.max(0, Math.min(newLeft, containerRect.width - textRect.width));
+                newTop = Math.max(0, Math.min(newTop, containerRect.height - textRect.height));
+
+                // MENGUBAH PX KE PERSENTASE (%): Agar saat jendela tab dikecilkan, posisi terkunci (fix) 
+                const percentX = (newLeft / containerRect.width) * 100;
+                const percentY = (newTop / containerRect.height) * 100;
+
+                textOverlayElement.style.bottom = 'auto'; // Reset bottom default
+                textOverlayElement.style.right = 'auto';
+                textOverlayElement.style.left = `${percentX}%`;
+                textOverlayElement.style.top = `${percentY}%`;
+
+                // Menyimpan angka rasio mutlak untuk dicetak mesin Render tanpa membaca DOM
+                window.textOffset.x = newLeft / containerRect.width;
+                window.textOffset.y = newTop / containerRect.height;
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDraggingText = false;
+                updateUIMetricsCache(); // Kunci posisi saat kursor dilepas
+            });
+        }
+
+        // --- STREAMING_CHUNK:Defining history and undo redo systems... ---
         function saveState() {
             if (historyIndex < history.length - 1) {
                 history = history.slice(0, historyIndex + 1);
@@ -493,19 +894,11 @@
                 return { ...v, url: newUrl };
             });
             
-            if (videoPlayer) {
-                videoPlayer.pause();
-                videoPlayer.removeAttribute('src');
-                videoPlayer.load();
-                videoPlayer.classList.add('hidden');
-                previewTitle.textContent = "Judul Video Preview";
-                previewPlaceholder.classList.remove('hidden');
-            }
-            
             updateUI();
             updateUndoRedoButtons();
         }
 
+        // --- STREAMING_CHUNK:Initializing the powerful FFmpeg WASM core... ---
         async function initFFmpegInBackground() {
             if (ffmpegInstance && ffmpegInstance.isLoaded()) return;
             if (ffmpegInitPromise) {
@@ -550,23 +943,57 @@
             await ffmpegInitPromise;
         }
 
-        dropZone.addEventListener('click', (e) => {
-            if (e.target !== videoPlayer) fileInput.click();
-        });
-
+        // --- Event Listener Thumbnail ---
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
-            dropZone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
+            thumbnailDropZone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
         });
         ['dragenter', 'dragover'].forEach(evt => {
-            dropZone.addEventListener(evt, () => dropZone.classList.add('drag-active'));
+            thumbnailDropZone.addEventListener(evt, () => thumbnailDropZone.classList.add('drag-active'));
         });
         ['dragleave', 'drop'].forEach(evt => {
-            dropZone.addEventListener(evt, () => dropZone.classList.remove('drag-active'));
+            thumbnailDropZone.addEventListener(evt, () => thumbnailDropZone.classList.remove('drag-active'));
         });
-        dropZone.addEventListener('drop', (e) => processFiles(e.dataTransfer.files));
+        
+        thumbnailDropZone.addEventListener('drop', (e) => {
+            const file = e.dataTransfer.files[0];
+            if(file && file.type.startsWith('image/')) handleThumbnailFile(file);
+        });
+
+        thumbnailInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if(file) handleThumbnailFile(file);
+        });
+
+        function handleThumbnailFile(file) {
+            thumbnailFileObj = file;
+            const url = URL.createObjectURL(file);
+            thumbnailPreview.src = url;
+            thumbnailPreview.classList.remove('hidden');
+            thumbnailPlaceholder.classList.add('hidden');
+            
+            const validVideos = videos.filter(v => v.isValid !== false);
+            if (validVideos.length > 0) {
+                const firstVideoName = validVideos[0].name;
+                const cleanName = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
+                thumbnailTitle.textContent = `Thumbnail: ${cleanName}`;
+            } else {
+                thumbnailTitle.textContent = "Thumbnail: " + file.name;
+            }
+            
+            if (downloadThumbBtn) downloadThumbBtn.disabled = false;
+        }
+
+        // --- STREAMING_CHUNK:Configuring video file upload and validations... ---
+        // --- Event Listener Video (Area Kanan) ---
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+            videoListSection.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
+        });
+        videoListSection.addEventListener('drop', (e) => processFiles(e.dataTransfer.files));
         fileInput.addEventListener('change', (e) => processFiles(e.target.files));
 
         async function processFiles(files) {
+            if (!files || files.length === 0) return; // Abaikan drop jika tidak ada file (mencegah bug notif saat geser video)
+
             const videoFiles = Array.from(files).filter(file => file.type.startsWith('video/'));
             if (videoFiles.length === 0) {
                 showModal('File Tidak Valid', 'Silakan pilih file video yang valid.');
@@ -607,8 +1034,13 @@
             });
         }
 
+        // --- STREAMING_CHUNK:Rebuilding the UI list of tracks... ---
         function updateUI() {
             videoList.innerHTML = '';
+            
+            const canvasTextOverlayContainer = document.getElementById('canvas-text-overlay-container');
+            const canvasTextOverlay = document.getElementById('canvas-text-overlay');
+
             if (videos.length === 0) {
                 videoList.appendChild(emptyState);
                 clearAllBtn.disabled = true;
@@ -619,6 +1051,13 @@
                 statusBadge.innerText = "SIAP";
                 statusBadge.className = "bg-emerald-950/60 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded border border-emerald-800/60 tracking-wider";
                 customOutputNameInput.value = '';
+                
+                if (thumbnailFileObj) {
+                    thumbnailTitle.textContent = `Thumbnail: ${thumbnailFileObj.name}`;
+                }
+                
+                if(canvasTextOverlayContainer) canvasTextOverlayContainer.classList.add('hidden');
+                if(canvasTextOverlay) canvasTextOverlay.innerText = '';
             } else {
                 clearAllBtn.disabled = false;
                 shuffleBtn.disabled = false;
@@ -631,8 +1070,16 @@
                 const validVideos = videos.filter(v => v.isValid !== false);
                 if (validVideos.length > 0) {
                     const firstVideoName = validVideos[0].name;
-                    customOutputNameInput.value = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
+                    const cleanName = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
+                    customOutputNameInput.value = cleanName;
+                    
+                    if (thumbnailFileObj) {
+                        thumbnailTitle.textContent = `Thumbnail: ${cleanName}`;
+                    }
                 }
+
+                if(canvasTextOverlayContainer) canvasTextOverlayContainer.classList.remove('hidden');
+                let tracklistArray = [];
 
                 videos.forEach((vid, index) => {
                     const li = document.createElement('li');
@@ -657,7 +1104,6 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1 z-10 flex-shrink-0">
-                            ${vid.isValid ? `<button class="text-slate-400 hover:text-emerald-400 transition p-1 cursor-pointer" onclick="playPreview('${vid.id}')" title="Preview Video"><i class="fas fa-play text-[9px]"></i></button>` : ''}
                             <button class="text-slate-500 hover:text-red-400 transition p-1 cursor-pointer" onclick="removeVideo('${vid.id}')" title="Hapus Video">
                                 <i class="fas fa-times text-[9px]"></i>
                             </button>
@@ -665,7 +1111,15 @@
                     `;
                     setupReordering(li, index);
                     videoList.appendChild(li);
+                    
+                    let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
+                    tracklistArray.push(formatTextCase(rawText, currentTextTransform));
                 });
+                
+                if(canvasTextOverlay) {
+                    canvasTextOverlay.innerText = tracklistArray.join('\n');
+                    applyTextStyles(); // Update style tiap ada perubahan teks
+                }
             }
             videoCountEl.innerText = videos.length;
         }
@@ -676,30 +1130,9 @@
             return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        function playPreview(id) {
-            const vid = videos.find(v => v.id === id);
-            if (vid && vid.isValid) {
-                videoPlayer.onended = null;
-                previewPlaceholder.classList.add('hidden');
-                videoPlayer.classList.remove('hidden');
-                videoPlayer.src = vid.url;
-                videoPlayer.play();
-                previewTitle.textContent = "Preview: " + vid.name;
-                if (window.innerWidth < 768) document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
         function removeVideo(id) {
             const idx = videos.findIndex(v => v.id === id);
             if (idx > -1) {
-                if (videoPlayer.src && videoPlayer.src.includes(videos[idx].url)) {
-                    videoPlayer.pause();
-                    videoPlayer.removeAttribute('src');
-                    videoPlayer.load();
-                    videoPlayer.classList.add('hidden');
-                    previewTitle.textContent = "Judul Video Preview";
-                    previewPlaceholder.classList.remove('hidden');
-                }
                 URL.revokeObjectURL(videos[idx].url);
                 videos.splice(idx, 1);
                 updateUI();
@@ -708,19 +1141,23 @@
         }
 
         clearAllBtn.addEventListener('click', () => {
-            videoPlayer.pause(); videoPlayer.removeAttribute('src'); videoPlayer.load();
-            videoPlayer.classList.add('hidden');
-            previewTitle.textContent = "Judul Video Preview";
-            previewPlaceholder.classList.remove('hidden');
+            thumbnailPreview.removeAttribute('src');
+            thumbnailPreview.classList.add('hidden');
+            thumbnailPlaceholder.classList.remove('hidden');
+            thumbnailTitle.textContent = "Belum ada thumbnail";
+            thumbnailFileObj = null;
+            if (downloadThumbBtn) downloadThumbBtn.disabled = true;
+            
             videos.forEach(v => URL.revokeObjectURL(v.url));
             videos = [];
             pastFirstVideoIds.clear();
-            manualRenderCounter = 0; // Reset angka kembali ke 0 saat list dihapus
+            manualRenderCounter = 0;
             customOutputNameInput.value = '';
             updateUI();
             saveState();
         });
 
+        // --- STREAMING_CHUNK:Implementing playlist shuffle functionality... ---
         function performShuffle(showNotification = true) {
             if (videos.length > 1) {
                 pastFirstVideoIds.add(videos[0].id);
@@ -769,12 +1206,9 @@
             }
         }
 
-        // Fungsi baru khusus untuk Auto Render agar urutan pertama dijamin unik tiap siklus
+        // Fungsi khusus untuk Auto Render agar urutan pertama dijamin unik tiap siklus
         function arrangeForAutoRenderCycle(cycleIndex, totalCycles) {
             if (videos.length < 2) return;
-            
-            // Simpan referensi ke urutan asli sebelum diacak untuk siklus ini
-            // cycleIndex menentukan video mana yang akan ditaruh di depan
             
             // Pindahkan video pada index cycleIndex ke posisi pertama (index 0)
             if (cycleIndex > 0 && cycleIndex < videos.length) {
@@ -782,8 +1216,7 @@
                 videos.unshift(videoToFront);
             }
             
-            // Acak HANYA video dari urutan ke-2 hingga terakhir (index 1 ke atas)
-            // agar variasi video di belakangnya tetap berbeda-beda
+            // Acak HANYA video dari urutan ke-2 hingga terakhir
             for (let i = videos.length - 1; i > 1; i--) {
                 const j = 1 + Math.floor(Math.random() * i); // random index dari 1 sampai i
                 [videos[i], videos[j]] = [videos[j], videos[i]];
@@ -812,6 +1245,7 @@
             item.addEventListener('dragleave', () => item.classList.remove('is-hovered-target'));
             item.addEventListener('drop', (e) => {
                 e.preventDefault();
+                e.stopPropagation(); // Mencegah event drop trigger fungsi baca file pada container
                 item.classList.remove('is-hovered-target');
                 if (draggedIndex === null || draggedIndex === index) return;
                 const moved = videos.splice(draggedIndex, 1)[0];
@@ -823,11 +1257,154 @@
 
         mergeBtn.addEventListener('click', () => startMergeProcess());
 
+        // --- STREAMING_CHUNK:Engine function for rendering Canvas thumbnails natively... ---
+        async function createThumbnailBlob() {
+            if (!thumbnailFileObj) return null;
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.src = URL.createObjectURL(thumbnailFileObj);
+                img.onload = () => {
+                    // Gunakan resolusi asli gambar secara mutlak
+                    const width = img.naturalWidth || img.width || 1280;
+                    const height = img.naturalHeight || img.height || 720;
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    // Mengatur smoothing quality ke high untuk hasil gambar yang tajam dan jernih
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const validVideos = videos.filter(v => v.isValid !== false);
+                    if (validVideos.length > 0) {
+                        // --- MODE KALKULASI ABSOLUT MATEMATIKA (ANTI-RESIZE & ANTI-MINIMIZE BUG) ---
+                        // Font Size dihitung 1.4% (0.014) dari lebar asli (ekuivalen rasio 1.4cqi UI)
+                        const fontSize = (width * 0.014) * currentFontScale;
+                        
+                        // Padding rasional UI terhadap resolusi asli
+                        const paddingX = width * 0.0075;
+                        const paddingY = width * 0.0075;
+
+                        // KOREKSI PRESISI DOM vs CANVAS:
+                        // Menambahkan kompensasi dorongan vertikal agar posisinya sama persis dengan preview
+                        const verticalCorrection = fontSize * 0.18;
+
+                        let startX, startY;
+
+                        if (window.textOffset.y !== -1) {
+                            // Menggunakan persentase drag x & y dikali resolusi kanvas
+                            startX = (window.textOffset.x * width) + paddingX;
+                            startY = (window.textOffset.y * height) + paddingY + verticalCorrection;
+                        } else {
+                            // Default posisi awal UI (Pojok Kiri Bawah)
+                            startX = (width * 0.035) + paddingX; 
+                            const totalLineHeight = validVideos.length * (fontSize * 1.25);
+                            startY = height - totalLineHeight - (height * 0.05) + verticalCorrection;
+                        }
+
+                        ctx.fillStyle = currentTextColor;
+                        ctx.font = `${currentFontStyle} ${currentFontWeight} ${fontSize}px ${currentFontFamily}`;
+                        ctx.textBaseline = 'top'; // Mudahkan perhitungan tinggi baris
+                        
+                        // Efek bayangan disesuaikan dengan slider intensitas
+                        // Jarak dan penyebaran bayangan dinaikkan total 1.5x 
+                        ctx.shadowColor = `rgba(0, 0, 0, ${currentShadowIntensity})`;
+                        ctx.shadowBlur = Math.max(3, fontSize * 0.225);
+                        ctx.shadowOffsetY = Math.max(1.5, fontSize * 0.15);
+                        
+                        // Setup garis tepi (Stroke)
+                        ctx.lineJoin = 'round';
+                        ctx.miterLimit = 2;
+                        
+                        const lineHeight = fontSize * 1.25; // Jarak antar baris yang lebih rapat (leading-tight)
+                        
+                        // Menangani Transformasi Case pada teks awal melalui fungsi terpusat
+                        let tracklistArray = validVideos.map((vid, index) => {
+                            let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
+                            return formatTextCase(rawText, currentTextTransform);
+                        });
+
+                        // Pastikan teks tidak keluar batas kiri/atas
+                        startX = Math.max(0, startX);
+                        startY = Math.max(0, startY);
+                        
+                        // Intensitas Scale Width & Height diturunkan 30%
+                        const effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
+                        const effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
+                        const maxWidth = (width - startX - (width * 0.02)) / effectiveScaleWidth; 
+
+                        // Truncate jika perlu dan hitung lebar maksimum blok teks untuk kebutuhan Alignment
+                        let maxLineWidth = 0;
+                        let displayLines = tracklistArray.map(text => {
+                            let printText = text;
+                            if (ctx.measureText(printText).width > maxWidth) {
+                                while(ctx.measureText(printText + '...').width > maxWidth && printText.length > 0) {
+                                    printText = printText.slice(0, -1);
+                                }
+                                printText += '...';
+                            }
+                            const measuredWidth = ctx.measureText(printText).width;
+                            if (measuredWidth > maxLineWidth) maxLineWidth = measuredWidth;
+                            return printText;
+                        });
+                        
+                        ctx.textAlign = currentTextAlign;
+                        
+                        displayLines.forEach((printText, i) => {
+                            ctx.save();
+                            // Mengunci render agar mengadopsi ukuran Scale Width & Height peregangan
+                            ctx.scale(effectiveScaleWidth, effectiveScaleHeight);
+                            
+                            // Kalkulasi anchor poin berdasarkan Alignment
+                            let alignOffsetX = 0;
+                            if (currentTextAlign === 'center') alignOffsetX = maxLineWidth / 2;
+                            if (currentTextAlign === 'right') alignOffsetX = maxLineWidth;
+
+                            const renderX = (startX + alignOffsetX) / effectiveScaleWidth;
+                            const renderY = (startY + (i * lineHeight)) / effectiveScaleHeight;
+                            
+                            // Eksekusi Outline (Stroke) jika aktif (width slider > 0)
+                            if (currentStrokeWidth > 0) {
+                                // Intensitas stroke sangat halus (dibagi 4 dari kalkulasi awal)
+                                ctx.lineWidth = currentStrokeWidth * (width * 0.00000625); // Hitungan matematis absolut
+                                ctx.strokeStyle = currentStrokeColor;
+                                ctx.strokeText(printText, renderX, renderY);
+                            }
+                            
+                            // Eksekusi Fill/Warna utama Font
+                            ctx.fillText(printText, renderX, renderY);
+                            
+                            ctx.restore();
+                        });
+                    }
+                    
+                    // SELALU gunakan MIME type image/jpeg agar output kecil namun berkualitas
+                    const mimeType = 'image/jpeg';
+                    
+                    // Kualitas 0.99: Titik maksimal untuk kejernihan super tajam, menaikkan ukuran file agar kualitas gambar lebih padat
+                    canvas.toBlob((blob) => {
+                        URL.revokeObjectURL(img.src);
+                        resolve(blob);
+                    }, mimeType, 0.99); 
+                };
+                img.onerror = () => {
+                    URL.revokeObjectURL(img.src);
+                    resolve(null);
+                };
+            });
+        }
+
+        // --- STREAMING_CHUNK:Executing FFmpeg tasks for merging videos... ---
         async function startMergeProcess(autoDirHandle = null, autoFileName = null, isAutoMode = false, cycleInfo = "") {
-            if (videoPlayer) { videoPlayer.pause(); videoPlayer.onended = null; }
             const validVideos = videos.filter(v => v.isValid !== false);
             
             if (validVideos.length < 2 || isProcessing) return false;
+
+            // KUNCI MEMORI METRIK UI SEBELUM PROSES RENDER
+            updateUIMetricsCache();
 
             let outputName = autoFileName;
             // Jika bukan Auto Render (Manual), beri angka berurutan di depan
@@ -902,18 +1479,15 @@
 
                 updateProgress(95, `Memulai Proses Turbo Merge... ${cycleInfo}`);
                 
-                await ffmpegInstance.run(
-                    '-y',                  // Timpa file jika ada tanpa konfirmasi internal
-                    '-hide_banner',        // Sembunyikan banner identitas FFmpeg
-                    '-loglevel', 'error',  // Matikan log text (hanya tampilkan error fatal) - mempercepat proses CPU
-                    '-f', 'concat', 
-                    '-safe', '0', 
-                    '-i', 'concat.txt', 
-                    '-c', 'copy', 
-                    '-fflags', '+fastseek', 
-                    '-movflags', '+faststart', 
-                    internalOutputName
-                );
+                let ffmpegArgs = [
+                    '-y', '-hide_banner', '-loglevel', 'error',
+                    '-f', 'concat', '-safe', '0', '-i', 'concat.txt'
+                ];
+                
+                ffmpegArgs.push('-c', 'copy');
+                ffmpegArgs.push('-fflags', '+fastseek', '-movflags', '+faststart', internalOutputName);
+                
+                await ffmpegInstance.run(...ffmpegArgs);
 
                 isFileLoadingPhase = true;
                 updateProgress(98, `Menyimpan file output... ${cycleInfo}`);
@@ -932,8 +1506,9 @@
 
                 updateProgress(100, `Selesai! ${cycleInfo}`);
                 
-                // --- PERUBAHAN: Generate File Teks (List Lagu) otomatis untuk Manual & Auto ---
+                // --- Generate File Teks (List Lagu) otomatis untuk Manual & Auto ---
                 const textOutputName = outputName.replace(/\.mp4$/i, '.txt');
+                const thumbOutputName = outputName.replace(/\.mp4$/i, `.jpg`);
                 const currentTitles = videos.map((v, idx) => {
                     return `${String(idx + 1).padStart(2, '0')}. ${v.name.replace(/\.[^/.]+$/, "")}`;
                 }).join('\n');
@@ -955,7 +1530,20 @@
                         console.warn("Gagal menyimpan file teks", e);
                     }
 
-                    if (!isAutoMode) showModal("Berhasil!", `Video dan File Teks (List Lagu) berhasil disimpan di "${dirHandle.name || 'Folder Anda'}".`);
+                    // Simpan File Thumbnail
+                    if (thumbnailFileObj) {
+                        try {
+                            const thumbBlob = await createThumbnailBlob();
+                            if (thumbBlob) {
+                                const thumbHandle = await dirHandle.getFileHandle(thumbOutputName, { create: true });
+                                const thumbWritable = await thumbHandle.createWritable();
+                                await thumbWritable.write(thumbBlob);
+                                await thumbWritable.close();
+                            }
+                        } catch (e) { console.warn("Gagal menyimpan file thumbnail", e); }
+                    }
+
+                    if (!isAutoMode) showModal("Berhasil!", `Video, File Teks (List Lagu), dan Thumbnail berhasil disimpan di "${dirHandle.name || 'Folder Anda'}".`);
                 } else {
                     // Download Video Fallback
                     const a = document.createElement('a');
@@ -979,7 +1567,25 @@
                     document.body.removeChild(txtA);
                     setTimeout(() => URL.revokeObjectURL(txtUrl), 10000);
 
-                    if (!isAutoMode) showModal("Berhasil!", `Video dan File Teks (List Lagu) berhasil diunduh.`);
+                    // Download File Thumbnail Fallback
+                    if (thumbnailFileObj) {
+                        try {
+                            const thumbBlob = await createThumbnailBlob();
+                            if (thumbBlob) {
+                                const thumbUrl = URL.createObjectURL(thumbBlob);
+                                const thumbA = document.createElement('a');
+                                thumbA.style.display = 'none';
+                                thumbA.href = thumbUrl;
+                                thumbA.download = thumbOutputName;
+                                document.body.appendChild(thumbA);
+                                thumbA.click();
+                                document.body.removeChild(thumbA);
+                                setTimeout(() => URL.revokeObjectURL(thumbUrl), 10000);
+                            }
+                        } catch (e) {}
+                    }
+
+                    if (!isAutoMode) showModal("Berhasil!", `Video, File Teks (List Lagu), dan Thumbnail berhasil diunduh.`);
                 }
                 
                 return true;
@@ -991,8 +1597,7 @@
                 isProcessing = false;
                 isFileLoadingPhase = false;
                 
-                // Jika bukan mode Auto, normalkan kembali UI (tutup overlay & nyalakan tombol)
-                // Jika mode Auto, biarkan overlay tetap terbuka untuk siklus berikutnya
+                // Jika bukan mode Auto, normalkan kembali UI
                 if (!isAutoMode) {
                     const validCount = videos.filter(v => v.isValid !== false).length;
                     mergeBtn.disabled = validCount < 2;
@@ -1008,6 +1613,7 @@
             }
         }
         
+        // --- STREAMING_CHUNK:Finalizing UI logic and protective listeners... ---
         if (autoRenderBtn) {
             autoRenderBtn.addEventListener('click', async () => {
                 const validVideos = videos.filter(v => v.isValid !== false);
@@ -1028,26 +1634,20 @@
                 const totalCycles = validVideos.length;
                 pastFirstVideoIds.clear(); // Reset riwayat dari acak manual
                 
-                // Tampilkan overlay sejak awal dan pertahankan selama auto render berlangsung
+                // Tampilkan overlay sejak awal
                 statusOverlay.classList.remove('hidden');
                 updateProgress(0, `Memulai Auto Render...`);
                 
-                // Simpan salinan urutan video yang valid saat ini sebagai base untuk memastikan
-                // setiap video dapat giliran di urutan pertama secara akurat
                 const baseVideos = [...videos];
                 
                 for (let i = 0; i < totalCycles; i++) {
-                    // Kembalikan ke urutan awal (base) sebelum mengatur siklus ini
-                    // untuk memastikan index 'i' selalu merujuk pada video yang tepat yang belum pernah di depan
                     videos = [...baseVideos];
                     
-                    // Gunakan fungsi baru yang menjamin akurasi posisi pertama
                     arrangeForAutoRenderCycle(i, totalCycles);
                     
                     const firstVideoName = videos[0].name;
                     const nameWithoutExt = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
                     
-                    // Format penamaan Auto Render: Angka (2 digit) di depan
                     const cycleNum = String(i + 1).padStart(2, '0');
                     const outputName = `${cycleNum}-${nameWithoutExt}.mp4`;
                     const cycleInfo = `(Siklus ${i+1} dari ${totalCycles})`;
@@ -1064,7 +1664,7 @@
                         break;
                     }
                     
-                    // Jeda sejenak sebelum siklus render berikutnya agar CPU bisa istirahat
+                    // Jeda sejenak sebelum siklus render berikutnya
                     if (i < totalCycles - 1) {
                         updateProgress(100, `Menyiapkan siklus ${i+2} dari ${totalCycles}...`);
                         await new Promise(r => setTimeout(r, 1500));
@@ -1077,7 +1677,7 @@
                 mergeBtn.disabled = validCount < 2;
                 if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
                 
-                showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) berisi Daftar Judul untuk MASING-MASING video telah otomatis tersimpan!`);
+                showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!`);
             });
         }
 
@@ -1099,6 +1699,29 @@
         }
 
         modalCloseBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+        // --- FITUR DOWNLOAD THUMBNAIL EDIT ---
+        if (downloadThumbBtn) {
+            downloadThumbBtn.addEventListener('click', async () => {
+                if (!thumbnailFileObj) return;
+                
+                const blob = await createThumbnailBlob();
+                if (!blob) return;
+                
+                const validVideos = videos.filter(v => v.isValid !== false);
+                const thumbExt = 'jpg';
+                const link = document.createElement('a');
+                let downloadName = `TNC7_Thumbnail_${Date.now()}.${thumbExt}`;
+                if (validVideos.length > 0) {
+                    const firstVideoName = validVideos[0].name.replace(/\.[^/.]+$/, "");
+                    downloadName = `${firstVideoName}.${thumbExt}`;
+                }
+                link.download = downloadName;
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+            });
+        }
 
         // Anti-Clone 
         document.addEventListener('contextmenu', (event) => event.preventDefault());
