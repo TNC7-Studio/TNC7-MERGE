@@ -1495,21 +1495,14 @@
                         // Intensitas Scale Width & Height diturunkan 30%
                         const effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
                         const effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
-                        const maxWidth = (width - startX - (width * 0.02)) / effectiveScaleWidth; 
+                        // const maxWidth = (width - startX - (width * 0.02)) / effectiveScaleWidth; // Tidak lagi membatasi lebar
 
-                        // Truncate jika perlu dan hitung lebar maksimum blok teks untuk kebutuhan Alignment
+                        // Menghapus logika truncation (titik-titik), membiarkan teks dirender utuh
                         let maxLineWidth = 0;
                         let displayLines = tracklistArray.map(text => {
-                            let printText = text;
-                            if (ctx.measureText(printText).width > maxWidth) {
-                                while(ctx.measureText(printText + '...').width > maxWidth && printText.length > 0) {
-                                    printText = printText.slice(0, -1);
-                                }
-                                printText += '...';
-                            }
-                            const measuredWidth = ctx.measureText(printText).width;
+                            const measuredWidth = ctx.measureText(text).width;
                             if (measuredWidth > maxLineWidth) maxLineWidth = measuredWidth;
-                            return printText;
+                            return text;
                         });
                         
                         ctx.textAlign = currentTextAlign;
