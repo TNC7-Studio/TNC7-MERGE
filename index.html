@@ -163,10 +163,37 @@
         </div>
     </header>
 
-    <main class="flex-grow max-w-[1800px] w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5 items-stretch overflow-hidden pb-4 px-2 md:px-4">
+    <main class="flex-grow max-w-[1800px] w-full mx-auto grid grid-cols-1 lg:grid-cols-6 gap-4 lg:gap-5 items-stretch overflow-hidden pb-4 px-2 md:px-4">
         
-        <!-- Panel Kiri: Canvas & Kontrol -->
-        <section class="w-full lg:col-span-2 dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-4 overflow-hidden h-full">
+        <!-- Panel Kiri: Daftar Gambar (Playlist) -->
+        <section id="image-list-section" class="w-full lg:col-span-1 dark-card rounded-2xl p-3 md:p-4 flex flex-col gap-2 overflow-hidden h-full relative">
+            <div class="flex items-center justify-between border-b border-slate-800/60 pb-3 flex-shrink-0">
+                <h3 class="font-bold text-[13px] tracking-wide text-white uppercase flex items-center gap-2">
+                    Daftar Gambar
+                    <span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-md font-bold" id="image-count">0</span>
+                    <button onclick="document.getElementById('thumbnail-input').click()" class="ml-1 text-emerald-500 hover:text-emerald-400 transition" title="Tambah Gambar">
+                        <i class="fas fa-plus-circle text-base"></i>
+                    </button>
+                </h3>
+                <button id="clear-images-btn" class="text-slate-500 hover:text-red-400 text-[10px] transition disabled:opacity-40 disabled:cursor-not-allowed" title="Hapus Semua Gambar" disabled>
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+
+            <ul id="image-list" class="space-y-0.5 flex-grow overflow-y-auto custom-scrollbar pr-1 mt-2">
+                <li id="empty-state-image" class="text-center text-slate-500 py-6 flex flex-col items-center justify-center h-full border border-dashed border-slate-800 rounded-xl min-h-[200px] cursor-pointer hover:bg-slate-800/50 transition-colors" onclick="document.getElementById('thumbnail-input').click()">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3 shadow-sm text-emerald-500 transition-colors">
+                        <i class="fas fa-images text-xl"></i>
+                    </div>
+                    <p class="text-sm md:text-base font-extrabold text-white mb-2 text-center drop-shadow-md">Klik atau Drag Gambar</p>
+                    <p class="text-[9px] md:text-[10px] text-slate-400 tracking-wider mb-5 text-center">MENDUKUNG JPG, PNG</p>
+                    <span class="px-4 py-1.5 bg-[#14161d] border border-slate-700 text-[9px] md:text-[10px] font-bold tracking-widest text-slate-400 rounded-lg shadow-inner">AREA DROP GAMBAR</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Panel Tengah: Canvas & Kontrol -->
+        <section class="w-full lg:col-span-4 dark-card rounded-2xl p-4 md:p-5 flex flex-col gap-4 overflow-hidden h-full">
             <div class="flex flex-col gap-3 w-full flex-grow overflow-hidden min-h-0 justify-center">
                 <!-- Area Preview Thumbnail (Kanvas) -->
                 <div class="w-full flex-grow overflow-hidden flex items-center justify-center min-h-0" style="container-type: size;">
@@ -181,7 +208,7 @@
                             <div id="canvas-text-overlay" class="absolute bottom-3 md:bottom-5 left-3 md:left-5 text-white font-semibold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-left whitespace-pre-wrap max-h-[85%] pointer-events-auto cursor-move select-none p-1.5 border border-transparent hover:border-dashed hover:border-emerald-500/50 rounded transition-colors" title="Klik & geser untuk memindahkan teks."></div>
                         </div>
 
-                        <input type="file" id="thumbnail-input" accept="image/jpeg, image/png, image/jpg" class="hidden">
+                        <input type="file" id="thumbnail-input" accept="image/jpeg, image/png, image/jpg" class="hidden" multiple>
                     </div>
                 </div>
                 
@@ -315,28 +342,22 @@
                 <button id="shuffle-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Acak Urutan Video" disabled>
                     <i class="fas fa-random"></i>
                 </button>
-                <button id="clear-all-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Hapus Semua" disabled>
+                <button id="clear-all-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-red-400 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Hapus Semua" disabled>
                     <i class="fas fa-trash"></i>
                 </button>
-                <button id="undo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Kembali (Undo)" disabled>
+                <button id="undo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Undo" disabled>
                     <i class="fas fa-undo"></i>
                 </button>
-                <button id="redo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Maju (Redo)" disabled>
+                <button id="redo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Redo" disabled>
                     <i class="fas fa-redo"></i>
                 </button>
-                <!-- Tombol Auto Render -->
-                <button id="auto-render-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2 rounded-lg flex-1 flex flex-col items-center justify-center gap-0.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed transition border border-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.2)]" disabled title="Render otomatis seluruh kombinasi">
-                    <div class="flex items-center gap-1 text-blue-100 text-[10px]">
-                        <i class="fas fa-robot"></i> Auto Render
-                    </div>
-                    <span class="text-[12px] leading-tight">Full Siklus</span>
+                <button id="auto-render-btn" class="flex-1 bg-[#2b3a6b] hover:bg-[#344683] text-blue-300 font-semibold py-2 px-3 md:px-4 rounded-lg text-sm transition border border-blue-900/50 disabled:opacity-40 disabled:cursor-not-allowed flex flex-col items-center justify-center gap-0.5" disabled>
+                    <span class="flex items-center gap-1.5"><i class="fas fa-robot text-[11px]"></i> Auto Render</span>
+                    <span class="text-[9px] font-bold tracking-wider uppercase opacity-80">Full Siklus</span>
                 </button>
-                <!-- Tombol Merge Hijau -->
-                <button id="merge-btn" class="btn-green text-white font-bold py-2 px-2 rounded-lg flex-1 flex flex-col items-center justify-center gap-0.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none transition" disabled>
-                    <div class="flex items-center gap-1 text-emerald-100 text-[10px]">
-                        <i class="fas fa-bolt"></i> Manual Merge
-                    </div>
-                    <span class="text-[12px] leading-tight">Simpan 1x</span>
+                <button id="merge-btn" class="flex-1 bg-[#1c5c44] hover:bg-[#237556] text-emerald-300 font-semibold py-2 px-3 md:px-4 rounded-lg text-sm transition border border-emerald-900/50 disabled:opacity-40 disabled:cursor-not-allowed flex flex-col items-center justify-center gap-0.5" disabled>
+                    <span class="flex items-center gap-1.5"><i class="fas fa-bolt text-[11px]"></i> Manual Merge</span>
+                    <span class="text-[9px] font-bold tracking-wider uppercase opacity-80">Simpan 1x</span>
                 </button>
             </div>
         </section>
@@ -368,6 +389,7 @@
             </ul>
             <input type="file" id="file-input" multiple accept="video/*" class="hidden">
         </section>
+
     </main>
     
     <div id="status-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center p-6 text-center">
@@ -549,6 +571,8 @@
         let historyIndex = -1;
         
         let thumbnailFileObj = null;
+        let images = []; // Array of object untuk playlist gambar
+        let activeImageIndex = 0; // Index gambar yang sedang di-preview
 
         const thumbnailDropZone = document.getElementById('thumbnail-drop-zone');
         const thumbnailInput = document.getElementById('thumbnail-input');
@@ -557,6 +581,14 @@
         const videoList = document.getElementById('video-list');
         const emptyState = document.getElementById('empty-state');
         const videoCountEl = document.getElementById('video-count');
+        
+        // Elemen UI Gambar Baru
+        const imageListSection = document.getElementById('image-list-section');
+        const imageList = document.getElementById('image-list');
+        const emptyStateImage = document.getElementById('empty-state-image');
+        const imageCountEl = document.getElementById('image-count');
+        const clearImagesBtn = document.getElementById('clear-images-btn');
+
         const previewAllBtn = document.getElementById('preview-all-btn');
         const shuffleBtn = document.getElementById('shuffle-btn');
         const clearAllBtn = document.getElementById('clear-all-btn');
@@ -955,32 +987,161 @@
         });
         
         thumbnailDropZone.addEventListener('drop', (e) => {
-            const file = e.dataTransfer.files[0];
-            if(file && file.type.startsWith('image/')) handleThumbnailFile(file);
+            if(e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processImages(e.dataTransfer.files);
+            }
         });
 
         thumbnailInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if(file) handleThumbnailFile(file);
+            if(e.target.files && e.target.files.length > 0) {
+                processImages(e.target.files);
+            }
         });
 
-        function handleThumbnailFile(file) {
-            thumbnailFileObj = file;
-            const url = URL.createObjectURL(file);
-            thumbnailPreview.src = url;
+        // --- Event Listener Image List (Area Kanan) ---
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+            imageListSection.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
+        });
+        
+        imageListSection.addEventListener('drop', (e) => {
+            if(e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processImages(e.dataTransfer.files);
+            }
+        });
+
+        if (clearImagesBtn) {
+            clearImagesBtn.addEventListener('click', () => {
+                images.forEach(img => URL.revokeObjectURL(img.url));
+                images = [];
+                activeImageIndex = 0;
+                updateImageUI();
+            });
+        }
+
+        // --- STREAMING_CHUNK:Processing uploaded images for playlist... ---
+        function processImages(files) {
+            const imgFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+            if (imgFiles.length === 0) {
+                showModal('File Tidak Valid', 'Silakan pilih file gambar yang valid (JPG/PNG).');
+                return;
+            }
+
+            const newImages = imgFiles.map(file => ({
+                id: 'img_' + Math.random().toString(36).substr(2, 9),
+                file: file,
+                url: URL.createObjectURL(file),
+                name: file.name
+            }));
+            
+            images.push(...newImages);
+            if (activeImageIndex >= images.length) activeImageIndex = 0;
+            updateImageUI();
+        }
+
+        function updateImageUI() {
+            imageList.innerHTML = '';
+            if (images.length === 0) {
+                imageList.appendChild(emptyStateImage);
+                imageCountEl.innerText = '0';
+                clearImagesBtn.disabled = true;
+                
+                thumbnailPreview.removeAttribute('src');
+                thumbnailPreview.classList.add('hidden');
+                thumbnailPlaceholder.classList.remove('hidden');
+                thumbnailTitle.textContent = "Belum ada thumbnail";
+                thumbnailFileObj = null;
+                if (downloadThumbBtn) downloadThumbBtn.disabled = true;
+                return;
+            }
+
+            clearImagesBtn.disabled = false;
+            imageCountEl.innerText = images.length;
+            
+            // Kunci index agar tidak out-of-bounds
+            if (activeImageIndex >= images.length) activeImageIndex = Math.max(0, images.length - 1);
+            
+            // Perbarui Canvas View ke gambar aktif
+            thumbnailFileObj = images[activeImageIndex].file;
+            thumbnailPreview.src = images[activeImageIndex].url;
             thumbnailPreview.classList.remove('hidden');
             thumbnailPlaceholder.classList.add('hidden');
-            
+            if (downloadThumbBtn) downloadThumbBtn.disabled = false;
+
             const validVideos = videos.filter(v => v.isValid !== false);
             if (validVideos.length > 0) {
                 const firstVideoName = validVideos[0].name;
                 const cleanName = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
-                thumbnailTitle.textContent = `Thumbnail: ${cleanName}`;
+                thumbnailTitle.textContent = images.length > 1 ? `Thumb: ${cleanName} (${images.length} Gbr)` : `Thumbnail: ${cleanName}`;
             } else {
-                thumbnailTitle.textContent = "Thumbnail: " + file.name;
+                thumbnailTitle.textContent = images.length > 1 ? `Playlist: ${images.length} Gambar` : "Thumbnail: " + thumbnailFileObj.name;
             }
-            
-            if (downloadThumbBtn) downloadThumbBtn.disabled = false;
+
+            images.forEach((img, index) => {
+                const li = document.createElement('li');
+                li.className = `video-item flex items-center justify-between py-1 px-2 rounded-md transition-colors ${index === activeImageIndex ? 'bg-emerald-900/40 border-emerald-500/60 shadow-sm' : ''}`;
+                li.draggable = true;
+                li.innerHTML = `
+                    <div class="flex items-center space-x-2 overflow-hidden cursor-pointer flex-grow" onclick="window.selectImage(${index})">
+                        <span class="text-[9px] ${index === activeImageIndex ? 'text-emerald-400' : 'text-slate-500'} font-bold w-4 text-right pr-1">${index + 1}</span>
+                        <img src="${img.url}" class="w-7 h-7 object-cover rounded border border-slate-700 flex-shrink-0" alt="thumb">
+                        <div class="flex flex-col overflow-hidden leading-tight">
+                            <span class="font-semibold text-[10px] ${index === activeImageIndex ? 'text-emerald-400' : 'text-slate-200'} truncate max-w-[100px] xl:max-w-[150px]" title="${img.name}">${img.name}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 z-10 flex-shrink-0 pl-1">
+                        <button class="text-slate-500 hover:text-red-400 transition p-1 cursor-pointer" onclick="window.removeImage('${img.id}', event)" title="Hapus Gambar">
+                            <i class="fas fa-times text-[9px]"></i>
+                        </button>
+                    </div>
+                `;
+                setupImageReordering(li, index);
+                imageList.appendChild(li);
+            });
+        }
+
+        window.selectImage = function(index) {
+            activeImageIndex = index;
+            updateImageUI();
+        };
+
+        window.removeImage = function(id, event) {
+            event.stopPropagation();
+            const idx = images.findIndex(img => img.id === id);
+            if (idx > -1) {
+                URL.revokeObjectURL(images[idx].url);
+                images.splice(idx, 1);
+                
+                if (activeImageIndex === idx) activeImageIndex = Math.max(0, idx - 1);
+                else if (activeImageIndex > idx) activeImageIndex--;
+                
+                updateImageUI();
+            }
+        };
+
+        let draggedImgIndex = null;
+        function setupImageReordering(item, index) {
+            item.addEventListener('dragstart', () => { draggedImgIndex = index; item.classList.add('is-dragging'); });
+            item.addEventListener('dragend', () => { draggedImgIndex = null; item.classList.remove('is-dragging'); });
+            item.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (draggedImgIndex !== null && draggedImgIndex !== index) item.classList.add('is-hovered-target');
+            });
+            item.addEventListener('dragleave', () => item.classList.remove('is-hovered-target'));
+            item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                item.classList.remove('is-hovered-target');
+                if (draggedImgIndex === null || draggedImgIndex === index) return;
+                
+                const moved = images.splice(draggedImgIndex, 1)[0];
+                images.splice(index, 0, moved);
+                
+                if (activeImageIndex === draggedImgIndex) activeImageIndex = index;
+                else if (activeImageIndex > draggedImgIndex && activeImageIndex <= index) activeImageIndex--;
+                else if (activeImageIndex < draggedImgIndex && activeImageIndex >= index) activeImageIndex++;
+                
+                updateImageUI();
+            });
         }
 
         // --- STREAMING_CHUNK:Configuring video file upload and validations... ---
@@ -1064,53 +1225,53 @@
                 previewAllBtn.disabled = false;
                 
                 const validCount = videos.filter(v => v.isValid !== false).length;
-                mergeBtn.disabled = validCount < 2;
-                if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
+            mergeBtn.disabled = validCount < 2;
+            if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
 
-                const validVideos = videos.filter(v => v.isValid !== false);
-                if (validVideos.length > 0) {
-                    const firstVideoName = validVideos[0].name;
-                    const cleanName = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
-                    customOutputNameInput.value = cleanName;
-                    
-                    if (thumbnailFileObj) {
-                        thumbnailTitle.textContent = `Thumbnail: ${cleanName}`;
-                    }
+            const validVideos = videos.filter(v => v.isValid !== false);
+            if (validVideos.length > 0) {
+                const firstVideoName = validVideos[0].name;
+                const cleanName = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
+                customOutputNameInput.value = cleanName;
+                
+                if (thumbnailFileObj) {
+                    thumbnailTitle.textContent = images.length > 1 ? `Thumb: ${cleanName} (${images.length} Gbr)` : `Thumbnail: ${cleanName}`;
                 }
+            }
 
-                if(canvasTextOverlayContainer) canvasTextOverlayContainer.classList.remove('hidden');
-                let tracklistArray = [];
+            if(canvasTextOverlayContainer) canvasTextOverlayContainer.classList.remove('hidden');
+            let tracklistArray = [];
 
-                videos.forEach((vid, index) => {
-                    const li = document.createElement('li');
-                    li.className = 'video-item flex items-center justify-between py-1 px-2 rounded-md';
-                    li.draggable = true;
+            videos.forEach((vid, index) => {
+                const li = document.createElement('li');
+                li.className = 'video-item flex items-center justify-between py-1 px-2 rounded-md';
+                li.draggable = true;
 
-                    const statusIcon = vid.isValid === false 
-                        ? '<i class="fas fa-times-circle text-red-500 text-[10px] flex-shrink-0" title="File Bermasalah"></i>' 
-                        : '<i class="fas fa-check-circle text-emerald-500 text-[10px] flex-shrink-0" title="File Valid"></i>';
-                    
-                    const titleClass = vid.isValid === false ? 'text-red-400 line-through opacity-70' : 'text-slate-200';
-                    const durationText = vid.isValid === false ? 'Format/File Rusak' : formatTime(vid.duration);
-                    const durationClass = vid.isValid === false ? 'text-red-500/70' : 'text-slate-500';
+                const statusIcon = vid.isValid === false 
+                    ? '<i class="fas fa-times-circle text-red-500 text-[10px] flex-shrink-0" title="File Bermasalah"></i>' 
+                    : '<i class="fas fa-check-circle text-emerald-500 text-[10px] flex-shrink-0" title="File Valid"></i>';
+                
+                const titleClass = vid.isValid === false ? 'text-red-400 line-through opacity-70' : 'text-slate-200';
+                const durationText = vid.isValid === false ? 'Format/File Rusak' : formatTime(vid.duration);
+                const durationClass = vid.isValid === false ? 'text-red-500/70' : 'text-slate-500';
 
-                    li.innerHTML = `
-                        <div class="flex items-center space-x-2 overflow-hidden pointer-events-none">
-                            <span class="text-[9px] text-slate-500 font-bold w-4 text-right pr-1">${index + 1}</span>
-                            ${statusIcon}
-                            <div class="flex flex-col overflow-hidden leading-tight">
-                                <span class="font-semibold text-[10px] ${titleClass} truncate max-w-[150px] sm:max-w-[220px]">${vid.name}</span>
-                                <span class="text-[8px] ${durationClass}">${durationText}</span>
-                            </div>
+                li.innerHTML = `
+                    <div class="flex items-center space-x-2 overflow-hidden pointer-events-none flex-grow">
+                        <span class="text-[9px] text-slate-500 font-bold w-4 text-right pr-1 flex-shrink-0">${index + 1}</span>
+                        ${statusIcon}
+                        <div class="flex flex-col overflow-hidden leading-tight flex-grow min-w-0">
+                            <span class="font-semibold text-[10px] ${titleClass} truncate w-full" title="${vid.name}">${vid.name}</span>
+                            <span class="text-[8px] ${durationClass}">${durationText}</span>
                         </div>
-                        <div class="flex items-center gap-1 z-10 flex-shrink-0">
-                            <button class="text-slate-500 hover:text-red-400 transition p-1 cursor-pointer" onclick="removeVideo('${vid.id}')" title="Hapus Video">
-                                <i class="fas fa-times text-[9px]"></i>
-                            </button>
-                        </div>
-                    `;
-                    setupReordering(li, index);
-                    videoList.appendChild(li);
+                    </div>
+                    <div class="flex items-center gap-1 z-10 flex-shrink-0 pl-1">
+                        <button class="text-slate-500 hover:text-red-400 transition p-1 cursor-pointer" onclick="removeVideo('${vid.id}')" title="Hapus Video">
+                            <i class="fas fa-times text-[9px]"></i>
+                        </button>
+                    </div>
+                `;
+                setupReordering(li, index);
+                videoList.appendChild(li);
                     
                     let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
                     tracklistArray.push(formatTextCase(rawText, currentTextTransform));
@@ -1141,13 +1302,13 @@
         }
 
         clearAllBtn.addEventListener('click', () => {
-            thumbnailPreview.removeAttribute('src');
-            thumbnailPreview.classList.add('hidden');
-            thumbnailPlaceholder.classList.remove('hidden');
-            thumbnailTitle.textContent = "Belum ada thumbnail";
-            thumbnailFileObj = null;
-            if (downloadThumbBtn) downloadThumbBtn.disabled = true;
+            // Bersihkan Gambar
+            images.forEach(img => URL.revokeObjectURL(img.url));
+            images = [];
+            activeImageIndex = 0;
+            updateImageUI();
             
+            // Bersihkan Video
             videos.forEach(v => URL.revokeObjectURL(v.url));
             videos = [];
             pastFirstVideoIds.clear();
@@ -1645,6 +1806,11 @@
                     
                     arrangeForAutoRenderCycle(i, totalCycles);
                     
+                    // Ganti thumbnail secara dinamis berdasarkan siklus (Playlist Gambar)
+                    if (images && images.length > 0) {
+                        thumbnailFileObj = images[i % images.length].file;
+                    }
+                    
                     const firstVideoName = videos[0].name;
                     const nameWithoutExt = firstVideoName.substring(0, firstVideoName.lastIndexOf('.')) || firstVideoName;
                     
@@ -1669,6 +1835,11 @@
                         updateProgress(100, `Menyiapkan siklus ${i+2} dari ${totalCycles}...`);
                         await new Promise(r => setTimeout(r, 1500));
                     }
+                }
+                
+                // Kembalikan thumbnail ke gambar aktif setelah auto render selesai
+                if (images && images.length > 0) {
+                    thumbnailFileObj = images[activeImageIndex].file;
                 }
                 
                 // Tutup overlay dan kembalikan state tombol
