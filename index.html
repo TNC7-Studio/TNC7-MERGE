@@ -205,7 +205,7 @@
                         <img id="thumbnail-preview" class="absolute inset-0 w-full h-full object-contain hidden z-10" alt="Thumbnail Preview">
                         
                         <div id="canvas-text-overlay-container" class="absolute inset-0 z-20 pointer-events-none hidden overflow-hidden" style="container-type: inline-size;">
-                            <div id="canvas-text-overlay" class="absolute bottom-3 md:bottom-5 left-3 md:left-5 text-white font-semibold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-left whitespace-pre-wrap max-h-[85%] pointer-events-auto cursor-move select-none p-1.5 border border-transparent hover:border-dashed hover:border-emerald-500/50 rounded transition-colors" title="Klik & geser untuk memindahkan teks."></div>
+                            <div id="canvas-text-overlay" class="absolute text-white font-semibold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-left whitespace-pre pointer-events-auto cursor-move select-none border border-transparent hover:border-dashed hover:border-emerald-500/50 rounded transition-colors" style="left: 3.5%; top: 60%; padding: 0.75cqi;" title="Klik & geser untuk memindahkan teks."></div>
                         </div>
 
                         <input type="file" id="thumbnail-input" accept="image/jpeg, image/png, image/jpg" class="hidden" multiple>
@@ -637,7 +637,7 @@
         let currentFontStyle = "normal";
         let currentTextTransform = "none";
         let currentTextAlign = "left";
-        window.textOffset = { x: 0.035, y: -1 }; // y = -1 menandakan posisi default (bawah)
+        window.textOffset = { x: 0.035, y: 0.6 }; // Posisi awal 60% dari atas
 
         // --- STREAMING_CHUNK:Defining text formatting helpers... ---
         // Fungsi untuk memastikan transformasi huruf bekerja sempurna (hard-replace teks)
@@ -857,9 +857,9 @@
                 let newLeft = e.clientX - startDragX - containerRect.left;
                 let newTop = e.clientY - startDragY - containerRect.top;
 
-                // Membatasi pergerakan agar teks tidak keluar dari area container (clamp bounds dengan textRect baru)
-                newLeft = Math.max(0, Math.min(newLeft, containerRect.width - textRect.width));
-                newTop = Math.max(0, Math.min(newTop, containerRect.height - textRect.height));
+                // Melonggarkan batasan agar teks panjang bisa digeser mepet garis tepi atau sebagian keluar layar tanpa error
+                newLeft = Math.max(-textRect.width + 20, Math.min(newLeft, containerRect.width - 20));
+                newTop = Math.max(-textRect.height + 20, Math.min(newTop, containerRect.height - 20));
 
                 // MENGUBAH PX KE PERSENTASE (%): Agar saat jendela tab dikecilkan, posisi terkunci (fix) 
                 const percentX = (newLeft / containerRect.width) * 100;
@@ -1441,6 +1441,10 @@
 
                     const validVideos = videos.filter(v => v.isValid !== false);
                     if (validVideos.length > 0) {
+                        // Intensitas Scale Width & Height diturunkan 30% (Sesuai dengan sinkronisasi DOM)
+                        const effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
+                        const effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
+
                         // --- MODE KALKULASI ABSOLUT MATEMATIKA (ANTI-RESIZE & ANTI-MINIMIZE BUG) ---
                         // Font Size dihitung 1.4% (0.014) dari lebar asli (ekuivalen rasio 1.4cqi UI)
                         const fontSize = (width * 0.014) * currentFontScale;
@@ -1450,21 +1454,15 @@
                         const paddingY = width * 0.0075;
 
                         // KOREKSI PRESISI DOM vs CANVAS:
-                        // Menambahkan kompensasi dorongan vertikal agar posisinya sama persis dengan preview
-                        const verticalCorrection = fontSize * 0.18;
+                        // Disesuaikan ke 0.285 untuk mengkompensasi half-leading line-height (1.25) dan gap ascender Browser.
+                        // Memastikan posisi Y mutlak akurat 100% (tidak bergeser ke atas) walau Size/Scale dimaksimalkan atau tab di-minimize.
+                        const verticalCorrection = fontSize * 0.285;
 
-                        let startX, startY;
-
-                        if (window.textOffset.y !== -1) {
-                            // Menggunakan persentase drag x & y dikali resolusi kanvas
-                            startX = (window.textOffset.x * width) + paddingX;
-                            startY = (window.textOffset.y * height) + paddingY + verticalCorrection;
-                        } else {
-                            // Default posisi awal UI (Pojok Kiri Bawah)
-                            startX = (width * 0.035) + paddingX; 
-                            const totalLineHeight = validVideos.length * (fontSize * 1.25);
-                            startY = height - totalLineHeight - (height * 0.05) + verticalCorrection;
-                        }
+                        // Posisi presisi terkunci dengan DOM menggunakan persentase rasio absolut.
+                        // Karena padding dan verticalCorrection berada di dalam elemen yang di-scale (CSS Transform),
+                        // maka harus dikalikan dengan effectiveScale agar posisinya sejajar persis dengan DOM.
+                        let startX = (window.textOffset.x * width) + (paddingX * effectiveScaleWidth);
+                        let startY = (window.textOffset.y * height) + (paddingY * effectiveScaleHeight) + (verticalCorrection * effectiveScaleHeight);
 
                         ctx.fillStyle = currentTextColor;
                         ctx.font = `${currentFontStyle} ${currentFontWeight} ${fontSize}px ${currentFontFamily}`;
@@ -1492,11 +1490,6 @@
                         startX = Math.max(0, startX);
                         startY = Math.max(0, startY);
                         
-                        // Intensitas Scale Width & Height diturunkan 30%
-                        const effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
-                        const effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
-                        // const maxWidth = (width - startX - (width * 0.02)) / effectiveScaleWidth; // Tidak lagi membatasi lebar
-
                         // Menghapus logika truncation (titik-titik), membiarkan teks dirender utuh
                         let maxLineWidth = 0;
                         let displayLines = tracklistArray.map(text => {
@@ -1517,8 +1510,11 @@
                             if (currentTextAlign === 'center') alignOffsetX = maxLineWidth / 2;
                             if (currentTextAlign === 'right') alignOffsetX = maxLineWidth;
 
-                            const renderX = (startX + alignOffsetX) / effectiveScaleWidth;
-                            const renderY = (startY + (i * lineHeight)) / effectiveScaleHeight;
+                            // Pembagian startX/Y dengan scale mengkonversi koordinat global ke lokal.
+                            // alignOffsetX dan posisi baris (i * lineHeight) sudah dalam koordinat lokal, 
+                            // sehingga saat di-scale oleh ctx.scale() di atas, semuanya merenggang presisi seperti DOM.
+                            const renderX = (startX / effectiveScaleWidth) + alignOffsetX;
+                            const renderY = (startY / effectiveScaleHeight) + (i * lineHeight);
                             
                             // Eksekusi Outline (Stroke) jika aktif (width slider > 0)
                             if (currentStrokeWidth > 0) {
