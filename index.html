@@ -1436,8 +1436,10 @@
                 const img = new Image();
                 img.src = URL.createObjectURL(thumbnailFileObj);
                 img.onload = () => {
-                    const width = img.naturalWidth || img.width || 1280;
-                    const height = img.naturalHeight || img.height || 720;
+                    // Peningkatan resolusi 50% (1.5x) untuk hasil JPG yang lebih tajam dan jernih
+                    const scaleMultiplier = 1.5; 
+                    const width = (img.naturalWidth || img.width || 1280) * scaleMultiplier;
+                    const height = (img.naturalHeight || img.height || 720) * scaleMultiplier;
                     canvas.width = width;
                     canvas.height = height;
 
