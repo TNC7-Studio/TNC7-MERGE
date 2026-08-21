@@ -24,8 +24,12 @@
         
         .dark-card {
             background-color: #14161d;
-            border: 1px solid #232733;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(16, 185, 129, 0.25) !important;
+            box-shadow: 
+                0 0 25px 0 rgba(16, 185, 129, 0.15), /* Pendaran (ambient glow) merata 360 derajat di luar panel */
+                inset 0 0 15px 0 rgba(16, 185, 129, 0.05), /* Pendaran halus di bagian dalam tepi panel */
+                0 15px 35px -10px rgba(0, 0, 0, 0.7) !important; /* Bayangan hitam untuk kedalaman UI */
+            position: relative;
         }
 
         .drop-area {
