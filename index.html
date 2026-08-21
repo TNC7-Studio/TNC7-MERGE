@@ -235,7 +235,9 @@
                                 <option value="Calibri, sans-serif">Calibri</option>
                                 <option value="Arial, sans-serif">Arial</option>
                                 <option value="'Times New Roman', serif">Times New Roman</option>
-                                <option value="Impact, sans-serif">Impact</option>
+                                <option value="'Helvetica Neue', Helvetica, sans-serif">Helvetica Neue</option>
+                                <option value="'Century Gothic', sans-serif">Century Gothic</option>
+                                <option value="Tahoma, sans-serif">Tahoma</option>
                                 <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
                             </select>
                         </div>
@@ -286,8 +288,8 @@
                             <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase ml-5">Size</span>
                             <div class="flex items-center gap-1.5" title="Ukuran Teks (Font Size)">
                                 <i class="fas fa-text-height text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
-                                <input type="range" id="font-scale-slider" min="0.5" max="3.5" step="0.05" value="1" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
-                                <span id="font-scale-val" class="text-[10px] text-slate-400 font-mono w-5 text-right flex-shrink-0">1.0</span>
+                                <input type="range" id="font-scale-slider" min="1" max="100" step="1" value="17" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
+                                <span id="font-scale-val" class="text-[10px] text-slate-400 font-mono w-5 text-right flex-shrink-0">17</span>
                             </div>
                         </div>
 
@@ -296,8 +298,8 @@
                             <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase ml-5">Scale W</span>
                             <div class="flex items-center gap-1.5" title="Lebar Teks (Scale Width)">
                                 <i class="fas fa-text-width text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
-                                <input type="range" id="scale-width-slider" min="0.5" max="3" step="0.1" value="1" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
-                                <span id="scale-width-val" class="text-[10px] text-slate-400 font-mono w-5 text-right flex-shrink-0">1.0</span>
+                                <input type="range" id="scale-width-slider" min="1" max="100" step="1" value="21" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
+                                <span id="scale-width-val" class="text-[10px] text-slate-400 font-mono w-5 text-right flex-shrink-0">21</span>
                             </div>
                         </div>
 
@@ -306,8 +308,8 @@
                             <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase ml-5">Scale H</span>
                             <div class="flex items-center gap-1.5" title="Tinggi Teks (Scale Height)">
                                 <i class="fas fa-arrows-alt-v text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
-                                <input type="range" id="scale-height-slider" min="0.5" max="3" step="0.1" value="1" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
-                                <span id="scale-height-val" class="text-[10px] text-slate-400 font-mono w-5 text-right flex-shrink-0">1.0</span>
+                                <input type="range" id="scale-height-slider" min="1" max="100" step="1" value="21" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
+                                <span id="scale-height-val" class="text-[10px] text-slate-400 font-mono w-5 text-right flex-shrink-0">21</span>
                             </div>
                         </div>
                         
@@ -317,7 +319,7 @@
                             <div class="flex items-center gap-1.5" title="Garis Tepi (Stroke & Warna)">
                                 <i class="fas fa-border-all text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
                                 <input type="color" id="stroke-color-picker" value="#000000" class="w-5 h-5 rounded cursor-pointer bg-transparent border-none p-0 outline-none flex-shrink-0">
-                                <input type="range" id="stroke-width-slider" min="0" max="20" step="1" value="0" class="w-full min-w-[20px] accent-emerald-500 cursor-pointer">
+                                <input type="range" id="stroke-width-slider" min="0" max="100" step="1" value="0" class="w-full min-w-[20px] accent-emerald-500 cursor-pointer">
                                 <span id="stroke-width-val" class="text-[10px] text-slate-400 font-mono w-4 text-right flex-shrink-0">0</span>
                             </div>
                         </div>
@@ -328,7 +330,7 @@
                             <div class="flex items-center gap-1.5" title="Intensitas Bayangan (Shadow)">
                                 <i class="fas fa-cloud-moon text-slate-500 text-[10px] w-3 text-center flex-shrink-0"></i>
                                 <input type="range" id="shadow-intensity-slider" min="0" max="100" step="1" value="50" class="w-full min-w-[30px] accent-emerald-500 cursor-pointer">
-                                <span id="shadow-intensity-val" class="text-[10px] text-slate-400 font-mono w-6 text-right flex-shrink-0">50%</span>
+                                <span id="shadow-intensity-val" class="text-[10px] text-slate-400 font-mono w-6 text-right flex-shrink-0">50</span>
                             </div>
                         </div>
                     </div>
@@ -351,7 +353,7 @@
                 <button id="redo-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 md:px-4 rounded-lg text-sm transition border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed" title="Redo" disabled>
                     <i class="fas fa-redo"></i>
                 </button>
-                <button id="auto-render-btn" class="flex-1 bg-[#2b3a6b] hover:bg-[#344683] text-blue-300 font-semibold py-2 px-3 md:px-4 rounded-lg text-sm transition border border-blue-900/50 disabled:opacity-40 disabled:cursor-not-allowed flex flex-col items-center justify-center gap-0.5" disabled>
+                <button id="auto-render-btn" class="flex-1 bg-red-900/80 hover:bg-red-800 text-red-300 font-semibold py-2 px-3 md:px-4 rounded-lg text-sm transition border border-red-900/50 disabled:opacity-40 disabled:cursor-not-allowed flex flex-col items-center justify-center gap-0.5" disabled>
                     <span class="flex items-center gap-1.5"><i class="fas fa-robot text-[11px]"></i> Auto Render</span>
                     <span class="text-[9px] font-bold tracking-wider uppercase opacity-80">Full Siklus</span>
                 </button>
@@ -405,6 +407,10 @@
         </div>
         <!-- Menampilkan persentase bulat -->
         <span id="progress-percent" class="text-xs font-bold text-emerald-400">0%</span>
+        
+        <button id="cancel-render-btn" class="mt-6 px-4 py-1.5 border border-red-900/50 bg-red-900/20 text-red-400 hover:bg-red-900/40 hover:text-red-300 rounded text-[10px] font-bold tracking-widest uppercase transition-all shadow-sm">
+            Batalkan
+        </button>
     </div>
 
     <!-- Message Modal -->
@@ -442,7 +448,7 @@
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app); // Inisialisasi Database
+        const db = getFirestore(app); 
 
         const authOverlay = document.getElementById('auth-overlay');
         const mainApp = document.getElementById('main-app-container');
@@ -539,12 +545,6 @@
                 mainApp.classList.remove('flex');
                 submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
                 submitBtn.disabled = false;
-                
-                // Seamless token login fallback untuk environment ini
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    // Kita nonaktifkan auto-login custom token agar memakai auth murni dari project Anda
-                    // signInWithCustomToken(auth, __initial_auth_token).catch(console.error);
-                }
             }
         });
     </script>
@@ -560,19 +560,21 @@
 
         let videos = [];
         let isProcessing = false;
+        let isRenderCancelled = false; // Variabel baru untuk memantau status pembatalan
+        let abortRenderFn = null; // Fungsi trigger pembatalan paksa
         let ffmpegInstance = null;
         let isFFmpegLoading = false;
         let isFileLoadingPhase = false; 
         let ffmpegInitPromise = null; 
         let pastFirstVideoIds = new Set(); 
-        let manualRenderCounter = 0; // Variabel baru untuk melacak jumlah render manual
+        let manualRenderCounter = 0; 
         
         let history = [];
         let historyIndex = -1;
         
         let thumbnailFileObj = null;
-        let images = []; // Array of object untuk playlist gambar
-        let activeImageIndex = 0; // Index gambar yang sedang di-preview
+        let images = []; 
+        let activeImageIndex = 0; 
 
         const thumbnailDropZone = document.getElementById('thumbnail-drop-zone');
         const thumbnailInput = document.getElementById('thumbnail-input');
@@ -582,7 +584,6 @@
         const emptyState = document.getElementById('empty-state');
         const videoCountEl = document.getElementById('video-count');
         
-        // Elemen UI Gambar Baru
         const imageListSection = document.getElementById('image-list-section');
         const imageList = document.getElementById('image-list');
         const emptyStateImage = document.getElementById('empty-state-image');
@@ -637,10 +638,9 @@
         let currentFontStyle = "normal";
         let currentTextTransform = "none";
         let currentTextAlign = "left";
-        window.textOffset = { x: 0.035, y: 0.6 }; // Posisi awal 60% dari atas
+        window.textOffset = { x: 0.035, y: 0.6 }; 
 
         // --- STREAMING_CHUNK:Defining text formatting helpers... ---
-        // Fungsi untuk memastikan transformasi huruf bekerja sempurna (hard-replace teks)
         function formatTextCase(text, transform) {
             if (transform === 'uppercase') return text.toUpperCase();
             if (transform === 'capitalize') {
@@ -649,7 +649,6 @@
             return text;
         }
 
-        // Fungsi untuk menyegarkan teks preview saat tombol case diklik
         function refreshTextPreview() {
             const canvasTextOverlay = document.getElementById('canvas-text-overlay');
             if (canvasTextOverlay) {
@@ -663,16 +662,8 @@
             }
         }
 
-        // --- SISTEM CACHE METRIK UI ---
         window.cachedRenderMetrics = { isValid: false };
-
-        function updateUIMetricsCache() {
-            // Dikosongkan: Rendering kini 100% menggunakan rasio persentase mutlak
-            // Ini menjamin posisi & ukuran font tidak bergeser biarpun layar dikecilkan
-            // atau tab berjalan di latar belakang (Minimize/Background Tabs).
-        }
-
-        // Pastikan cache selalu diperbarui saat layar di-resize
+        function updateUIMetricsCache() {}
         window.addEventListener('resize', updateUIMetricsCache);
 
         const thumbnailPreview = document.getElementById('thumbnail-preview');
@@ -683,14 +674,38 @@
         const statusText = document.getElementById('status-text');
         const progressBar = document.getElementById('progress-bar');
         const progressPercent = document.getElementById('progress-percent');
+        const cancelRenderBtn = document.getElementById('cancel-render-btn'); // Tangkap tombol batal
+
+        // --- STREAMING_CHUNK:Adding logic to cancel rendering... ---
+        if(cancelRenderBtn) {
+            cancelRenderBtn.addEventListener('click', () => {
+                if (!isProcessing) return;
+                isRenderCancelled = true;
+                cancelRenderBtn.innerText = "MEMBATALKAN...";
+                cancelRenderBtn.disabled = true;
+                statusText.innerText = "Menghentikan proses...";
+                
+                if (abortRenderFn) {
+                    abortRenderFn(); // Putus paksa janji (Promise) yang sedang berjalan
+                }
+
+                // Hentikan mesin FFmpeg secara paksa jika sedang melakukan render
+                if (ffmpegInstance) {
+                    try {
+                        ffmpegInstance.exit();
+                    } catch (e) {
+                        console.warn("Force exit FFmpeg engine:", e);
+                    }
+                    ffmpegInstance = null; // Tandai bahwa instance telah mati
+                }
+            });
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             initFFmpegInBackground();
-            saveState(); // Inisialisasi state awal
+            saveState(); 
         });
 
-        // --- STREAMING_CHUNK:Attaching event listeners for text controls... ---
-        // Event Listener untuk Kontrol Font
         fontFamilySelect.addEventListener('change', (e) => {
             currentFontFamily = e.target.value;
             applyTextStyles();
@@ -701,21 +716,45 @@
             applyTextStyles();
         });
 
+        // --- STREAMING_CHUNK:Attaching logical map handlers for smooth integer sliders... ---
+        // --- FUNGSI MAP RANGE MENGONVERSI SKALA 1-100 KE NILAI ASLI CANVAS ---
+        function mapRange(value, inMin, inMax, outMin, outMax) {
+            return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+        }
+
+        // --- EVENT LISTENER DENGAN SLIDER 1 SAMPAI 100 ---
         fontScaleSlider.addEventListener('input', (e) => {
-            currentFontScale = parseFloat(e.target.value);
-            fontScaleVal.innerText = currentFontScale.toFixed(2);
+            let val = parseInt(e.target.value);
+            fontScaleVal.innerText = val;
+            currentFontScale = mapRange(val, 1, 100, 0.5, 3.5); 
             applyTextStyles();
         });
 
         scaleWidthSlider.addEventListener('input', (e) => {
-            currentScaleWidth = parseFloat(e.target.value);
-            scaleWidthVal.innerText = currentScaleWidth.toFixed(1);
+            let val = parseInt(e.target.value);
+            scaleWidthVal.innerText = val;
+            currentScaleWidth = mapRange(val, 1, 100, 0.5, 3.0); 
             applyTextStyles();
         });
 
         scaleHeightSlider.addEventListener('input', (e) => {
-            currentScaleHeight = parseFloat(e.target.value);
-            scaleHeightVal.innerText = currentScaleHeight.toFixed(1);
+            let val = parseInt(e.target.value);
+            scaleHeightVal.innerText = val;
+            currentScaleHeight = mapRange(val, 1, 100, 0.5, 3.0);
+            applyTextStyles();
+        });
+
+        strokeWidthSlider.addEventListener('input', (e) => {
+            let val = parseInt(e.target.value);
+            strokeWidthVal.innerText = val;
+            currentStrokeWidth = mapRange(val, 0, 100, 0, 20); 
+            applyTextStyles();
+        });
+
+        shadowIntensitySlider.addEventListener('input', (e) => {
+            let val = parseInt(e.target.value);
+            shadowIntensityVal.innerText = val;
+            currentShadowIntensity = val / 100;
             applyTextStyles();
         });
 
@@ -774,49 +813,30 @@
             applyTextStyles();
         });
 
-        strokeWidthSlider.addEventListener('input', (e) => {
-            currentStrokeWidth = parseFloat(e.target.value);
-            strokeWidthVal.innerText = currentStrokeWidth;
-            applyTextStyles();
-        });
-
-        shadowIntensitySlider.addEventListener('input', (e) => {
-            let val = parseInt(e.target.value);
-            currentShadowIntensity = val / 100;
-            shadowIntensityVal.innerText = `${val}%`;
-            applyTextStyles();
-        });
-
         // --- STREAMING_CHUNK:Implementing text rendering application logic... ---
         function applyTextStyles() {
             const canvasTextOverlay = document.getElementById('canvas-text-overlay');
             if (canvasTextOverlay) {
                 canvasTextOverlay.style.fontFamily = currentFontFamily;
-                // Menggunakan cqi (container query) agar ukuran teks meresize dinamis sempurna 
-                // mengikuti lebar kontainer, sehingga proporsi dengan gambar selalu sama (Fix-locked)
                 canvasTextOverlay.style.fontSize = `calc(1.4cqi * ${currentFontScale})`;
                 canvasTextOverlay.style.color = currentTextColor;
                 canvasTextOverlay.style.fontWeight = currentFontWeight;
                 canvasTextOverlay.style.fontStyle = currentFontStyle;
                 canvasTextOverlay.style.textAlign = currentTextAlign;
                 
-                // Scale Width, Scale Height & Stroke
                 let effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
                 let effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
                 canvasTextOverlay.style.transform = `scale(${effectiveScaleWidth}, ${effectiveScaleHeight})`;
                 canvasTextOverlay.style.transformOrigin = "left top";
-                // Intensitas stroke sangat halus (dibagi 4 dari hitungan awal)
+                
                 canvasTextOverlay.style.webkitTextStroke = `${currentStrokeWidth * 0.00125}cqi ${currentStrokeColor}`;
                 
-                // Shadow Intensity
-                // Jarak dan penyebaran bayangan dinaikkan total 1.5x 
                 canvasTextOverlay.style.textShadow = `
                     0px max(2.25px, 0.315cqi) max(4.5px, 0.4725cqi) rgba(0, 0, 0, ${currentShadowIntensity})
                 `;
             }
         }
 
-        // --- Logika Scroll Mouse untuk Ganti Font (Masih berjalan jika scroll tepat di select box) ---
         fontFamilySelect.addEventListener('wheel', (e) => {
             e.preventDefault(); 
             const options = fontFamilySelect.options;
@@ -832,7 +852,6 @@
             }
         });
 
-        // --- STREAMING_CHUNK:Setting up canvas drag and drop interactions... ---
         // --- Logika Drag and Drop Text di Atas Canvas ---
         const textOverlayElement = document.getElementById('canvas-text-overlay');
         const overlayContainerElement = document.getElementById('canvas-text-overlay-container');
@@ -846,38 +865,35 @@
                 const rect = textOverlayElement.getBoundingClientRect();
                 startDragX = e.clientX - rect.left;
                 startDragY = e.clientY - rect.top;
-                e.preventDefault(); // Mencegah block text selection default
+                e.preventDefault(); 
             });
 
             window.addEventListener('mousemove', (e) => {
                 if (!isDraggingText) return;
                 const containerRect = overlayContainerElement.getBoundingClientRect();
-                const textRect = textOverlayElement.getBoundingClientRect(); // Membaca batas teks yang sudah discaling
+                const textRect = textOverlayElement.getBoundingClientRect(); 
                 
                 let newLeft = e.clientX - startDragX - containerRect.left;
                 let newTop = e.clientY - startDragY - containerRect.top;
 
-                // Melonggarkan batasan agar teks panjang bisa digeser mepet garis tepi atau sebagian keluar layar tanpa error
                 newLeft = Math.max(-textRect.width + 20, Math.min(newLeft, containerRect.width - 20));
                 newTop = Math.max(-textRect.height + 20, Math.min(newTop, containerRect.height - 20));
 
-                // MENGUBAH PX KE PERSENTASE (%): Agar saat jendela tab dikecilkan, posisi terkunci (fix) 
                 const percentX = (newLeft / containerRect.width) * 100;
                 const percentY = (newTop / containerRect.height) * 100;
 
-                textOverlayElement.style.bottom = 'auto'; // Reset bottom default
+                textOverlayElement.style.bottom = 'auto'; 
                 textOverlayElement.style.right = 'auto';
                 textOverlayElement.style.left = `${percentX}%`;
                 textOverlayElement.style.top = `${percentY}%`;
 
-                // Menyimpan angka rasio mutlak untuk dicetak mesin Render tanpa membaca DOM
                 window.textOffset.x = newLeft / containerRect.width;
                 window.textOffset.y = newTop / containerRect.height;
             });
 
             window.addEventListener('mouseup', () => {
                 isDraggingText = false;
-                updateUIMetricsCache(); // Kunci posisi saat kursor dilepas
+                updateUIMetricsCache(); 
             });
         }
 
@@ -911,7 +927,6 @@
         });
 
         function restoreState(index) {
-            // Revoke current object urls to prevent memory leak
             videos.forEach(v => {
                 if (v.url) {
                     try { URL.revokeObjectURL(v.url); } catch(e) {}
@@ -949,13 +964,12 @@
                         log: false
                     });
                     
-                    // Update Persentase Normal/Bulat
                     ffmpegInstance.setProgress(({ ratio }) => {
                         if (!isFileLoadingPhase) {
                             const now = Date.now();
                             if (now - lastProgressTime > 100) {
                                 const rawPct = Math.min(Math.max(ratio * 100, 0), 100);
-                                const pct = Math.round(rawPct); // Dibulatkan agar rapi
+                                const pct = Math.round(rawPct);
                                 updateProgress(pct, `Menggabungkan File (Turbo Mode)...`);
                                 lastProgressTime = now;
                             }
@@ -1057,10 +1071,8 @@
             clearImagesBtn.disabled = false;
             imageCountEl.innerText = images.length;
             
-            // Kunci index agar tidak out-of-bounds
             if (activeImageIndex >= images.length) activeImageIndex = Math.max(0, images.length - 1);
             
-            // Perbarui Canvas View ke gambar aktif
             thumbnailFileObj = images[activeImageIndex].file;
             thumbnailPreview.src = images[activeImageIndex].url;
             thumbnailPreview.classList.remove('hidden');
@@ -1145,7 +1157,6 @@
         }
 
         // --- STREAMING_CHUNK:Configuring video file upload and validations... ---
-        // --- Event Listener Video (Area Kanan) ---
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
             videoListSection.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
         });
@@ -1153,7 +1164,7 @@
         fileInput.addEventListener('change', (e) => processFiles(e.target.files));
 
         async function processFiles(files) {
-            if (!files || files.length === 0) return; // Abaikan drop jika tidak ada file (mencegah bug notif saat geser video)
+            if (!files || files.length === 0) return; 
 
             const videoFiles = Array.from(files).filter(file => file.type.startsWith('video/'));
             if (videoFiles.length === 0) {
@@ -1279,7 +1290,7 @@
                 
                 if(canvasTextOverlay) {
                     canvasTextOverlay.innerText = tracklistArray.join('\n');
-                    applyTextStyles(); // Update style tiap ada perubahan teks
+                    applyTextStyles(); 
                 }
             }
             videoCountEl.innerText = videos.length;
@@ -1302,13 +1313,11 @@
         }
 
         clearAllBtn.addEventListener('click', () => {
-            // Bersihkan Gambar
             images.forEach(img => URL.revokeObjectURL(img.url));
             images = [];
             activeImageIndex = 0;
             updateImageUI();
             
-            // Bersihkan Video
             videos.forEach(v => URL.revokeObjectURL(v.url));
             videos = [];
             pastFirstVideoIds.clear();
@@ -1360,26 +1369,22 @@
                     setTimeout(() => item.classList.remove('just-moved'), 800);
                 });
 
-                // Menampilkan pemberitahuan modal jika siklus selesai
                 if (siklusSelesai && showNotification) {
                     showModal("Info Pengacakan", "Semua video sudah pernah berada di urutan pertama. Riwayat posisi telah di-reset untuk siklus acak berikutnya.");
                 }
             }
         }
 
-        // Fungsi khusus untuk Auto Render agar urutan pertama dijamin unik tiap siklus
         function arrangeForAutoRenderCycle(cycleIndex, totalCycles) {
             if (videos.length < 2) return;
             
-            // Pindahkan video pada index cycleIndex ke posisi pertama (index 0)
             if (cycleIndex > 0 && cycleIndex < videos.length) {
                 const videoToFront = videos.splice(cycleIndex, 1)[0];
                 videos.unshift(videoToFront);
             }
             
-            // Acak HANYA video dari urutan ke-2 hingga terakhir
             for (let i = videos.length - 1; i > 1; i--) {
-                const j = 1 + Math.floor(Math.random() * i); // random index dari 1 sampai i
+                const j = 1 + Math.floor(Math.random() * i); 
                 [videos[i], videos[j]] = [videos[j], videos[i]];
             }
             
@@ -1406,7 +1411,7 @@
             item.addEventListener('dragleave', () => item.classList.remove('is-hovered-target'));
             item.addEventListener('drop', (e) => {
                 e.preventDefault();
-                e.stopPropagation(); // Mencegah event drop trigger fungsi baca file pada container
+                e.stopPropagation(); 
                 item.classList.remove('is-hovered-target');
                 if (draggedIndex === null || draggedIndex === index) return;
                 const moved = videos.splice(draggedIndex, 1)[0];
@@ -1427,13 +1432,11 @@
                 const img = new Image();
                 img.src = URL.createObjectURL(thumbnailFileObj);
                 img.onload = () => {
-                    // Gunakan resolusi asli gambar secara mutlak
                     const width = img.naturalWidth || img.width || 1280;
                     const height = img.naturalHeight || img.height || 720;
                     canvas.width = width;
                     canvas.height = height;
 
-                    // Mengatur smoothing quality ke high untuk hasil gambar yang tajam dan jernih
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
 
@@ -1441,56 +1444,39 @@
 
                     const validVideos = videos.filter(v => v.isValid !== false);
                     if (validVideos.length > 0) {
-                        // Intensitas Scale Width & Height diturunkan 30% (Sesuai dengan sinkronisasi DOM)
                         const effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
                         const effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
 
-                        // --- MODE KALKULASI ABSOLUT MATEMATIKA (ANTI-RESIZE & ANTI-MINIMIZE BUG) ---
-                        // Font Size dihitung 1.4% (0.014) dari lebar asli (ekuivalen rasio 1.4cqi UI)
                         const fontSize = (width * 0.014) * currentFontScale;
-                        
-                        // Padding rasional UI terhadap resolusi asli
                         const paddingX = width * 0.0075;
                         const paddingY = width * 0.0075;
 
-                        // KOREKSI PRESISI DOM vs CANVAS:
-                        // Disesuaikan ke 0.285 untuk mengkompensasi half-leading line-height (1.25) dan gap ascender Browser.
-                        // Memastikan posisi Y mutlak akurat 100% (tidak bergeser ke atas) walau Size/Scale dimaksimalkan atau tab di-minimize.
                         const verticalCorrection = fontSize * 0.285;
 
-                        // Posisi presisi terkunci dengan DOM menggunakan persentase rasio absolut.
-                        // Karena padding dan verticalCorrection berada di dalam elemen yang di-scale (CSS Transform),
-                        // maka harus dikalikan dengan effectiveScale agar posisinya sejajar persis dengan DOM.
                         let startX = (window.textOffset.x * width) + (paddingX * effectiveScaleWidth);
                         let startY = (window.textOffset.y * height) + (paddingY * effectiveScaleHeight) + (verticalCorrection * effectiveScaleHeight);
 
                         ctx.fillStyle = currentTextColor;
                         ctx.font = `${currentFontStyle} ${currentFontWeight} ${fontSize}px ${currentFontFamily}`;
-                        ctx.textBaseline = 'top'; // Mudahkan perhitungan tinggi baris
+                        ctx.textBaseline = 'top'; 
                         
-                        // Efek bayangan disesuaikan dengan slider intensitas
-                        // Jarak dan penyebaran bayangan dinaikkan total 1.5x 
                         ctx.shadowColor = `rgba(0, 0, 0, ${currentShadowIntensity})`;
                         ctx.shadowBlur = Math.max(3, fontSize * 0.225);
                         ctx.shadowOffsetY = Math.max(1.5, fontSize * 0.15);
                         
-                        // Setup garis tepi (Stroke)
                         ctx.lineJoin = 'round';
                         ctx.miterLimit = 2;
                         
-                        const lineHeight = fontSize * 1.25; // Jarak antar baris yang lebih rapat (leading-tight)
+                        const lineHeight = fontSize * 1.25; 
                         
-                        // Menangani Transformasi Case pada teks awal melalui fungsi terpusat
                         let tracklistArray = validVideos.map((vid, index) => {
                             let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
                             return formatTextCase(rawText, currentTextTransform);
                         });
 
-                        // Pastikan teks tidak keluar batas kiri/atas
                         startX = Math.max(0, startX);
                         startY = Math.max(0, startY);
                         
-                        // Menghapus logika truncation (titik-titik), membiarkan teks dirender utuh
                         let maxLineWidth = 0;
                         let displayLines = tracklistArray.map(text => {
                             const measuredWidth = ctx.measureText(text).width;
@@ -1502,39 +1488,28 @@
                         
                         displayLines.forEach((printText, i) => {
                             ctx.save();
-                            // Mengunci render agar mengadopsi ukuran Scale Width & Height peregangan
                             ctx.scale(effectiveScaleWidth, effectiveScaleHeight);
                             
-                            // Kalkulasi anchor poin berdasarkan Alignment
                             let alignOffsetX = 0;
                             if (currentTextAlign === 'center') alignOffsetX = maxLineWidth / 2;
                             if (currentTextAlign === 'right') alignOffsetX = maxLineWidth;
 
-                            // Pembagian startX/Y dengan scale mengkonversi koordinat global ke lokal.
-                            // alignOffsetX dan posisi baris (i * lineHeight) sudah dalam koordinat lokal, 
-                            // sehingga saat di-scale oleh ctx.scale() di atas, semuanya merenggang presisi seperti DOM.
                             const renderX = (startX / effectiveScaleWidth) + alignOffsetX;
                             const renderY = (startY / effectiveScaleHeight) + (i * lineHeight);
                             
-                            // Eksekusi Outline (Stroke) jika aktif (width slider > 0)
                             if (currentStrokeWidth > 0) {
-                                // Intensitas stroke sangat halus (dibagi 4 dari kalkulasi awal)
-                                ctx.lineWidth = currentStrokeWidth * (width * 0.00000625); // Hitungan matematis absolut
+                                ctx.lineWidth = currentStrokeWidth * (width * 0.00000625);
                                 ctx.strokeStyle = currentStrokeColor;
                                 ctx.strokeText(printText, renderX, renderY);
                             }
                             
-                            // Eksekusi Fill/Warna utama Font
                             ctx.fillText(printText, renderX, renderY);
                             
                             ctx.restore();
                         });
                     }
                     
-                    // SELALU gunakan MIME type image/jpeg agar output kecil namun berkualitas
                     const mimeType = 'image/jpeg';
-                    
-                    // Kualitas 0.99: Titik maksimal untuk kejernihan super tajam, menaikkan ukuran file agar kualitas gambar lebih padat
                     canvas.toBlob((blob) => {
                         URL.revokeObjectURL(img.src);
                         resolve(blob);
@@ -1555,11 +1530,19 @@
 
             // KUNCI MEMORI METRIK UI SEBELUM PROSES RENDER
             updateUIMetricsCache();
+            
+            // Reset status cancel setiap kali proses baru dimulai
+            isRenderCancelled = false;
+            abortRenderFn = null;
+            if(cancelRenderBtn) {
+                cancelRenderBtn.innerText = "Batalkan";
+                cancelRenderBtn.disabled = false;
+                cancelRenderBtn.classList.remove('hidden');
+            }
 
             let outputName = autoFileName;
-            // Jika bukan Auto Render (Manual), beri angka berurutan di depan
             if (!autoFileName) {
-                manualRenderCounter++; // Tambah angka urutan setiap kali render manual
+                manualRenderCounter++; 
                 let baseName = "TNC7-MERGE";
                 if (validVideos.length > 0) {
                     const firstVideoName = validVideos[0].name;
@@ -1607,12 +1590,16 @@
                 updateProgress(10, `Membaca file ke RAM... ${cycleInfo}`);
 
                 for (let i = 0; i < validVideos.length; i++) {
+                    if (isRenderCancelled) throw new Error("CANCELLED"); // Cek Batal saat load file
+                    
                     const vid = validVideos[i];
                     const ext = vid.file.name.split('.').pop() || 'mp4';
                     const fname = `file_${i}.${ext}`;
                     fileNames[i] = fname;
                     
                     const arrayBuffer = await vid.file.arrayBuffer();
+                    if (isRenderCancelled) throw new Error("CANCELLED"); // Cek lagi setelah proses baca file berat
+                    
                     ffmpegInstance.FS('writeFile', fname, new Uint8Array(arrayBuffer));
                     
                     readCount++;
@@ -1637,8 +1624,18 @@
                 ffmpegArgs.push('-c', 'copy');
                 ffmpegArgs.push('-fflags', '+fastseek', '-movflags', '+faststart', internalOutputName);
                 
-                await ffmpegInstance.run(...ffmpegArgs);
+                if (isRenderCancelled) throw new Error("CANCELLED"); // Cek Batal sebelum render
+                
+                const runPromise = ffmpegInstance.run(...ffmpegArgs);
+                const cancelPromise = new Promise((_, reject) => {
+                    abortRenderFn = () => reject(new Error("CANCELLED"));
+                });
 
+                await Promise.race([runPromise, cancelPromise]);
+                abortRenderFn = null;
+                
+                if (isRenderCancelled) throw new Error("CANCELLED"); // Cek Batal setelah render
+                
                 isFileLoadingPhase = true;
                 updateProgress(98, `Menyimpan file output... ${cycleInfo}`);
                 
@@ -1656,7 +1653,6 @@
 
                 updateProgress(100, `Selesai! ${cycleInfo}`);
                 
-                // --- Generate File Teks (List Lagu) otomatis untuk Manual & Auto ---
                 const textOutputName = outputName.replace(/\.mp4$/i, '.txt');
                 const thumbOutputName = outputName.replace(/\.mp4$/i, `.jpg`);
                 const currentTitles = videos.map((v, idx) => {
@@ -1665,12 +1661,10 @@
                 const tracklistContent = `Daftar Lagu untuk ${outputName}:\n\n${currentTitles}`;
 
                 if (fileHandle && !useFallback) {
-                    // Simpan Video
                     const writable = await fileHandle.createWritable();
                     await writable.write(blob);
                     await writable.close();
                     
-                    // Simpan File Teks
                     try {
                         const txtHandle = await dirHandle.getFileHandle(textOutputName, { create: true });
                         const txtWritable = await txtHandle.createWritable();
@@ -1680,7 +1674,6 @@
                         console.warn("Gagal menyimpan file teks", e);
                     }
 
-                    // Simpan File Thumbnail
                     if (thumbnailFileObj) {
                         try {
                             const thumbBlob = await createThumbnailBlob();
@@ -1695,7 +1688,6 @@
 
                     if (!isAutoMode) showModal("Berhasil!", `Video, File Teks (List Lagu), dan Thumbnail berhasil disimpan di "${dirHandle.name || 'Folder Anda'}".`);
                 } else {
-                    // Download Video Fallback
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = blobUrl;
@@ -1705,7 +1697,6 @@
                     document.body.removeChild(a);
                     setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
 
-                    // Download File Teks Fallback
                     const txtBlob = new Blob([tracklistContent], { type: 'text/plain' });
                     const txtUrl = URL.createObjectURL(txtBlob);
                     const txtA = document.createElement('a');
@@ -1717,7 +1708,6 @@
                     document.body.removeChild(txtA);
                     setTimeout(() => URL.revokeObjectURL(txtUrl), 10000);
 
-                    // Download File Thumbnail Fallback
                     if (thumbnailFileObj) {
                         try {
                             const thumbBlob = await createThumbnailBlob();
@@ -1740,6 +1730,13 @@
                 
                 return true;
             } catch (error) {
+                // Menangani output khusus saat pengguna membatalkan
+                if (isRenderCancelled || !ffmpegInstance || (error && error.message === "CANCELLED")) {
+                    console.log("Proses rendering dibatalkan oleh pengguna.");
+                    if (!isAutoMode) showModal("Dibatalkan", "Proses rendering telah dibatalkan.");
+                    return false;
+                }
+                
                 console.error("Error Processing:", error);
                 if (!isAutoMode) showModal("Gagal", "Terjadi kesalahan saat menggabungkan video. Pastikan format file seragam atau file tidak rusak.");
                 return false;
@@ -1747,7 +1744,6 @@
                 isProcessing = false;
                 isFileLoadingPhase = false;
                 
-                // Jika bukan mode Auto, normalkan kembali UI
                 if (!isAutoMode) {
                     const validCount = videos.filter(v => v.isValid !== false).length;
                     mergeBtn.disabled = validCount < 2;
@@ -1774,7 +1770,7 @@
                     try {
                         dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
                     } catch (err) {
-                        return; // Batal jika user close picker
+                        return; 
                     }
                 } else {
                     showModal("Tidak Didukung", "Fitur Auto Render membutuhkan akses Folder sistem. Gunakan Google Chrome atau Edge versi Desktop.");
@@ -1782,9 +1778,8 @@
                 }
 
                 const totalCycles = validVideos.length;
-                pastFirstVideoIds.clear(); // Reset riwayat dari acak manual
+                pastFirstVideoIds.clear(); 
                 
-                // Tampilkan overlay sejak awal
                 statusOverlay.classList.remove('hidden');
                 updateProgress(0, `Memulai Auto Render...`);
                 
@@ -1795,7 +1790,6 @@
                     
                     arrangeForAutoRenderCycle(i, totalCycles);
                     
-                    // Ganti thumbnail secara dinamis berdasarkan siklus (Playlist Gambar)
                     if (images && images.length > 0) {
                         thumbnailFileObj = images[i % images.length].file;
                     }
@@ -1810,7 +1804,11 @@
                     try {
                         const success = await startMergeProcess(dirHandle, outputName, true, cycleInfo);
                         if (!success) {
-                            showModal("Auto Render Terhenti", `Proses gagal atau dibatalkan pada siklus ke-${i+1}.`);
+                            if (isRenderCancelled) {
+                                showModal("Rendering Dibatalkan", `Auto Render dibatalkan pada siklus ke-${i+1}. Siklus yang sudah selesai tetap tersimpan.`);
+                            } else {
+                                showModal("Auto Render Terhenti", `Proses gagal atau dibatalkan pada siklus ke-${i+1}.`);
+                            }
                             break;
                         }
                     } catch (err) {
@@ -1819,25 +1817,21 @@
                         break;
                     }
                     
-                    // Jeda sejenak sebelum siklus render berikutnya
-                    if (i < totalCycles - 1) {
+                    if (i < totalCycles - 1 && !isRenderCancelled) {
                         updateProgress(100, `Menyiapkan siklus ${i+2} dari ${totalCycles}...`);
                         await new Promise(r => setTimeout(r, 1500));
                     }
                 }
                 
                 // Kembalikan thumbnail ke gambar aktif setelah auto render selesai
-                if (images && images.length > 0) {
-                    thumbnailFileObj = images[activeImageIndex].file;
-                }
-                
-                // Tutup overlay dan kembalikan state tombol
                 statusOverlay.classList.add('hidden');
                 const validCount = videos.filter(v => v.isValid !== false).length;
                 mergeBtn.disabled = validCount < 2;
                 if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
                 
-                showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!`);
+                if (!isRenderCancelled) {
+                    showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!`);
+                }
             });
         }
 
@@ -1860,7 +1854,6 @@
 
         modalCloseBtn.addEventListener('click', () => modal.classList.add('hidden'));
 
-        // --- FITUR DOWNLOAD THUMBNAIL EDIT ---
         if (downloadThumbBtn) {
             downloadThumbBtn.addEventListener('click', async () => {
                 if (!thumbnailFileObj) return;
