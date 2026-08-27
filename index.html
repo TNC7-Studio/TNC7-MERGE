@@ -580,6 +580,62 @@
         let images = []; 
         let activeImageIndex = 0; 
 
+        // --- GLOBAL LOCK & QUEUE VARIABLES ---
+        const CURRENT_TAB_ID = 'tab_' + Math.random().toString(36).substr(2, 9);
+        const renderChannel = new BroadcastChannel('tnc7_render_channel');
+        let isWaitingInQueue = false;
+        let pendingAutoRenderDir = null;
+
+        function updateQueueUI() {
+            if (isWaitingInQueue) {
+                let q = JSON.parse(localStorage.getItem('tnc7_render_queue') || '[]');
+                const pos = q.indexOf(CURRENT_TAB_ID) + 1;
+                if (pos > 0) {
+                    updateProgress(0, `Menunggu Antrean (Posisi: ${pos})`);
+                }
+            }
+        }
+
+        renderChannel.onmessage = (event) => {
+            if (event.data.type === 'YOUR_TURN' && event.data.targetTab === CURRENT_TAB_ID) {
+                if (pendingAutoRenderDir) {
+                    localStorage.setItem('tnc7_active_render_tab', CURRENT_TAB_ID);
+                    executeAutoRender(pendingAutoRenderDir);
+                    pendingAutoRenderDir = null;
+                }
+            } else if (event.data.type === 'QUEUE_UPDATE') {
+                updateQueueUI();
+            }
+        };
+
+        function releaseGlobalLock() {
+            if (localStorage.getItem('tnc7_active_render_tab') === CURRENT_TAB_ID) {
+                localStorage.removeItem('tnc7_active_render_tab');
+            }
+            let q = JSON.parse(localStorage.getItem('tnc7_render_queue') || '[]');
+            if (q.length > 0) {
+                const nextTabId = q.shift();
+                localStorage.setItem('tnc7_render_queue', JSON.stringify(q));
+                renderChannel.postMessage({ type: 'YOUR_TURN', targetTab: nextTabId });
+                renderChannel.postMessage({ type: 'QUEUE_UPDATE' });
+            }
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (localStorage.getItem('tnc7_active_render_tab') === CURRENT_TAB_ID) {
+                localStorage.removeItem('tnc7_active_render_tab');
+                releaseGlobalLock();
+            } else {
+                let q = JSON.parse(localStorage.getItem('tnc7_render_queue') || '[]');
+                const idx = q.indexOf(CURRENT_TAB_ID);
+                if (idx !== -1) {
+                    q.splice(idx, 1);
+                    localStorage.setItem('tnc7_render_queue', JSON.stringify(q));
+                    renderChannel.postMessage({ type: 'QUEUE_UPDATE' });
+                }
+            }
+        });
+
         const thumbnailDropZone = document.getElementById('thumbnail-drop-zone');
         const thumbnailInput = document.getElementById('thumbnail-input');
         const videoListSection = document.getElementById('video-list-section');
@@ -683,6 +739,21 @@
         // --- STREAMING_CHUNK:Adding logic to cancel rendering... ---
         if(cancelRenderBtn) {
             cancelRenderBtn.addEventListener('click', () => {
+                if (isWaitingInQueue) {
+                    isWaitingInQueue = false;
+                    let q = JSON.parse(localStorage.getItem('tnc7_render_queue') || '[]');
+                    const idx = q.indexOf(CURRENT_TAB_ID);
+                    if (idx !== -1) {
+                        q.splice(idx, 1);
+                        localStorage.setItem('tnc7_render_queue', JSON.stringify(q));
+                        renderChannel.postMessage({ type: 'QUEUE_UPDATE' });
+                    }
+                    statusOverlay.classList.add('hidden');
+                    pendingAutoRenderDir = null;
+                    cancelRenderBtn.innerText = "Batalkan";
+                    return;
+                }
+
                 if (!isProcessing) return;
                 isRenderCancelled = true;
                 cancelRenderBtn.innerText = "MEMBATALKAN...";
@@ -1425,7 +1496,19 @@
             });
         }
 
-        mergeBtn.addEventListener('click', () => startMergeProcess());
+        mergeBtn.addEventListener('click', async () => {
+            const activeTab = localStorage.getItem('tnc7_active_render_tab');
+            if (activeTab && activeTab !== CURRENT_TAB_ID) {
+                showModal("Global Lock Aktif", "Tab lain sedang melakukan proses Render. Harap tunggu hingga selesai.");
+                return;
+            }
+            localStorage.setItem('tnc7_active_render_tab', CURRENT_TAB_ID);
+            try {
+                await startMergeProcess();
+            } finally {
+                releaseGlobalLock();
+            }
+        });
 
         // --- STREAMING_CHUNK:Engine function for rendering Canvas thumbnails natively... ---
         async function createThumbnailBlob() {
@@ -1766,31 +1849,20 @@
         }
         
         // --- STREAMING_CHUNK:Finalizing UI logic and protective listeners... ---
-        if (autoRenderBtn) {
-            autoRenderBtn.addEventListener('click', async () => {
-                const validVideos = videos.filter(v => v.isValid !== false);
-                if (validVideos.length < 2 || isProcessing) return;
-
-                let dirHandle = null;
-                if ('showDirectoryPicker' in window) {
-                    try {
-                        dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-                    } catch (err) {
-                        return; 
-                    }
-                } else {
-                    showModal("Tidak Didukung", "Fitur Auto Render membutuhkan akses Folder sistem. Gunakan Google Chrome atau Edge versi Desktop.");
-                    return;
-                }
-
-                const totalCycles = validVideos.length;
-                pastFirstVideoIds.clear(); 
-                
-                statusOverlay.classList.remove('hidden');
-                updateProgress(0, `Memulai Auto Render...`);
-                
-                const baseVideos = [...videos];
-                
+        async function executeAutoRender(dirHandle) {
+            isWaitingInQueue = false;
+            cancelRenderBtn.innerText = "Batalkan"; 
+            
+            const validVideos = videos.filter(v => v.isValid !== false);
+            const totalCycles = validVideos.length;
+            pastFirstVideoIds.clear(); 
+            
+            statusOverlay.classList.remove('hidden');
+            updateProgress(0, `Memulai Auto Render...`);
+            
+            const baseVideos = [...videos];
+            
+            try {
                 for (let i = 0; i < totalCycles; i++) {
                     videos = [...baseVideos];
                     
@@ -1829,15 +1901,63 @@
                     }
                 }
                 
-                // Kembalikan thumbnail ke gambar aktif setelah auto render selesai
                 statusOverlay.classList.add('hidden');
                 const validCount = videos.filter(v => v.isValid !== false).length;
                 mergeBtn.disabled = validCount < 2;
                 if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
                 
                 if (!isRenderCancelled) {
-                    showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!`);
+                    showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!\n\nTab ini akan ditutup secara otomatis dalam 3 detik untuk mengosongkan RAM.`);
+                    
+                    // Fitur Auto-Close setelah 3 detik
+                    setTimeout(() => {
+                        window.open('', '_self', ''); // Trik bypass agar browser mengizinkan script menutup tab
+                        window.close();
+                    }, 3000);
                 }
+            } finally {
+                releaseGlobalLock();
+            }
+        }
+
+        if (autoRenderBtn) {
+            autoRenderBtn.addEventListener('click', async () => {
+                const validVideos = videos.filter(v => v.isValid !== false);
+                if (validVideos.length < 2 || isProcessing) return;
+
+                let dirHandle = null;
+                if ('showDirectoryPicker' in window) {
+                    try {
+                        dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    } catch (err) {
+                        return; 
+                    }
+                } else {
+                    showModal("Tidak Didukung", "Fitur Auto Render membutuhkan akses Folder sistem. Gunakan Google Chrome atau Edge versi Desktop.");
+                    return;
+                }
+
+                const activeTab = localStorage.getItem('tnc7_active_render_tab');
+                if (activeTab && activeTab !== CURRENT_TAB_ID) {
+                    let q = JSON.parse(localStorage.getItem('tnc7_render_queue') || '[]');
+                    if (!q.includes(CURRENT_TAB_ID)) {
+                        q.push(CURRENT_TAB_ID);
+                        localStorage.setItem('tnc7_render_queue', JSON.stringify(q));
+                        renderChannel.postMessage({ type: 'QUEUE_UPDATE' });
+                    }
+                    pendingAutoRenderDir = dirHandle;
+                    isWaitingInQueue = true;
+                    
+                    statusOverlay.classList.remove('hidden');
+                    cancelRenderBtn.innerText = "Keluar Antrean";
+                    cancelRenderBtn.disabled = false;
+                    cancelRenderBtn.classList.remove('hidden');
+                    updateQueueUI();
+                    return;
+                }
+
+                localStorage.setItem('tnc7_active_render_tab', CURRENT_TAB_ID);
+                executeAutoRender(dirHandle);
             });
         }
 
