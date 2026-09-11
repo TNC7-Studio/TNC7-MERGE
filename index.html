@@ -117,6 +117,20 @@
 </head>
 <body class="h-screen overflow-hidden flex flex-col justify-between p-2 md:p-4 relative mt-1.5 md:mt-2">
 
+    <div id="pin-overlay" class="fixed inset-0 bg-[#0b0c0e]/95 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 backdrop-blur-md">
+        <div class="bg-[#14161d] rounded-xl p-8 max-w-[360px] w-full text-center flex flex-col items-center border border-slate-800 shadow-2xl">
+            <i class="fas fa-lock text-emerald-500 text-4xl mb-4"></i>
+            <h2 class="text-white text-[15px] font-extrabold mb-8 tracking-[0.15em]">SYSTEM LOCKED</h2>
+            
+            <div class="flex gap-2 w-full">
+                <input type="password" id="pin-input" placeholder="Masukkan PIN" class="flex-grow bg-[#0d0e12] border border-emerald-500 rounded-md text-center text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 py-2.5 text-sm transition-colors" autocomplete="off">
+                <button id="pin-submit-btn" class="bg-[#1a1d27] border border-slate-700 hover:bg-slate-800 text-white rounded-md w-12 flex items-center justify-center transition-colors">
+                    <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="fixed top-0 left-0 w-full h-1.5 md:h-2 bg-emerald-500 z-50 shadow-[0_2px_15px_rgba(16,185,129,0.5)]"></div>
 
     <!-- Wrapper Utama Aplikasi -->
@@ -1747,6 +1761,49 @@
                 link.click();
                 setTimeout(() => URL.revokeObjectURL(link.href), 10000);
             });
+        }
+
+        const pinOverlay = document.getElementById('pin-overlay');
+        const pinInput = document.getElementById('pin-input');
+        const pinSubmitBtn = document.getElementById('pin-submit-btn');
+
+        function checkSystemPin() {
+            if (pinInput.value.trim() === "0") {
+                pinOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    pinOverlay.classList.add('hidden');
+                }, 500);
+            } else {
+                pinInput.classList.add('border-red-500', 'text-red-400');
+                pinInput.classList.remove('border-emerald-500', 'text-slate-300');
+                setTimeout(() => {
+                    pinInput.classList.remove('border-red-500', 'text-red-400');
+                    pinInput.classList.add('border-emerald-500', 'text-slate-300');
+                    pinInput.value = '';
+                }, 600);
+            }
+        }
+
+        if (pinInput) {
+            // Langsung terbuka saat ketik '0'
+            pinInput.addEventListener('input', (e) => {
+                if (e.target.value.trim() === "0") {
+                    checkSystemPin();
+                }
+            });
+
+            pinInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    checkSystemPin();
+                }
+            });
+            
+            // Fokus otomatis ke input saat halaman dimuat
+            setTimeout(() => pinInput.focus(), 100);
+        }
+
+        if (pinSubmitBtn) {
+            pinSubmitBtn.addEventListener('click', checkSystemPin);
         }
 
         // Anti-Clone 
