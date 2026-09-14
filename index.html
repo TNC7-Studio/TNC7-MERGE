@@ -1584,7 +1584,6 @@
                 
                 const data = ffmpegInstance.FS('readFile', internalOutputName);
 
-                // Hapus file dari memory untuk mencegah kebocoran RAM
                 fileNames.forEach(f => { try { ffmpegInstance.FS('unlink', f); } catch(e){} });
                 try { ffmpegInstance.FS('unlink', 'concat.txt'); } catch(e){}
                 try { ffmpegInstance.FS('unlink', internalOutputName); } catch(e){}
@@ -1695,12 +1694,10 @@
                     statusOverlay.classList.add('hidden');
                 }
                 
-                // Segera matikan dan nyalakan ulang instance FFmpeg untuk cycle berikutnya agar RAM bersih
                 if (ffmpegInstance) {
                     try { ffmpegInstance.exit(); } catch (e) { console.warn("Cleanup engine:", e); }
                     ffmpegInstance = null;
-                    // Persingkat waktu delay inisialisasi ulang
-                    setTimeout(() => { initFFmpegInBackground(); }, 100); 
+                    setTimeout(() => { initFFmpegInBackground(); }, 500); 
                 }
             }
         }
