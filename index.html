@@ -117,24 +117,36 @@
 </head>
 <body class="h-screen overflow-hidden flex flex-col justify-between p-2 md:p-4 relative mt-1.5 md:mt-2">
 
-    <div id="pin-overlay" class="fixed inset-0 bg-[#0b0c0e]/95 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 backdrop-blur-md">
-        <div class="bg-[#14161d] rounded-xl p-8 max-w-[360px] w-full text-center flex flex-col items-center border border-slate-800 shadow-2xl">
-            <i class="fas fa-lock text-emerald-500 text-4xl mb-4"></i>
-            <h2 class="text-white text-[15px] font-extrabold mb-8 tracking-[0.15em]">SYSTEM LOCKED</h2>
+    <div class="fixed top-0 left-0 w-full h-1.5 md:h-2 bg-emerald-500 z-50 shadow-[0_2px_15px_rgba(16,185,129,0.5)]"></div>
+
+    <!-- Auth Overlay (PIN Based) -->
+    <div id="auth-overlay" class="fixed inset-0 bg-[#0b0c0e] z-[100] flex flex-col items-center justify-center p-4">
+        <div class="dark-card rounded-2xl p-8 w-full max-w-md border border-slate-800/80 flex flex-col items-center">
+            <div class="mb-6 text-emerald-500">
+                <i class="fas fa-lock text-5xl"></i>
+            </div>
             
-            <div class="flex gap-2 w-full">
-                <input type="password" id="pin-input" placeholder="Masukkan PIN" class="flex-grow bg-[#0d0e12] border border-emerald-500 rounded-md text-center text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 py-2.5 text-sm transition-colors" autocomplete="off">
-                <button id="pin-submit-btn" class="bg-[#1a1d27] border border-slate-700 hover:bg-slate-800 text-white rounded-md w-12 flex items-center justify-center transition-colors">
-                    <i class="fas fa-arrow-right text-sm"></i>
+            <h1 class="text-xl font-bold tracking-widest text-white mb-8 uppercase text-center">
+                SYSTEM LOCKED
+            </h1>
+            
+            <div class="flex items-center gap-3 w-full max-w-[320px]">
+                <div class="relative w-full">
+                    <input type="password" id="pin-input" placeholder="Masukkan PIN" class="w-full bg-[#0d0e12] border-2 border-emerald-500 rounded-lg px-4 py-3 text-center text-sm text-white focus:outline-none focus:ring-0 focus:border-emerald-400 transition-colors shadow-[0_0_10px_rgba(16,185,129,0.2)] placeholder-slate-500">
+                </div>
+                <button type="button" id="pin-submit" class="bg-[#14161d] hover:bg-slate-800 border border-slate-700 text-white rounded-lg w-12 h-[46px] flex items-center justify-center transition-colors flex-shrink-0 shadow-sm">
+                    <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
+            <div id="pin-error" class="hidden mt-3 text-red-400 text-[11px] text-center w-full">PIN salah.</div>
         </div>
     </div>
 
-    <div class="fixed top-0 left-0 w-full h-1.5 md:h-2 bg-emerald-500 z-50 shadow-[0_2px_15px_rgba(16,185,129,0.5)]"></div>
-
     <!-- Wrapper Utama Aplikasi -->
-    <div id="main-app-container" class="flex flex-col flex-grow w-full overflow-hidden relative">
+    <div id="main-app-container" class="hidden flex-col flex-grow w-full overflow-hidden relative">
+        <button id="logout-btn" class="absolute top-2 right-2 md:top-4 md:right-4 z-50 text-slate-400 hover:text-red-400 text-xs md:text-sm bg-[#14161d] hover:bg-slate-800 py-1.5 px-3 rounded-lg border border-slate-800 transition flex items-center gap-1.5 shadow-md">
+            <i class="fas fa-sign-out-alt"></i> <span class="hidden md:inline font-semibold">Keluar</span>
+        </button>
 
     <header class="text-center py-3 flex-shrink-0">
         <div class="inline-flex flex-col items-center">
@@ -415,6 +427,66 @@
     <footer class="text-center py-2 text-[10px] text-slate-600 flex-shrink-0">
         Engine: Turbo FFmpeg WASM | TNC7 MARGE &copy; 2026
     </footer>
+
+    <!-- Script Autentikasi PIN -->
+    <script>
+        const authOverlay = document.getElementById('auth-overlay');
+        const mainApp = document.getElementById('main-app-container');
+        const pinInput = document.getElementById('pin-input');
+        const pinSubmit = document.getElementById('pin-submit');
+        const pinError = document.getElementById('pin-error');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Fokus ke input saat hal dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            if(pinInput) pinInput.focus();
+        });
+
+        function unlockApp() {
+            authOverlay.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+            mainApp.classList.add('flex'); 
+            pinInput.value = '';
+            pinError.classList.add('hidden');
+        }
+
+        function checkPin() {
+            const pin = pinInput.value;
+            if (pin === '0') {
+                unlockApp();
+            } else if (pin.length > 0) {
+                pinError.classList.remove('hidden');
+            } else {
+                pinError.classList.add('hidden');
+            }
+        }
+
+        // Auto unlock saat mengetik '0'
+        pinInput.addEventListener('input', (e) => {
+            if (e.target.value === '0') {
+                unlockApp();
+            } else {
+                pinError.classList.add('hidden'); // Sembunyikan error saat mengetik
+            }
+        });
+
+        // Submit dengan tombol enter atau klik panah
+        pinInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPin();
+        });
+        pinSubmit.addEventListener('click', checkPin);
+
+        // Fitur Keluar / Lock
+        if(logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                authOverlay.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+                mainApp.classList.remove('flex');
+                pinInput.value = '';
+                pinInput.focus();
+            });
+        }
+    </script>
 
     <script>
         if ('serviceWorker' in navigator) {
@@ -1512,6 +1584,7 @@
                 
                 const data = ffmpegInstance.FS('readFile', internalOutputName);
 
+                // Hapus file dari memory untuk mencegah kebocoran RAM
                 fileNames.forEach(f => { try { ffmpegInstance.FS('unlink', f); } catch(e){} });
                 try { ffmpegInstance.FS('unlink', 'concat.txt'); } catch(e){}
                 try { ffmpegInstance.FS('unlink', internalOutputName); } catch(e){}
@@ -1622,10 +1695,12 @@
                     statusOverlay.classList.add('hidden');
                 }
                 
+                // Segera matikan dan nyalakan ulang instance FFmpeg untuk cycle berikutnya agar RAM bersih
                 if (ffmpegInstance) {
                     try { ffmpegInstance.exit(); } catch (e) { console.warn("Cleanup engine:", e); }
                     ffmpegInstance = null;
-                    setTimeout(() => { initFFmpegInBackground(); }, 500); 
+                    // Persingkat waktu delay inisialisasi ulang
+                    setTimeout(() => { initFFmpegInBackground(); }, 100); 
                 }
             }
         }
@@ -1688,13 +1763,9 @@
                 if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
                 
                 if (!isRenderCancelled) {
-                    showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!\n\nTab ini akan ditutup secara otomatis dalam 3 detik untuk mengosongkan RAM.`);
+                    showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!`);
                     
-                    // Fitur Auto-Close setelah 3 detik
-                    setTimeout(() => {
-                        window.open('', '_self', ''); // Trik bypass agar browser mengizinkan script menutup tab
-                        window.close();
-                    }, 3000);
+                    // Fitur Auto-Close dihapus sesuai permintaan
                 }
             } catch (err) {
                 console.error("Auto render global error:", err);
@@ -1761,49 +1832,6 @@
                 link.click();
                 setTimeout(() => URL.revokeObjectURL(link.href), 10000);
             });
-        }
-
-        const pinOverlay = document.getElementById('pin-overlay');
-        const pinInput = document.getElementById('pin-input');
-        const pinSubmitBtn = document.getElementById('pin-submit-btn');
-
-        function checkSystemPin() {
-            if (pinInput.value.trim() === "0") {
-                pinOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    pinOverlay.classList.add('hidden');
-                }, 500);
-            } else {
-                pinInput.classList.add('border-red-500', 'text-red-400');
-                pinInput.classList.remove('border-emerald-500', 'text-slate-300');
-                setTimeout(() => {
-                    pinInput.classList.remove('border-red-500', 'text-red-400');
-                    pinInput.classList.add('border-emerald-500', 'text-slate-300');
-                    pinInput.value = '';
-                }, 600);
-            }
-        }
-
-        if (pinInput) {
-            // Langsung terbuka saat ketik '0'
-            pinInput.addEventListener('input', (e) => {
-                if (e.target.value.trim() === "0") {
-                    checkSystemPin();
-                }
-            });
-
-            pinInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    checkSystemPin();
-                }
-            });
-            
-            // Fokus otomatis ke input saat halaman dimuat
-            setTimeout(() => pinInput.focus(), 100);
-        }
-
-        if (pinSubmitBtn) {
-            pinSubmitBtn.addEventListener('click', checkSystemPin);
         }
 
         // Anti-Clone 
