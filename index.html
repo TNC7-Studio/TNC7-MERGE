@@ -26,9 +26,9 @@
             background-color: #14161d;
             border: 1px solid rgba(16, 185, 129, 0.25) !important;
             box-shadow: 
-                0 0 25px 0 rgba(16, 185, 129, 0.15), /* Pendaran (ambient glow) merata 360 derajat di luar panel */
-                inset 0 0 15px 0 rgba(16, 185, 129, 0.05), /* Pendaran halus di bagian dalam tepi panel */
-                0 15px 35px -10px rgba(0, 0, 0, 0.7) !important; /* Bayangan hitam untuk kedalaman UI */
+                0 0 25px 0 rgba(16, 185, 129, 0.15),
+                inset 0 0 15px 0 rgba(16, 185, 129, 0.05),
+                0 15px 35px -10px rgba(0, 0, 0, 0.7) !important;
             position: relative;
         }
 
@@ -112,6 +112,42 @@
         select option:checked {
             background-color: #10b981 !important;
             color: #ffffff !important;
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            background-color: transparent;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.15em;
+            height: 1.15em;
+            border: 1px solid #475569;
+            border-radius: 0.15em;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .custom-checkbox::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #10b981;
+            background-color: #10b981;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+
+        .custom-checkbox:checked::before {
+            transform: scale(1);
+        }
+        
+        .custom-checkbox:checked {
+            border-color: #10b981;
         }
     </style>
 </head>
@@ -202,7 +238,7 @@
                         <img id="thumbnail-preview" class="absolute inset-0 w-full h-full object-contain hidden z-10" alt="Thumbnail Preview">
                         
                         <div id="canvas-text-overlay-container" class="absolute inset-0 z-20 pointer-events-none hidden overflow-hidden" style="container-type: inline-size;">
-                            <div id="canvas-text-overlay" class="absolute text-white font-semibold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-left whitespace-pre pointer-events-auto cursor-move select-none border border-transparent hover:border-dashed hover:border-emerald-500/50 rounded transition-colors" style="left: 3.5%; top: 60%; padding: 0.75cqi;" title="Klik & geser untuk memindahkan teks."></div>
+                            <div id="canvas-text-overlay" class="absolute text-white font-semibold text-left whitespace-pre pointer-events-auto cursor-move select-none border border-transparent hover:border-dashed hover:border-emerald-500/50 transition-colors z-30" style="left: 3.5%; top: 60%;" title="Klik & geser untuk memindahkan teks."></div>
                         </div>
 
                         <input type="file" id="thumbnail-input" accept="image/jpeg, image/png, image/jpg" class="hidden" multiple>
@@ -277,6 +313,39 @@
                         </div>
                     </div>
                     
+                    <div class="flex flex-col gap-1.5 w-32 md:w-44 lg:w-48 flex-shrink-0 border-l border-slate-700/50 pl-2">
+                        <!-- Checkbox & Select -->
+                        <div class="flex items-center gap-2">
+                            <label class="flex items-center gap-1.5 cursor-pointer text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                                <input type="checkbox" id="mask-toggle" class="custom-checkbox">
+                                MASK
+                            </label>
+                            <input type="color" id="mask-color-picker" value="#000000" class="w-5 h-5 rounded cursor-pointer bg-transparent border-none p-0 outline-none flex-shrink-0 disabled:opacity-50" title="Warna Masking" disabled>
+                            <div class="bg-[#0b0c0e] border border-slate-700/50 rounded flex items-center px-1 py-0.5 transition-colors focus-within:border-emerald-500/50 flex-grow">
+                                <select id="mask-direction" class="bg-transparent border-none outline-none text-[9px] text-slate-300 w-full cursor-pointer focus:ring-0 p-0 disabled:opacity-50" disabled>
+                                    <option value="left-to-right">Kiri &rarr; Kanan</option>
+                                    <option value="right-to-left">Kanan &rarr; Kiri</option>
+                                    <option value="top-to-bottom">Atas &darr; Bawah</option>
+                                    <option value="solid">Blok Solid</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Opacity Slider -->
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-[8px] text-slate-500 font-bold uppercase w-8">OPC</span>
+                            <input type="range" id="mask-opacity-slider" min="0" max="100" step="1" value="70" class="w-full accent-emerald-500 cursor-pointer disabled:opacity-50" disabled>
+                            <span id="mask-opacity-val" class="text-[9px] text-slate-400 font-mono w-5 text-right">70</span>
+                        </div>
+                        
+                        <!-- Precision Slider -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-[8px] text-slate-500 font-bold uppercase w-8">PRESISI</span>
+                            <input type="range" id="mask-precision-slider" min="10" max="200" step="1" value="100" class="w-full accent-emerald-500 cursor-pointer disabled:opacity-50" disabled>
+                            <span id="mask-precision-val" class="text-[9px] text-slate-400 font-mono w-5 text-right">100</span>
+                        </div>
+                    </div>
+
                     <!-- Area Slider Dilebarkan Penuh (Kolom Terpisah agar Slider Panjang & Nyaman) -->
                     <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-3 border-t md:border-t-0 md:border-l border-slate-700/50 pt-2 md:pt-0 md:pl-4 flex-1 w-full overflow-hidden">
                         
@@ -402,7 +471,6 @@
         <div class="w-full max-w-xs bg-slate-800 rounded-full h-1.5 overflow-hidden mb-2">
             <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%"></div>
         </div>
-        <!-- Menampilkan persentase bulat -->
         <span id="progress-percent" class="text-xs font-bold text-emerald-400">0%</span>
         
         <button id="cancel-render-btn" class="mt-6 px-4 py-1.5 border border-red-900/50 bg-red-900/20 text-red-400 hover:bg-red-900/40 hover:text-red-300 rounded text-[10px] font-bold tracking-widest uppercase transition-all shadow-sm">
@@ -437,7 +505,6 @@
         const pinError = document.getElementById('pin-error');
         const logoutBtn = document.getElementById('logout-btn');
 
-        // Fokus ke input saat hal dimuat
         window.addEventListener('DOMContentLoaded', () => {
             if(pinInput) pinInput.focus();
         });
@@ -461,22 +528,19 @@
             }
         }
 
-        // Auto unlock saat mengetik '0'
         pinInput.addEventListener('input', (e) => {
             if (e.target.value === '0') {
                 unlockApp();
             } else {
-                pinError.classList.add('hidden'); // Sembunyikan error saat mengetik
+                pinError.classList.add('hidden'); 
             }
         });
 
-        // Submit dengan tombol enter atau klik panah
         pinInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') checkPin();
         });
         pinSubmit.addEventListener('click', checkPin);
 
-        // Fitur Keluar / Lock
         if(logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 authOverlay.classList.remove('hidden');
@@ -499,8 +563,8 @@
 
         let videos = [];
         let isProcessing = false;
-        let isRenderCancelled = false; // Variabel baru untuk memantau status pembatalan
-        let abortRenderFn = null; // Fungsi trigger pembatalan paksa
+        let isRenderCancelled = false; 
+        let abortRenderFn = null; 
         let ffmpegInstance = null;
         let isFFmpegLoading = false;
         let isFileLoadingPhase = false; 
@@ -563,6 +627,21 @@
         const alignCenterBtn = document.getElementById('align-center-btn');
         const alignRightBtn = document.getElementById('align-right-btn');
 
+        const maskToggle = document.getElementById('mask-toggle');
+        const maskColorPicker = document.getElementById('mask-color-picker');
+        const maskDirection = document.getElementById('mask-direction');
+        const maskOpacitySlider = document.getElementById('mask-opacity-slider');
+        const maskOpacityVal = document.getElementById('mask-opacity-val');
+        const maskPrecisionSlider = document.getElementById('mask-precision-slider');
+        const maskPrecisionVal = document.getElementById('mask-precision-val');
+        const textMaskLayer = document.getElementById('text-mask-layer');
+
+        let isMaskEnabled = false;
+        let currentMaskColor = "#000000";
+        let currentMaskDirection = 'left-to-right';
+        let currentMaskOpacity = 0.7;
+        let currentMaskPrecision = 1.0; // 100%
+
         let currentFontFamily = "Calibri, sans-serif";
         let currentFontScale = 1.0;
         let currentTextColor = "#ffffff";
@@ -570,7 +649,7 @@
         let currentScaleHeight = 1.0;
         let currentStrokeColor = "#000000";
         let currentStrokeWidth = 0;
-        let currentShadowIntensity = 0.5; // Default 50%
+        let currentShadowIntensity = 0.5;
         let isBold = false;
         let currentFontWeight = "600";
         let isItalic = false;
@@ -579,13 +658,20 @@
         let currentTextAlign = "left";
         window.textOffset = { x: 0.035, y: 0.6 }; 
 
-        // --- STREAMING_CHUNK:Defining text formatting helpers... ---
         function formatTextCase(text, transform) {
             if (transform === 'uppercase') return text.toUpperCase();
             if (transform === 'capitalize') {
                 return text.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
             }
             return text;
+        }
+
+        // Helper untuk mengubah HEX color ke format RGBA
+        function hexToRgba(hex, opacity) {
+            let r = parseInt(hex.slice(1, 3), 16),
+                g = parseInt(hex.slice(3, 5), 16),
+                b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
         }
 
         function refreshTextPreview() {
@@ -613,9 +699,8 @@
         const statusText = document.getElementById('status-text');
         const progressBar = document.getElementById('progress-bar');
         const progressPercent = document.getElementById('progress-percent');
-        const cancelRenderBtn = document.getElementById('cancel-render-btn'); // Tangkap tombol batal
+        const cancelRenderBtn = document.getElementById('cancel-render-btn'); 
 
-        // --- STREAMING_CHUNK:Adding logic to cancel rendering... ---
         if(cancelRenderBtn) {
             cancelRenderBtn.addEventListener('click', () => {
                 if (!isProcessing) return;
@@ -625,17 +710,16 @@
                 statusText.innerText = "Menghentikan proses...";
                 
                 if (abortRenderFn) {
-                    abortRenderFn(); // Putus paksa janji (Promise) yang sedang berjalan
+                    abortRenderFn(); 
                 }
 
-                // Hentikan mesin FFmpeg secara paksa jika sedang melakukan render
                 if (ffmpegInstance) {
                     try {
                         ffmpegInstance.exit();
                     } catch (e) {
                         console.warn("Force exit FFmpeg engine:", e);
                     }
-                    ffmpegInstance = null; // Tandai bahwa instance telah mati
+                    ffmpegInstance = null; 
                 }
             });
         }
@@ -655,13 +739,10 @@
             applyTextStyles();
         });
 
-        // --- STREAMING_CHUNK:Attaching logical map handlers for smooth integer sliders... ---
-        // --- FUNGSI MAP RANGE MENGONVERSI SKALA 1-100 KE NILAI ASLI CANVAS ---
         function mapRange(value, inMin, inMax, outMin, outMax) {
             return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
         }
 
-        // --- EVENT LISTENER DENGAN SLIDER 1 SAMPAI 100 ---
         fontScaleSlider.addEventListener('input', (e) => {
             let val = parseInt(e.target.value);
             fontScaleVal.innerText = val;
@@ -743,6 +824,46 @@
             applyTextStyles();
         }
 
+        maskToggle.addEventListener('change', (e) => {
+            isMaskEnabled = e.target.checked;
+            maskColorPicker.disabled = !isMaskEnabled;
+            maskDirection.disabled = !isMaskEnabled;
+            maskOpacitySlider.disabled = !isMaskEnabled;
+            maskPrecisionSlider.disabled = !isMaskEnabled;
+            
+            if (isMaskEnabled) {
+                if (textMaskLayer) textMaskLayer.style.display = 'block';
+            } else {
+                if (textMaskLayer) textMaskLayer.style.display = 'none';
+            }
+            applyTextStyles();
+        });
+
+        maskColorPicker.addEventListener('input', (e) => {
+            currentMaskColor = e.target.value;
+            applyTextStyles();
+        });
+
+        maskDirection.addEventListener('change', (e) => {
+            currentMaskDirection = e.target.value;
+            applyTextStyles();
+        });
+
+        maskOpacitySlider.addEventListener('input', (e) => {
+            let val = parseInt(e.target.value);
+            maskOpacityVal.innerText = val;
+            currentMaskOpacity = val / 100;
+            applyTextStyles();
+        });
+
+        maskPrecisionSlider.addEventListener('input', (e) => {
+            let val = parseInt(e.target.value);
+            maskPrecisionVal.innerText = val;
+            currentMaskPrecision = val / 100;
+            applyTextStyles();
+        });
+
+
         alignLeftBtn.addEventListener('click', () => setAlign('left'));
         alignCenterBtn.addEventListener('click', () => setAlign('center'));
         alignRightBtn.addEventListener('click', () => setAlign('right'));
@@ -752,27 +873,83 @@
             applyTextStyles();
         });
 
-        // --- STREAMING_CHUNK:Implementing text rendering application logic... ---
         function applyTextStyles() {
             const canvasTextOverlay = document.getElementById('canvas-text-overlay');
-            if (canvasTextOverlay) {
+            const container = document.getElementById('canvas-text-overlay-container');
+            
+            if (canvasTextOverlay && container) {
+                // HACK MUTLAK: Buang CQI yang bug di browser, gunakan Pixel absolut berdasar lebar kotak aktual
+                const containerWidth = container.getBoundingClientRect().width || container.clientWidth;
+                // Cegah error jika elemen sedang disembunyikan (display: none)
+                const safeWidth = containerWidth > 0 ? containerWidth : 800; 
+                
+                // Menyamakan rasio mutlak Canvas (1920 * 0.014) ke layar Preview
+                const baseFontSize = safeWidth * 0.014;
+                
                 canvasTextOverlay.style.fontFamily = currentFontFamily;
-                canvasTextOverlay.style.fontSize = `calc(1.4cqi * ${currentFontScale})`;
+                canvasTextOverlay.style.fontSize = `${baseFontSize * currentFontScale}px`;
                 canvasTextOverlay.style.color = currentTextColor;
                 canvasTextOverlay.style.fontWeight = currentFontWeight;
                 canvasTextOverlay.style.fontStyle = currentFontStyle;
+                
                 canvasTextOverlay.style.textAlign = currentTextAlign;
+                canvasTextOverlay.style.lineHeight = '1.25'; // Ensure CSS matches Canvas line height
+                
+                canvasTextOverlay.style.border = '0px'; 
+                canvasTextOverlay.style.boxSizing = 'content-box'; 
                 
                 let effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
                 let effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
                 canvasTextOverlay.style.transform = `scale(${effectiveScaleWidth}, ${effectiveScaleHeight})`;
                 canvasTextOverlay.style.transformOrigin = "left top";
                 
-                canvasTextOverlay.style.webkitTextStroke = `${currentStrokeWidth * 0.00125}cqi ${currentStrokeColor}`;
+                canvasTextOverlay.style.webkitTextStroke = `${currentStrokeWidth * (safeWidth * 0.0000125)}px ${currentStrokeColor}`;
                 
                 canvasTextOverlay.style.textShadow = `
-                    0px max(2.25px, 0.315cqi) max(4.5px, 0.4725cqi) rgba(0, 0, 0, ${currentShadowIntensity})
+                    0px max(2.25px, ${safeWidth * 0.00315}px) max(4.5px, ${safeWidth * 0.004725}px) rgba(0, 0, 0, ${currentShadowIntensity})
                 `;
+                
+                const padX = `0.5em`; 
+                const padY = `0.25em`; 
+                canvasTextOverlay.style.padding = `${padY} ${padX}`;
+                canvasTextOverlay.style.margin = `-${padY} -${padX}`; 
+
+                // --- PENGATURAN MASK (UI PREVIEW) ---
+                if (isMaskEnabled) {
+                    const rgbaColor = hexToRgba(currentMaskColor, currentMaskOpacity);
+                    const transparentColor = hexToRgba(currentMaskColor, 0);
+                    
+                    let finalWidth = "100%";
+                    if (currentMaskDirection === 'left-to-right' || currentMaskDirection === 'right-to-left' || currentMaskDirection === 'solid') {
+                         finalWidth = `${currentMaskPrecision * 100}%`;
+                    }
+                    
+                    if (currentMaskDirection === 'left-to-right') {
+                        canvasTextOverlay.style.background = `linear-gradient(to right, ${rgbaColor} 0%, ${rgbaColor} 65%, ${transparentColor} 100%)`;
+                        canvasTextOverlay.style.backgroundPosition = 'left';
+                        canvasTextOverlay.style.backgroundSize = `${finalWidth} 100%`;
+                        canvasTextOverlay.style.backgroundRepeat = 'no-repeat';
+                    } else if (currentMaskDirection === 'right-to-left') {
+                        canvasTextOverlay.style.background = `linear-gradient(to left, ${rgbaColor} 0%, ${rgbaColor} 65%, ${transparentColor} 100%)`;
+                        canvasTextOverlay.style.backgroundPosition = 'right';
+                        canvasTextOverlay.style.backgroundSize = `${finalWidth} 100%`;
+                        canvasTextOverlay.style.backgroundRepeat = 'no-repeat';
+                    } else if (currentMaskDirection === 'top-to-bottom') {
+                        let finalHeight = `${currentMaskPrecision * 100}%`;
+                        canvasTextOverlay.style.background = `linear-gradient(to bottom, ${rgbaColor} 0%, ${rgbaColor} 65%, ${transparentColor} 100%)`;
+                        canvasTextOverlay.style.backgroundPosition = 'top';
+                        canvasTextOverlay.style.backgroundSize = `100% ${finalHeight}`;
+                        canvasTextOverlay.style.backgroundRepeat = 'no-repeat';
+                    } else if (currentMaskDirection === 'solid') {
+                        canvasTextOverlay.style.background = rgbaColor;
+                        canvasTextOverlay.style.backgroundPosition = 'left';
+                        canvasTextOverlay.style.backgroundSize = `${finalWidth} 100%`;
+                        canvasTextOverlay.style.backgroundRepeat = 'no-repeat';
+                    }
+                } else {
+                    canvasTextOverlay.style.background = 'transparent';
+                    // Menghapus reset padding/margin disini agar box model tetap konstan
+                }
             }
         }
 
@@ -791,7 +968,6 @@
             }
         });
 
-        // --- Logika Drag and Drop Text di Atas Canvas ---
         const textOverlayElement = document.getElementById('canvas-text-overlay');
         const overlayContainerElement = document.getElementById('canvas-text-overlay-container');
         let isDraggingText = false;
@@ -825,6 +1001,11 @@
                 textOverlayElement.style.right = 'auto';
                 textOverlayElement.style.left = `${percentX}%`;
                 textOverlayElement.style.top = `${percentY}%`;
+                
+                if (textMaskLayer) {
+                    textMaskLayer.style.left = `${percentX}%`;
+                    textMaskLayer.style.top = `${percentY}%`;
+                }
 
                 window.textOffset.x = newLeft / containerRect.width;
                 window.textOffset.y = newTop / containerRect.height;
@@ -834,9 +1015,19 @@
                 isDraggingText = false;
                 updateUIMetricsCache(); 
             });
+            
+            // Perbarui posisi dan ukuran mask saat resize window
+            window.addEventListener('resize', () => {
+                applyTextStyles();
+            });
+            
+            // Observasi perubahan konten pada text overlay untuk update mask
+            const observer = new MutationObserver(() => {
+                applyTextStyles();
+            });
+            observer.observe(textOverlayElement, { childList: true, characterData: true, subtree: true });
         }
 
-        // --- STREAMING_CHUNK:Defining history and undo redo systems... ---
         function saveState() {
             if (historyIndex < history.length - 1) {
                 history = history.slice(0, historyIndex + 1);
@@ -884,7 +1075,6 @@
             updateUndoRedoButtons();
         }
 
-        // --- STREAMING_CHUNK:Initializing the powerful FFmpeg WASM core... ---
         async function initFFmpegInBackground() {
             if (ffmpegInstance && ffmpegInstance.isLoaded()) return;
             if (ffmpegInitPromise) {
@@ -928,7 +1118,6 @@
             await ffmpegInitPromise;
         }
 
-        // --- Event Listener Thumbnail ---
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
             thumbnailDropZone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
         });
@@ -951,7 +1140,6 @@
             }
         });
 
-        // --- Event Listener Image List (Area Kanan) ---
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
             imageListSection.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
         });
@@ -971,7 +1159,6 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Processing uploaded images for playlist... ---
         function processImages(files) {
             const imgFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
             if (imgFiles.length === 0) {
@@ -1095,7 +1282,6 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Configuring video file upload and validations... ---
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
             videoListSection.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
         });
@@ -1145,7 +1331,6 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Rebuilding the UI list of tracks... ---
         function updateUI() {
             videoList.innerHTML = '';
             
@@ -1266,7 +1451,6 @@
             saveState();
         });
 
-        // --- STREAMING_CHUNK:Implementing playlist shuffle functionality... ---
         function performShuffle(showNotification = true) {
             if (videos.length > 1) {
                 pastFirstVideoIds.add(videos[0].id);
@@ -1364,100 +1548,194 @@
             await startMergeProcess();
         });
 
-        // --- STREAMING_CHUNK:Engine function for rendering Canvas thumbnails natively... ---
         async function createThumbnailBlob() {
             if (!thumbnailFileObj) return null;
             return new Promise((resolve) => {
                 const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+                const ctx = canvas.getContext('2d'); 
                 const img = new Image();
                 img.src = URL.createObjectURL(thumbnailFileObj);
+                
                 img.onload = () => {
-                    // Peningkatan resolusi 50% (1.5x) untuk hasil JPG yang lebih tajam dan jernih
-                    const scaleMultiplier = 1.5; 
-                    const width = (img.naturalWidth || img.width || 1280) * scaleMultiplier;
-                    const height = (img.naturalHeight || img.height || 720) * scaleMultiplier;
-                    canvas.width = width;
-                    canvas.height = height;
+                    try { 
+                        // --- KUNCI PRESISI MUTLAK: STANDARISASI KANVAS 1920x1080 (16:9) ---
+                        // Memaksa output menjadi 16:9 standar YouTube agar rasio koordinat teks
+                        // dari layar Preview (yang juga 16:9) DIJAMIN tidak akan pernah meleset.
+                        const width = 1920;
+                        const height = 1080;
+                        canvas.width = width;
+                        canvas.height = height;
 
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
+                        // Tiru background warna gelap UI Preview untuk area kosong
+                        ctx.fillStyle = '#08090b';
+                        ctx.fillRect(0, 0, width, height);
 
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const validVideos = videos.filter(v => v.isValid !== false);
-                    if (validVideos.length > 0) {
-                        const effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
-                        const effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
-
-                        const fontSize = (width * 0.014) * currentFontScale;
-                        const paddingX = width * 0.0075;
-                        const paddingY = width * 0.0075;
-
-                        const verticalCorrection = fontSize * 0.285;
-
-                        let startX = (window.textOffset.x * width) + (paddingX * effectiveScaleWidth);
-                        let startY = (window.textOffset.y * height) + (paddingY * effectiveScaleHeight) + (verticalCorrection * effectiveScaleHeight);
-
-                        ctx.fillStyle = currentTextColor;
-                        ctx.font = `${currentFontStyle} ${currentFontWeight} ${fontSize}px ${currentFontFamily}`;
-                        ctx.textBaseline = 'top'; 
+                        // Gambar foto asli (Tiru efek CSS 'object-fit: contain' dari Preview)
+                        const imgRatio = img.naturalWidth / img.naturalHeight;
+                        const canvasRatio = width / height;
+                        let drawWidth = width;
+                        let drawHeight = height;
+                        let drawX = 0;
+                        let drawY = 0;
                         
-                        ctx.shadowColor = `rgba(0, 0, 0, ${currentShadowIntensity})`;
-                        ctx.shadowBlur = Math.max(3, fontSize * 0.225);
-                        ctx.shadowOffsetY = Math.max(1.5, fontSize * 0.15);
-                        
-                        ctx.lineJoin = 'round';
-                        ctx.miterLimit = 2;
-                        
-                        const lineHeight = fontSize * 1.25; 
-                        
-                        let tracklistArray = validVideos.map((vid, index) => {
-                            let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
-                            return formatTextCase(rawText, currentTextTransform);
-                        });
+                        if (imgRatio > canvasRatio) {
+                            // Gambar lebih lebar dari 16:9
+                            drawHeight = width / imgRatio;
+                            drawY = (height - drawHeight) / 2;
+                        } else {
+                            // Gambar lebih tinggi dari 16:9 (segiempat, potrait, dll)
+                            drawWidth = height * imgRatio;
+                            drawX = (width - drawWidth) / 2;
+                        }
 
-                        startX = Math.max(0, startX);
-                        startY = Math.max(0, startY);
-                        
-                        let maxLineWidth = 0;
-                        let displayLines = tracklistArray.map(text => {
-                            const measuredWidth = ctx.measureText(text).width;
-                            if (measuredWidth > maxLineWidth) maxLineWidth = measuredWidth;
-                            return text;
-                        });
-                        
-                        ctx.textAlign = currentTextAlign;
-                        
-                        displayLines.forEach((printText, i) => {
-                            ctx.save();
-                            ctx.scale(effectiveScaleWidth, effectiveScaleHeight);
+                        ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+
+                        const validVideos = videos.filter(v => v.isValid !== false);
+                        if (validVideos.length > 0) {
+                            const effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
+                            const effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
+
+                            // Kunci Font Mutlak
+                            const fontSize = (width * 0.014) * currentFontScale;
+                            ctx.font = `${currentFontStyle} ${currentFontWeight} ${fontSize}px ${currentFontFamily}`;
                             
-                            let alignOffsetX = 0;
-                            if (currentTextAlign === 'center') alignOffsetX = maxLineWidth / 2;
-                            if (currentTextAlign === 'right') alignOffsetX = maxLineWidth;
-
-                            const renderX = (startX / effectiveScaleWidth) + alignOffsetX;
-                            const renderY = (startY / effectiveScaleHeight) + (i * lineHeight);
+                            ctx.textBaseline = 'alphabetic'; 
+                            ctx.lineJoin = 'round';
+                            ctx.miterLimit = 2;
                             
-                            if (currentStrokeWidth > 0) {
-                                ctx.lineWidth = currentStrokeWidth * (width * 0.00000625);
-                                ctx.strokeStyle = currentStrokeColor;
-                                ctx.strokeText(printText, renderX, renderY);
+                            const lineHeight = fontSize * 1.25; 
+                            const halfLeading = (lineHeight - fontSize) / 2;
+                            
+                            let tracklistArray = validVideos.map((vid, index) => {
+                                let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
+                                return formatTextCase(rawText, currentTextTransform);
+                            });
+
+                            let anchorX = window.textOffset.x * width;
+                            let anchorY = window.textOffset.y * height;
+                            
+                            let maxLineWidth = 0;
+                            let displayLines = tracklistArray.map(text => {
+                                let metrics = ctx.measureText(text);
+                                if (metrics.width > maxLineWidth) maxLineWidth = metrics.width;
+                                return text;
+                            });
+                            
+                            const finalMaxLineWidth = maxLineWidth;
+
+                            if (isMaskEnabled) {
+                                ctx.save();
+                                
+                                const padRenderX = fontSize * 0.5;
+                                const padRenderY = fontSize * 0.25;
+                                
+                                const exactTextHeight = displayLines.length * lineHeight;
+                                
+                                const unscaledBoxWidth = finalMaxLineWidth + (padRenderX * 2);
+                                const unscaledBoxHeight = exactTextHeight + (padRenderY * 2);
+                                
+                                let maskDrawWidth = unscaledBoxWidth;
+                                let maskDrawHeight = unscaledBoxHeight;
+                                
+                                if (currentMaskDirection === 'left-to-right' || currentMaskDirection === 'right-to-left' || currentMaskDirection === 'solid') {
+                                    maskDrawWidth = unscaledBoxWidth * currentMaskPrecision;
+                                }
+                                if (currentMaskDirection === 'top-to-bottom') {
+                                    maskDrawHeight = unscaledBoxHeight * currentMaskPrecision;
+                                }
+
+                                // KUNCI PRESISI AKHIR: Tarik koordinat mundur (Kiri & Atas) sesuai Negative Margin CSS
+                                const boxLeft = anchorX - padRenderX;
+                                const boxTop = anchorY - padRenderY;
+                                
+                                // Terapkan Posisi dan Skala Murni Box Model CSS
+                                ctx.translate(boxLeft, boxTop);
+                                ctx.scale(effectiveScaleWidth, effectiveScaleHeight);
+
+                                // --- RENDER LAYER 1: MASK BACKGROUND ---
+                                ctx.shadowColor = 'transparent';
+                                ctx.shadowBlur = 0;
+                                ctx.shadowOffsetX = 0;
+                                ctx.shadowOffsetY = 0;
+
+                                const rgbaColor = hexToRgba(currentMaskColor, currentMaskOpacity);
+                                const transparentColor = hexToRgba(currentMaskColor, 0);
+                                
+                                let maskX = 0;
+                                let maskY = 0;
+                                
+                                if (currentMaskDirection === 'right-to-left') {
+                                    maskX = unscaledBoxWidth - maskDrawWidth;
+                                }
+
+                                if (currentMaskDirection === 'solid') {
+                                    ctx.fillStyle = rgbaColor;
+                                    ctx.fillRect(maskX, maskY, maskDrawWidth, maskDrawHeight);
+                                } else {
+                                    let gradient;
+                                    if (currentMaskDirection === 'left-to-right') {
+                                        gradient = ctx.createLinearGradient(maskX, maskY, maskX + maskDrawWidth, maskY);
+                                    } else if (currentMaskDirection === 'right-to-left') {
+                                        gradient = ctx.createLinearGradient(maskX + maskDrawWidth, maskY, maskX, maskY);
+                                    } else if (currentMaskDirection === 'top-to-bottom') {
+                                        gradient = ctx.createLinearGradient(maskX, maskY, maskX, maskY + maskDrawHeight);
+                                    }
+                                    
+                                    gradient.addColorStop(0, rgbaColor);
+                                    gradient.addColorStop(0.65, rgbaColor);
+                                    gradient.addColorStop(1, transparentColor);
+                                    
+                                    ctx.fillStyle = gradient;
+                                    ctx.fillRect(maskX, maskY, maskDrawWidth, maskDrawHeight);
+                                }
+
+                                // --- RENDER LAYER 2: STROKE & TEXT ---
+                                ctx.textAlign = currentTextAlign;
+                                
+                                let textDrawX = padRenderX;
+                                if (currentTextAlign === 'center') textDrawX = padRenderX + (finalMaxLineWidth / 2);
+                                if (currentTextAlign === 'right') textDrawX = padRenderX + finalMaxLineWidth;
+
+                                // STROKE LAYER
+                                if (currentStrokeWidth > 0) {
+                                    ctx.shadowColor = 'transparent'; 
+                                    ctx.lineWidth = currentStrokeWidth * (width * 0.0000125); 
+                                    ctx.strokeStyle = currentStrokeColor;
+                                    
+                                    tracklistArray.forEach((printText, i) => {
+                                        // Teks diposisikan persis dengan metode half-leading CSS
+                                        let textDrawY = padRenderY + (i * lineHeight) + fontSize + halfLeading;
+                                        ctx.strokeText(printText, textDrawX, textDrawY);
+                                    });
+                                }
+                                
+                                // FILL LAYER
+                                ctx.fillStyle = currentTextColor;
+                                ctx.shadowOffsetX = 0;
+                                ctx.shadowOffsetY = Math.max(2.25, width * 0.00315);
+                                ctx.shadowBlur = Math.max(4.5, width * 0.004725);
+                                ctx.shadowColor = `rgba(0, 0, 0, ${currentShadowIntensity})`;
+                                
+                                tracklistArray.forEach((printText, i) => {
+                                    let textDrawY = padRenderY + (i * lineHeight) + fontSize + halfLeading;
+                                    ctx.fillText(printText, textDrawX, textDrawY);
+                                });
+                                
+                                ctx.restore(); 
                             }
-                            
-                            ctx.fillText(printText, renderX, renderY);
-                            
-                            ctx.restore();
-                        });
+                        }
+
+                        canvas.toBlob((blob) => {
+                            URL.revokeObjectURL(img.src);
+                            resolve(blob);
+                        }, 'image/jpeg', 0.92); 
+
+                    } catch (err) {
+                        console.error("Kesalahan saat render Thumbnail Canvas:", err);
+                        resolve(null); 
                     }
-                    
-                    const mimeType = 'image/jpeg';
-                    canvas.toBlob((blob) => {
-                        URL.revokeObjectURL(img.src);
-                        resolve(blob);
-                    }, mimeType, 0.99); 
                 };
+                
                 img.onerror = () => {
                     URL.revokeObjectURL(img.src);
                     resolve(null);
@@ -1465,16 +1743,13 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Executing FFmpeg tasks for merging videos... ---
         async function startMergeProcess(autoDirHandle = null, autoFileName = null, isAutoMode = false, cycleInfo = "") {
             const validVideos = videos.filter(v => v.isValid !== false);
             
             if (validVideos.length < 2 || isProcessing) return false;
 
-            // KUNCI MEMORI METRIK UI SEBELUM PROSES RENDER
             updateUIMetricsCache();
             
-            // Reset status cancel setiap kali proses baru dimulai
             isRenderCancelled = false;
             abortRenderFn = null;
             if(cancelRenderBtn) {
@@ -1526,30 +1801,56 @@
             const internalOutputName = `out_${Date.now()}.mp4`;
 
             try {
+                // PENAMBAHAN PROTEKSI BERLAPIS UNTUK BUG "GAGAL DI AWAL"
                 await initFFmpegInBackground();
+                if (!ffmpegInstance) {
+                    await new Promise(r => setTimeout(r, 1000)); // Delay ekstra agar memory bersih
+                    await initFFmpegInBackground();
+                }
+                if (!ffmpegInstance) throw new Error("FFMPEG_INIT_FAILED");
 
                 const fileNames = [];
                 let readCount = 0;
                 updateProgress(10, `Membaca file ke RAM... ${cycleInfo}`);
 
                 for (let i = 0; i < validVideos.length; i++) {
-                    if (isRenderCancelled) throw new Error("CANCELLED"); // Cek Batal saat load file
+                    if (isRenderCancelled) throw new Error("CANCELLED"); 
                     
                     const vid = validVideos[i];
-                    const ext = vid.file.name.split('.').pop() || 'mp4';
+                    
+                    // Ekstraksi ekstensi yang lebih stabil
+                    let ext = 'mp4';
+                    if (vid.file.name && vid.file.name.includes('.')) {
+                        ext = vid.file.name.split('.').pop().toLowerCase();
+                    }
                     const fname = `file_${i}.${ext}`;
                     fileNames[i] = fname;
                     
-                    const arrayBuffer = await vid.file.arrayBuffer();
-                    if (isRenderCancelled) throw new Error("CANCELLED"); // Cek lagi setelah proses baca file berat
+                    // Proteksi Batas RAM (OOM - Out of Memory)
+                    let arrayBuffer;
+                    try {
+                        arrayBuffer = await vid.file.arrayBuffer();
+                    } catch (e) {
+                        throw new Error("RAM_LIMIT_EXCEEDED");
+                    }
+                    if (isRenderCancelled) throw new Error("CANCELLED"); 
                     
-                    ffmpegInstance.FS('writeFile', fname, new Uint8Array(arrayBuffer));
+                    // Proteksi File System Menulis Error
+                    try {
+                        const uint8Array = new Uint8Array(arrayBuffer);
+                        ffmpegInstance.FS('writeFile', fname, uint8Array);
+                    } catch (e) {
+                        throw new Error("FS_WRITE_FAILED");
+                    }
+                    
+                    // BERSIHKAN MEMORI SEKETIKA (Sangat penting mencegah RAM penuh di awal)
+                    arrayBuffer = null; 
                     
                     readCount++;
                     const currentProgress = Math.round(10 + ((readCount / validVideos.length) * 85));
                     updateProgress(Math.min(currentProgress, 95), `Memuat video ${readCount}/${validVideos.length} ${cycleInfo}`);
                     
-                    await new Promise(r => setTimeout(r, 1)); 
+                    await new Promise(r => setTimeout(r, 10)); // Sedikit jeda agar browser tidak freeze
                 }
 
                 isFileLoadingPhase = false; 
@@ -1567,7 +1868,7 @@
                 ffmpegArgs.push('-c', 'copy');
                 ffmpegArgs.push('-fflags', '+fastseek', '-movflags', '+faststart', internalOutputName);
                 
-                if (isRenderCancelled) throw new Error("CANCELLED"); // Cek Batal sebelum render
+                if (isRenderCancelled) throw new Error("CANCELLED"); 
                 
                 const runPromise = ffmpegInstance.run(...ffmpegArgs);
                 const cancelPromise = new Promise((_, reject) => {
@@ -1577,20 +1878,33 @@
                 await Promise.race([runPromise, cancelPromise]);
                 abortRenderFn = null;
                 
-                if (isRenderCancelled) throw new Error("CANCELLED"); // Cek Batal setelah render
+                if (isRenderCancelled) throw new Error("CANCELLED"); 
                 
                 isFileLoadingPhase = true;
                 updateProgress(98, `Menyimpan file output... ${cycleInfo}`);
                 
-                const data = ffmpegInstance.FS('readFile', internalOutputName);
-
+                // CRITICAL FIX: Hapus file input DARI MEMORY SEBELUM readFile output
+                // Jika video terlalu besar, readFile akan gagal karena RAM penuh oleh input
                 fileNames.forEach(f => { try { ffmpegInstance.FS('unlink', f); } catch(e){} });
                 try { ffmpegInstance.FS('unlink', 'concat.txt'); } catch(e){}
+                
+                // Proteksi Pembacaan Hasil Render yang Kosong/Error
+                let data;
+                try {
+                    data = ffmpegInstance.FS('readFile', internalOutputName);
+                } catch (e) {
+                    throw new Error("RENDER_FAILED");
+                }
+
+                // Setelah data berhasil dibaca, hapus file output dari filesystem memori
                 try { ffmpegInstance.FS('unlink', internalOutputName); } catch(e){}
 
                 const blob = new Blob([data.buffer], { type: 'video/mp4' });
                 const blobUrl = URL.createObjectURL(blob);
                 
+                // Bersihkan variabel penampung memori
+                data = null; 
+
                 statusBadge.innerText = "SELESAI";
                 statusBadge.className = "bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded tracking-wider shadow-lg shadow-emerald-900/30";
 
@@ -1673,7 +1987,6 @@
                 
                 return true;
             } catch (error) {
-                // Menangani output khusus saat pengguna membatalkan
                 if (isRenderCancelled || !ffmpegInstance || (error && error.message === "CANCELLED")) {
                     console.log("Proses rendering dibatalkan oleh pengguna.");
                     if (!isAutoMode) showModal("Dibatalkan", "Proses rendering telah dibatalkan.");
@@ -1681,7 +1994,19 @@
                 }
                 
                 console.error("Error Processing:", error);
-                if (!isAutoMode) showModal("Gagal", "Terjadi kesalahan saat menggabungkan video. Pastikan format file seragam atau file tidak rusak.");
+                
+                // Penanganan Error Spesifik untuk "Gagal di Awal"
+                if (error && error.message === "FFMPEG_INIT_FAILED") {
+                    if (!isAutoMode) showModal("Gagal", "Mesin Turbo gagal dimuat. Silakan muat ulang halaman.");
+                } else if (error && error.message === "RAM_LIMIT_EXCEEDED") {
+                    if (!isAutoMode) showModal("Gagal", "File terlalu besar. RAM tidak cukup untuk memproses video ini.");
+                } else if (error && error.message === "FS_WRITE_FAILED") {
+                    if (!isAutoMode) showModal("Gagal", "Gagal menulis file ke sistem memori. Pastikan memori RAM memadai.");
+                } else if (error && error.message === "RENDER_FAILED") {
+                    if (!isAutoMode) showModal("Gagal", "Proses penggabungan gagal. Pastikan format file seragam.");
+                } else {
+                    if (!isAutoMode) showModal("Gagal", "Terjadi kesalahan sistem. Pastikan format file tidak rusak.");
+                }
                 return false;
             } finally {
                 isProcessing = false;
@@ -1697,12 +2022,12 @@
                 if (ffmpegInstance) {
                     try { ffmpegInstance.exit(); } catch (e) { console.warn("Cleanup engine:", e); }
                     ffmpegInstance = null;
-                    setTimeout(() => { initFFmpegInBackground(); }, 500); 
+                    // Tingkatkan delay sedikit setelah engine mati, sebelum menyala ulang agar garbage collector bekerja
+                    setTimeout(() => { initFFmpegInBackground(); }, 300); 
                 }
             }
         }
         
-        // --- STREAMING_CHUNK:Finalizing UI logic and protective listeners... ---
         async function executeAutoRender(dirHandle) {
             cancelRenderBtn.innerText = "Batalkan"; 
             
@@ -1714,6 +2039,7 @@
             updateProgress(0, `Memulai Auto Render...`);
             
             const baseVideos = [...videos];
+            let isAutoRenderFailed = false; // Penanda jika gagal di tengah jalan
             
             try {
                 for (let i = 0; i < totalCycles; i++) {
@@ -1735,20 +2061,22 @@
                     try {
                         const success = await startMergeProcess(dirHandle, outputName, true, cycleInfo);
                         if (!success) {
+                            isAutoRenderFailed = true; // Tandai bahwa proses gagal
                             if (isRenderCancelled) {
                                 showModal("Rendering Dibatalkan", `Auto Render dibatalkan pada siklus ke-${i+1}. Siklus yang sudah selesai tetap tersimpan.`);
                             } else {
-                                showModal("Auto Render Terhenti", `Proses gagal atau dibatalkan pada siklus ke-${i+1}.`);
+                                showModal("Auto Render Terhenti", `Proses gagal pada siklus ke-${i+1}. Penyebab paling umum adalah kapasitas RAM (Memori) browser tidak cukup untuk memuat file-file video Anda secara bersamaan.`);
                             }
                             break;
                         }
                     } catch (err) {
+                        isAutoRenderFailed = true; // Tandai bahwa proses gagal
                         console.error("Auto render error:", err);
                         showModal("Error Auto Render", `Proses terhenti pada siklus ke-${i+1}.`);
                         break;
                     }
                     
-                    if (i < totalCycles - 1 && !isRenderCancelled) {
+                    if (i < totalCycles - 1 && !isRenderCancelled && !isAutoRenderFailed) {
                         updateProgress(100, `Menyiapkan siklus ${i+2} dari ${totalCycles}...`);
                         await new Promise(r => setTimeout(r, 1500));
                     }
@@ -1759,10 +2087,9 @@
                 mergeBtn.disabled = validCount < 2;
                 if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
                 
-                if (!isRenderCancelled) {
+                // HANYA tampilkan pesan SUKSES jika tidak di-cancel dan TIDAK GAGAL
+                if (!isRenderCancelled && !isAutoRenderFailed) {
                     showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!`);
-                    
-                    // Fitur Auto-Close dihapus sesuai permintaan
                 }
             } catch (err) {
                 console.error("Auto render global error:", err);
@@ -1831,7 +2158,6 @@
             });
         }
 
-        // Anti-Clone 
         document.addEventListener('contextmenu', (event) => event.preventDefault());
         document.addEventListener('keydown', (e) => {
             if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
