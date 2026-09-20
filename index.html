@@ -909,10 +909,13 @@
                     0px max(2.25px, ${safeWidth * 0.00315}px) max(4.5px, ${safeWidth * 0.004725}px) rgba(0, 0, 0, ${currentShadowIntensity})
                 `;
                 
+                // ADJUSTMENT: Make vertical padding balanced by handling top and bottom separately.
                 const padX = `0.5em`; 
-                const padY = `0.25em`; 
-                canvasTextOverlay.style.padding = `${padY} ${padX}`;
-                canvasTextOverlay.style.margin = `-${padY} -${padX}`; 
+                const padTop = `0.3em`;    // Slightly less padding on top
+                const padBottom = `0.4em`; // Slightly more padding on bottom to balance visual weight
+                
+                canvasTextOverlay.style.padding = `${padTop} ${padX} ${padBottom} ${padX}`;
+                canvasTextOverlay.style.margin = `-${padTop} -${padX} -${padBottom} -${padX}`; 
 
                 // PASTIKAN POSISI TETAP MENGIKUTI OFFSET SAAT UKURAN BERUBAH (MAXIMIZE/MINIMIZE)
                 if (window.textOffset) {
@@ -1629,12 +1632,15 @@
                                 ctx.save();
                                 
                                 const padRenderX = fontSize * 0.5;
-                                const padRenderY = fontSize * 0.25;
+                                // ADJUSTMENT: Asymmetric padding for canvas rendering to fix top-heavy visual
+                                const padRenderTop = fontSize * 0.3;
+                                const padRenderBottom = fontSize * 0.4;
                                 
                                 const exactTextHeight = displayLines.length * lineHeight;
                                 
+                                // Calculate total box size with distinct top and bottom padding
                                 const unscaledBoxWidth = finalMaxLineWidth + (padRenderX * 2);
-                                const unscaledBoxHeight = exactTextHeight + (padRenderY * 2);
+                                const unscaledBoxHeight = exactTextHeight + padRenderTop + padRenderBottom;
                                 
                                 let maskDrawWidth = unscaledBoxWidth;
                                 let maskDrawHeight = unscaledBoxHeight;
@@ -1646,8 +1652,9 @@
                                     maskDrawHeight = unscaledBoxHeight * currentMaskPrecision;
                                 }
 
+                                // Adjust box starting Y position based on the new top padding
                                 const boxLeft = anchorX - padRenderX;
-                                const boxTop = anchorY - padRenderY;
+                                const boxTop = anchorY - padRenderTop;
                                 
                                 ctx.translate(boxLeft, boxTop);
                                 ctx.scale(effectiveScaleWidth, effectiveScaleHeight);
@@ -1694,14 +1701,16 @@
                                 if (currentTextAlign === 'center') textDrawX = padRenderX + (finalMaxLineWidth / 2);
                                 if (currentTextAlign === 'right') textDrawX = padRenderX + finalMaxLineWidth;
 
+                                // Helper function to calculate exact Y position for text
+                                const getTextDrawY = (index) => padRenderTop + (index * lineHeight) + fontSize + halfLeading - (fontSize * 0.05); // slight tweak for vertical optical centering
+
                                 if (currentStrokeWidth > 0) {
                                     ctx.shadowColor = 'transparent'; 
                                     ctx.lineWidth = currentStrokeWidth * (width * 0.0000125); 
                                     ctx.strokeStyle = currentStrokeColor;
                                     
                                     tracklistArray.forEach((printText, i) => {
-                                        let textDrawY = padRenderY + (i * lineHeight) + fontSize + halfLeading;
-                                        ctx.strokeText(printText, textDrawX, textDrawY);
+                                        ctx.strokeText(printText, textDrawX, getTextDrawY(i));
                                     });
                                 }
                                 
@@ -1712,8 +1721,7 @@
                                 ctx.shadowColor = `rgba(0, 0, 0, ${currentShadowIntensity})`;
                                 
                                 tracklistArray.forEach((printText, i) => {
-                                    let textDrawY = padRenderY + (i * lineHeight) + fontSize + halfLeading;
-                                    ctx.fillText(printText, textDrawX, textDrawY);
+                                    ctx.fillText(printText, textDrawX, getTextDrawY(i));
                                 });
                                 
                                 ctx.restore(); 
