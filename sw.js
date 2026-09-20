@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tnc7-marge-v26';
+const CACHE_NAME = 'tnc7-marge-v27';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
