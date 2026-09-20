@@ -914,6 +914,12 @@
                 canvasTextOverlay.style.padding = `${padY} ${padX}`;
                 canvasTextOverlay.style.margin = `-${padY} -${padX}`; 
 
+                // PASTIKAN POSISI TETAP MENGIKUTI OFFSET SAAT UKURAN BERUBAH (MAXIMIZE/MINIMIZE)
+                if (window.textOffset) {
+                    canvasTextOverlay.style.left = `${window.textOffset.x * 100}%`;
+                    canvasTextOverlay.style.top = `${window.textOffset.y * 100}%`;
+                }
+
                 if (isMaskEnabled) {
                     const rgbaColor = hexToRgba(currentMaskColor, currentMaskOpacity);
                     const transparentColor = hexToRgba(currentMaskColor, 0);
@@ -1014,8 +1020,18 @@
                 updateUIMetricsCache(); 
             });
             
+            // Gunakan ResizeObserver untuk menangani resize dari minimize ke maximize dengan presisi tinggi
+            const resizeObserver = new ResizeObserver(() => {
+                requestAnimationFrame(() => {
+                    applyTextStyles();
+                });
+            });
+            resizeObserver.observe(overlayContainerElement);
+            
             window.addEventListener('resize', () => {
-                applyTextStyles();
+                requestAnimationFrame(() => {
+                    applyTextStyles();
+                });
             });
             
             const observer = new MutationObserver(() => {
