@@ -1628,20 +1628,27 @@
                             
                             const finalMaxLineWidth = maxLineWidth;
 
+                            ctx.save();
+                            
+                            const padRenderX = fontSize * 0.5;
+                            // ADJUSTMENT: Asymmetric padding for canvas rendering to fix top-heavy visual
+                            const padRenderTop = fontSize * 0.3;
+                            const padRenderBottom = fontSize * 0.4;
+                            
+                            const exactTextHeight = displayLines.length * lineHeight;
+                            
+                            // Calculate total box size with distinct top and bottom padding
+                            const unscaledBoxWidth = finalMaxLineWidth + (padRenderX * 2);
+                            const unscaledBoxHeight = exactTextHeight + padRenderTop + padRenderBottom;
+                            
+                            // Adjust box starting Y position based on the new top padding
+                            const boxLeft = anchorX - padRenderX;
+                            const boxTop = anchorY - padRenderTop;
+                            
+                            ctx.translate(boxLeft, boxTop);
+                            ctx.scale(effectiveScaleWidth, effectiveScaleHeight);
+
                             if (isMaskEnabled) {
-                                ctx.save();
-                                
-                                const padRenderX = fontSize * 0.5;
-                                // ADJUSTMENT: Asymmetric padding for canvas rendering to fix top-heavy visual
-                                const padRenderTop = fontSize * 0.3;
-                                const padRenderBottom = fontSize * 0.4;
-                                
-                                const exactTextHeight = displayLines.length * lineHeight;
-                                
-                                // Calculate total box size with distinct top and bottom padding
-                                const unscaledBoxWidth = finalMaxLineWidth + (padRenderX * 2);
-                                const unscaledBoxHeight = exactTextHeight + padRenderTop + padRenderBottom;
-                                
                                 let maskDrawWidth = unscaledBoxWidth;
                                 let maskDrawHeight = unscaledBoxHeight;
                                 
@@ -1651,13 +1658,6 @@
                                 if (currentMaskDirection === 'top-to-bottom') {
                                     maskDrawHeight = unscaledBoxHeight * currentMaskPrecision;
                                 }
-
-                                // Adjust box starting Y position based on the new top padding
-                                const boxLeft = anchorX - padRenderX;
-                                const boxTop = anchorY - padRenderTop;
-                                
-                                ctx.translate(boxLeft, boxTop);
-                                ctx.scale(effectiveScaleWidth, effectiveScaleHeight);
 
                                 ctx.shadowColor = 'transparent';
                                 ctx.shadowBlur = 0;
@@ -1694,38 +1694,38 @@
                                     ctx.fillStyle = gradient;
                                     ctx.fillRect(maskX, maskY, maskDrawWidth, maskDrawHeight);
                                 }
+                            }
 
-                                ctx.textAlign = currentTextAlign;
-                                
-                                let textDrawX = padRenderX;
-                                if (currentTextAlign === 'center') textDrawX = padRenderX + (finalMaxLineWidth / 2);
-                                if (currentTextAlign === 'right') textDrawX = padRenderX + finalMaxLineWidth;
+                            ctx.textAlign = currentTextAlign;
+                            
+                            let textDrawX = padRenderX;
+                            if (currentTextAlign === 'center') textDrawX = padRenderX + (finalMaxLineWidth / 2);
+                            if (currentTextAlign === 'right') textDrawX = padRenderX + finalMaxLineWidth;
 
-                                // Helper function to calculate exact Y position for text
-                                const getTextDrawY = (index) => padRenderTop + (index * lineHeight) + fontSize + halfLeading - (fontSize * 0.05); // slight tweak for vertical optical centering
+                            // Helper function to calculate exact Y position for text
+                            const getTextDrawY = (index) => padRenderTop + (index * lineHeight) + fontSize + halfLeading - (fontSize * 0.05); // slight tweak for vertical optical centering
 
-                                if (currentStrokeWidth > 0) {
-                                    ctx.shadowColor = 'transparent'; 
-                                    ctx.lineWidth = currentStrokeWidth * (width * 0.0000125); 
-                                    ctx.strokeStyle = currentStrokeColor;
-                                    
-                                    tracklistArray.forEach((printText, i) => {
-                                        ctx.strokeText(printText, textDrawX, getTextDrawY(i));
-                                    });
-                                }
-                                
-                                ctx.fillStyle = currentTextColor;
-                                ctx.shadowOffsetX = 0;
-                                ctx.shadowOffsetY = Math.max(2.25, width * 0.00315);
-                                ctx.shadowBlur = Math.max(4.5, width * 0.004725);
-                                ctx.shadowColor = `rgba(0, 0, 0, ${currentShadowIntensity})`;
+                            if (currentStrokeWidth > 0) {
+                                ctx.shadowColor = 'transparent'; 
+                                ctx.lineWidth = currentStrokeWidth * (width * 0.0000125); 
+                                ctx.strokeStyle = currentStrokeColor;
                                 
                                 tracklistArray.forEach((printText, i) => {
-                                    ctx.fillText(printText, textDrawX, getTextDrawY(i));
+                                    ctx.strokeText(printText, textDrawX, getTextDrawY(i));
                                 });
-                                
-                                ctx.restore(); 
                             }
+                            
+                            ctx.fillStyle = currentTextColor;
+                            ctx.shadowOffsetX = 0;
+                            ctx.shadowOffsetY = Math.max(2.25, width * 0.00315);
+                            ctx.shadowBlur = Math.max(4.5, width * 0.004725);
+                            ctx.shadowColor = `rgba(0, 0, 0, ${currentShadowIntensity})`;
+                            
+                            tracklistArray.forEach((printText, i) => {
+                                ctx.fillText(printText, textDrawX, getTextDrawY(i));
+                            });
+                            
+                            ctx.restore(); 
                         }
 
                         // PENINGKATAN KECEPATAN: Kualitas JPEG 0.90 (optimal speed vs size)
