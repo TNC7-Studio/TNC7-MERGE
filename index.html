@@ -43,7 +43,6 @@
             background-color: rgba(16, 185, 129, 0.05) !important;
         }
 
-        /* Warna Tombol Hijau */
         .btn-green {
             background-color: #10b981;
             transition: all 0.2s ease;
@@ -100,7 +99,6 @@
             background: #10b981; 
         }
         
-        /* Dark Mode untuk Select Option Dropdown */
         select option {
             background-color: #14161d;
             color: #f3f4f6;
@@ -148,6 +146,16 @@
         
         .custom-checkbox:checked {
             border-color: #10b981;
+        }
+
+        /* Menyembunyikan panah atas/bawah bawaan pada input type number */
+        .hide-spinners::-webkit-outer-spin-button,
+        .hide-spinners::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .hide-spinners[type=number] {
+            -moz-appearance: textfield;
         }
     </style>
 </head>
@@ -432,17 +440,24 @@
 
         <!-- Panel Kanan: Daftar Video -->
         <section id="video-list-section" class="w-full lg:col-span-1 dark-card rounded-2xl p-3 md:p-4 flex flex-col gap-2 overflow-hidden h-full relative">
-            <div class="flex items-center justify-between border-b border-slate-800/60 pb-3 flex-shrink-0">
-                <h3 class="font-bold text-[13px] tracking-wide text-white uppercase flex items-center gap-2">
-                    Daftar Video
-                    <span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-md font-bold" id="video-count">0</span>
-                    <button onclick="document.getElementById('file-input').click()" class="ml-1 text-emerald-500 hover:text-emerald-400 transition" title="Tambah Video">
-                        <i class="fas fa-plus-circle text-base"></i>
-                    </button>
-                </h3>
-                <span id="status-badge" class="bg-emerald-950/60 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded border border-emerald-800/60 tracking-wider">
-                    SIAP
-                </span>
+            <div class="flex flex-col gap-3 border-b border-slate-800/60 pb-3 flex-shrink-0">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-[13px] tracking-wide text-white uppercase flex items-center gap-2">
+                        Daftar Video
+                        <span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-md font-bold" id="video-count">0</span>
+                        <button onclick="document.getElementById('file-input').click()" class="ml-1 text-emerald-500 hover:text-emerald-400 transition" title="Tambah Video">
+                            <i class="fas fa-plus-circle text-base"></i>
+                        </button>
+                    </h3>
+                    <span id="status-badge" class="bg-emerald-950/60 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded border border-emerald-800/60 tracking-wider">
+                        SIAP
+                    </span>
+                </div>
+                <!-- Input Limit Render (Diperbesar & Dirapikan) -->
+                <div class="flex items-center justify-between bg-[#0b0c0e] border border-slate-700/50 rounded-lg px-3 py-2 transition-colors focus-within:border-emerald-500/50 cursor-text shadow-inner" onclick="document.getElementById('render-limit-input').focus()">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap flex items-center"><i class="fas fa-filter mr-1.5 text-slate-500"></i>Max Output:</span>
+                    <input type="number" id="render-limit-input" min="2" value="15" placeholder="Semua" class="w-20 bg-transparent border-none outline-none text-xs text-emerald-400 font-bold text-right focus:ring-0 p-0 placeholder-slate-600 hide-spinners" title="Jumlah maksimal video per render (kosongkan = semua)">
+                </div>
             </div>
 
             <ul id="video-list" class="space-y-0.5 flex-grow overflow-y-auto custom-scrollbar pr-1 mt-2">
@@ -460,22 +475,25 @@
 
     </main>
     
-    <div id="status-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center p-6 text-center">
-        <div class="relative w-14 h-14 mb-4 flex items-center justify-center">
-            <div class="absolute inset-0 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin"></div>
-            <i class="fas fa-layer-group text-emerald-400 text-base"></i>
+    <div id="status-overlay" class="fixed inset-0 bg-transparent z-50 hidden flex items-center justify-center p-4">
+        <!-- Kotak/Panel khusus untuk membungkus area loading -->
+        <div class="bg-[#14161d] border border-emerald-900/40 shadow-[0_15px_50px_rgba(0,0,0,0.9)] rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center w-full max-w-sm">
+            <div class="relative w-14 h-14 mb-4 flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin"></div>
+                <i class="fas fa-layer-group text-emerald-400 text-base"></i>
+            </div>
+            <h3 id="status-text" class="text-base font-bold text-white mb-1">Memproses...</h3>
+            <p id="status-subtext" class="text-[11px] text-slate-400 mb-5">Proses berjalan lokal dengan Super Turbo Mode</p>
+            
+            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden mb-2">
+                <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <span id="progress-percent" class="text-xs font-bold text-emerald-400">0%</span>
+            
+            <button id="cancel-render-btn" class="mt-6 px-4 py-1.5 border border-red-900/50 bg-red-900/20 text-red-400 hover:bg-red-900/40 hover:text-red-300 rounded text-[10px] font-bold tracking-widest uppercase transition-all shadow-sm">
+                Batalkan
+            </button>
         </div>
-        <h3 id="status-text" class="text-base font-bold text-white mb-1">Memproses...</h3>
-        <p id="status-subtext" class="text-[11px] text-slate-400 mb-5">Proses berjalan lokal dengan Super Turbo Mode</p>
-        
-        <div class="w-full max-w-xs bg-slate-800 rounded-full h-1.5 overflow-hidden mb-2">
-            <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%"></div>
-        </div>
-        <span id="progress-percent" class="text-xs font-bold text-emerald-400">0%</span>
-        
-        <button id="cancel-render-btn" class="mt-6 px-4 py-1.5 border border-red-900/50 bg-red-900/20 text-red-400 hover:bg-red-900/40 hover:text-red-300 rounded text-[10px] font-bold tracking-widest uppercase transition-all shadow-sm">
-            Batalkan
-        </button>
     </div>
 
     <!-- Message Modal -->
@@ -589,6 +607,7 @@
         const videoList = document.getElementById('video-list');
         const emptyState = document.getElementById('empty-state');
         const videoCountEl = document.getElementById('video-count');
+        const renderLimitInput = document.getElementById('render-limit-input');
         
         const imageListSection = document.getElementById('image-list-section');
         const imageList = document.getElementById('image-list');
@@ -677,19 +696,6 @@
             return `rgba(${r}, ${g}, ${b}, ${opacity})`;
         }
 
-        function refreshTextPreview() {
-            const canvasTextOverlay = document.getElementById('canvas-text-overlay');
-            if (canvasTextOverlay) {
-                const validVideos = videos.filter(v => v.isValid !== false);
-                let tracklistArray = validVideos.map((vid, index) => {
-                    let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
-                    return formatTextCase(rawText, currentTextTransform);
-                });
-                canvasTextOverlay.innerText = tracklistArray.join('\n');
-                applyTextStyles();
-            }
-        }
-
         window.cachedRenderMetrics = { isValid: false };
         function updateUIMetricsCache() {}
         window.addEventListener('resize', updateUIMetricsCache);
@@ -731,6 +737,21 @@
             initFFmpegInBackground();
             saveState(); 
         });
+
+        // Limit Render Function
+        function getRenderLimit() {
+            if (!renderLimitInput) return videos.length;
+            const val = parseInt(renderLimitInput.value);
+            const validCount = videos.filter(v => v.isValid !== false).length;
+            if (isNaN(val) || val <= 0 || val > validCount) return validCount;
+            return val;
+        }
+
+        if (renderLimitInput) {
+            renderLimitInput.addEventListener('input', () => {
+                updateUI(); 
+            });
+        }
 
         fontFamilySelect.addEventListener('change', (e) => {
             currentFontFamily = e.target.value;
@@ -909,15 +930,13 @@
                     0px max(2.25px, ${safeWidth * 0.00315}px) max(4.5px, ${safeWidth * 0.004725}px) rgba(0, 0, 0, ${currentShadowIntensity})
                 `;
                 
-                // ADJUSTMENT: Make vertical padding balanced by handling top and bottom separately.
                 const padX = `0.5em`; 
-                const padTop = `0.3em`;    // Slightly less padding on top
-                const padBottom = `0.4em`; // Slightly more padding on bottom to balance visual weight
+                const padTop = `0.3em`;    
+                const padBottom = `0.4em`; 
                 
                 canvasTextOverlay.style.padding = `${padTop} ${padX} ${padBottom} ${padX}`;
                 canvasTextOverlay.style.margin = `-${padTop} -${padX} -${padBottom} -${padX}`; 
 
-                // PASTIKAN POSISI TETAP MENGIKUTI OFFSET SAAT UKURAN BERUBAH (MAXIMIZE/MINIMIZE)
                 if (window.textOffset) {
                     canvasTextOverlay.style.left = `${window.textOffset.x * 100}%`;
                     canvasTextOverlay.style.top = `${window.textOffset.y * 100}%`;
@@ -957,6 +976,22 @@
                 } else {
                     canvasTextOverlay.style.background = 'transparent';
                 }
+            }
+        }
+
+        function refreshTextPreview() {
+            const canvasTextOverlay = document.getElementById('canvas-text-overlay');
+            if (canvasTextOverlay) {
+                let validVideos = videos.filter(v => v.isValid !== false);
+                const limit = getRenderLimit();
+                validVideos = validVideos.slice(0, limit);
+                
+                let tracklistArray = validVideos.map((vid, index) => {
+                    let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
+                    return formatTextCase(rawText, currentTextTransform);
+                });
+                canvasTextOverlay.innerText = tracklistArray.join('\n');
+                applyTextStyles();
             }
         }
 
@@ -1023,7 +1058,6 @@
                 updateUIMetricsCache(); 
             });
             
-            // Gunakan ResizeObserver untuk menangani resize dari minimize ke maximize dengan presisi tinggi
             const resizeObserver = new ResizeObserver(() => {
                 requestAnimationFrame(() => {
                     applyTextStyles();
@@ -1391,17 +1425,23 @@
 
                 if(canvasTextOverlayContainer) canvasTextOverlayContainer.classList.remove('hidden');
                 let tracklistArray = [];
+                const limit = getRenderLimit();
 
                 videos.forEach((vid, index) => {
                     const li = document.createElement('li');
-                    li.className = 'video-item flex items-center justify-between py-1 px-2 rounded-md';
+                    
+                    const isStandby = index >= limit;
+                    const standbyClass = isStandby ? 'opacity-40 border-dashed bg-[#0b0c0e] grayscale-[50%]' : '';
+                    const titleStandbyClass = isStandby ? 'text-slate-400' : 'text-slate-200';
+                    
+                    li.className = `video-item flex items-center justify-between py-1 px-2 rounded-md ${standbyClass}`;
                     li.draggable = true;
 
                     const statusIcon = vid.isValid === false 
                         ? '<i class="fas fa-times-circle text-red-500 text-[10px] flex-shrink-0" title="File Bermasalah"></i>' 
-                        : '<i class="fas fa-check-circle text-emerald-500 text-[10px] flex-shrink-0" title="File Valid"></i>';
+                        : (isStandby ? '<i class="fas fa-random text-slate-500 text-[10px] flex-shrink-0" title="Standby / Diacak"></i>' : '<i class="fas fa-check-circle text-emerald-500 text-[10px] flex-shrink-0" title="File Valid"></i>');
                     
-                    const titleClass = vid.isValid === false ? 'text-red-400 line-through opacity-70' : 'text-slate-200';
+                    const titleClass = vid.isValid === false ? 'text-red-400 line-through opacity-70' : titleStandbyClass;
                     const durationText = vid.isValid === false ? 'Format/File Rusak' : formatTime(vid.duration);
                     const durationClass = vid.isValid === false ? 'text-red-500/70' : 'text-slate-500';
 
@@ -1423,8 +1463,10 @@
                     setupReordering(li, index);
                     videoList.appendChild(li);
                         
-                    let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
-                    tracklistArray.push(formatTextCase(rawText, currentTextTransform));
+                    if (index < limit && vid.isValid !== false) {
+                        let rawText = `${String(index + 1).padStart(2, '0')}. ${vid.name.replace(/\.[^/.]+$/, "")}`;
+                        tracklistArray.push(formatTextCase(rawText, currentTextTransform));
+                    }
                 });
                 
                 if(canvasTextOverlay) {
@@ -1563,14 +1605,12 @@
             if (!thumbnailFileObj) return null;
             return new Promise((resolve) => {
                 const canvas = document.createElement('canvas');
-                // PENINGKATAN KECEPATAN: Membiarkan browser menggunakan GPU akselerasi
                 const ctx = canvas.getContext('2d'); 
                 const img = new Image();
                 img.src = URL.createObjectURL(thumbnailFileObj);
                 
                 img.onload = () => {
                     try { 
-                        // KUNCI PRESISI MUTLAK: STANDARISASI KANVAS 1920x1080 (16:9)
                         const width = 1920;
                         const height = 1080;
                         canvas.width = width;
@@ -1596,7 +1636,10 @@
 
                         ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 
-                        const validVideos = videos.filter(v => v.isValid !== false);
+                        let validVideos = videos.filter(v => v.isValid !== false);
+                        const limit = getRenderLimit();
+                        validVideos = validVideos.slice(0, limit);
+
                         if (validVideos.length > 0) {
                             const effectiveScaleWidth = 1 + (currentScaleWidth - 1) * 0.7;
                             const effectiveScaleHeight = 1 + (currentScaleHeight - 1) * 0.7;
@@ -1631,17 +1674,14 @@
                             ctx.save();
                             
                             const padRenderX = fontSize * 0.5;
-                            // ADJUSTMENT: Asymmetric padding for canvas rendering to fix top-heavy visual
                             const padRenderTop = fontSize * 0.3;
                             const padRenderBottom = fontSize * 0.4;
                             
                             const exactTextHeight = displayLines.length * lineHeight;
                             
-                            // Calculate total box size with distinct top and bottom padding
                             const unscaledBoxWidth = finalMaxLineWidth + (padRenderX * 2);
                             const unscaledBoxHeight = exactTextHeight + padRenderTop + padRenderBottom;
                             
-                            // Adjust box starting Y position based on the new top padding
                             const boxLeft = anchorX - padRenderX;
                             const boxTop = anchorY - padRenderTop;
                             
@@ -1702,8 +1742,7 @@
                             if (currentTextAlign === 'center') textDrawX = padRenderX + (finalMaxLineWidth / 2);
                             if (currentTextAlign === 'right') textDrawX = padRenderX + finalMaxLineWidth;
 
-                            // Helper function to calculate exact Y position for text
-                            const getTextDrawY = (index) => padRenderTop + (index * lineHeight) + fontSize + halfLeading - (fontSize * 0.05); // slight tweak for vertical optical centering
+                            const getTextDrawY = (index) => padRenderTop + (index * lineHeight) + fontSize + halfLeading - (fontSize * 0.05); 
 
                             if (currentStrokeWidth > 0) {
                                 ctx.shadowColor = 'transparent'; 
@@ -1728,7 +1767,6 @@
                             ctx.restore(); 
                         }
 
-                        // PENINGKATAN KECEPATAN: Kualitas JPEG 0.90 (optimal speed vs size)
                         canvas.toBlob((blob) => {
                             URL.revokeObjectURL(img.src);
                             resolve(blob);
@@ -1752,7 +1790,9 @@
         });
 
         async function startMergeProcess(autoDirHandle = null, autoFileName = null, isAutoMode = false, cycleInfo = "") {
-            const validVideos = videos.filter(v => v.isValid !== false);
+            let validVideos = videos.filter(v => v.isValid !== false);
+            const limit = getRenderLimit();
+            validVideos = validVideos.slice(0, limit);
             
             if (validVideos.length < 2 || isProcessing) return false;
 
@@ -1863,14 +1903,12 @@
 
                 updateProgress(95, `Memulai Proses Turbo Merge... ${cycleInfo}`);
                 
-                // PENINGKATAN KECEPATAN: FFmpeg Arguments
                 let ffmpegArgs = [
                     '-y', '-hide_banner', '-loglevel', 'error',
                     '-f', 'concat', '-safe', '0', '-i', 'concat.txt'
                 ];
                 
                 ffmpegArgs.push('-c', 'copy');
-                // Hapus -fflags +fastseek jika bermasalah, namun movflags faststart sangat membantu
                 ffmpegArgs.push('-movflags', '+faststart', internalOutputName);
                 
                 if (isRenderCancelled) throw new Error("CANCELLED"); 
@@ -1912,7 +1950,9 @@
                 
                 const textOutputName = outputName.replace(/\.mp4$/i, '.txt');
                 const thumbOutputName = outputName.replace(/\.mp4$/i, `.jpg`);
-                const currentTitles = videos.map((v, idx) => {
+                
+                let renderSubset = videos.filter(v => v.isValid !== false).slice(0, limit);
+                const currentTitles = renderSubset.map((v, idx) => {
                     return `${String(idx + 1).padStart(2, '0')}. ${v.name.replace(/\.[^/.]+$/, "")}`;
                 }).join('\n');
                 const tracklistContent = `Daftar Lagu untuk ${outputName}:\n\n${currentTitles}`;
@@ -2030,7 +2070,9 @@
             cancelRenderBtn.innerText = "Batalkan"; 
             
             const validVideos = videos.filter(v => v.isValid !== false);
-            const totalCycles = validVideos.length;
+            const limit = getRenderLimit();
+            // Batasi jumlah siklus sesuai input Max Output, jika input lebih besar dari jumlah video, gunakan jumlah video
+            const totalCycles = Math.min(limit, validVideos.length); 
             pastFirstVideoIds.clear(); 
             
             statusOverlay.classList.remove('hidden');
