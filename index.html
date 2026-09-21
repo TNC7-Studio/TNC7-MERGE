@@ -1540,6 +1540,11 @@
                     }
                 }
                 
+                if (images.length > 1) {
+                    activeImageIndex = (activeImageIndex + 1) % images.length;
+                    updateImageUI();
+                }
+                
                 updateUI();
                 saveState();
                 
@@ -2088,7 +2093,8 @@
                     arrangeForAutoRenderCycle(i, totalCycles);
                     
                     if (images && images.length > 0) {
-                        thumbnailFileObj = images[i % images.length].file;
+                        activeImageIndex = i % images.length;
+                        updateImageUI();
                     }
                     
                     const firstVideoName = videos[0].name;
