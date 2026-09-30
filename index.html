@@ -453,10 +453,16 @@
                         SIAP
                     </span>
                 </div>
-                <!-- Input Limit Render (Diperbesar & Dirapikan) -->
-                <div class="flex items-center justify-between bg-[#0b0c0e] border border-slate-700/50 rounded-lg px-3 py-2 transition-colors focus-within:border-emerald-500/50 cursor-text shadow-inner" onclick="document.getElementById('render-limit-input').focus()">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap flex items-center"><i class="fas fa-filter mr-1.5 text-slate-500"></i>Max Output:</span>
-                    <input type="number" id="render-limit-input" min="2" value="15" placeholder="Semua" class="w-20 bg-transparent border-none outline-none text-xs text-emerald-400 font-bold text-right focus:ring-0 p-0 placeholder-slate-600 hide-spinners" title="Jumlah maksimal video per render (kosongkan = semua)">
+                <!-- Input Limit Render & Export TXT Toggle -->
+                <div class="flex items-center gap-2">
+                    <label class="flex items-center justify-center bg-[#0b0c0e] border border-slate-700/50 rounded-lg px-2.5 py-2 cursor-pointer shadow-inner hover:border-emerald-500/50 transition-colors" title="Download Notepad List Lagu">
+                        <input type="checkbox" id="export-txt-toggle" class="custom-checkbox">
+                        <span class="ml-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">TXT</span>
+                    </label>
+                    <div class="flex-grow flex items-center justify-between bg-[#0b0c0e] border border-slate-700/50 rounded-lg px-3 py-2 transition-colors focus-within:border-emerald-500/50 cursor-text shadow-inner" onclick="document.getElementById('render-limit-input').focus()">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap flex items-center"><i class="fas fa-filter mr-1.5 text-slate-500"></i>Max Output:</span>
+                        <input type="number" id="render-limit-input" min="2" value="15" placeholder="Semua" class="w-20 bg-transparent border-none outline-none text-xs text-emerald-400 font-bold text-right focus:ring-0 p-0 placeholder-slate-600 hide-spinners" title="Jumlah maksimal video per render (kosongkan = semua)">
+                    </div>
                 </div>
             </div>
 
@@ -1610,7 +1616,8 @@
             if (!thumbnailFileObj) return null;
             return new Promise((resolve) => {
                 const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d'); 
+                // Mematikan alpha channel untuk mencegah pudarnya warna akibat kalkulasi transparansi browser
+                const ctx = canvas.getContext('2d', { alpha: false, colorSpace: 'srgb' }); 
                 const img = new Image();
                 img.src = URL.createObjectURL(thumbnailFileObj);
                 
@@ -1620,6 +1627,10 @@
                         const height = 1080;
                         canvas.width = width;
                         canvas.height = height;
+
+                        // Aktifkan mode rendering high-quality agar gambar tidak blur saat diskala
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
 
                         ctx.fillStyle = '#08090b';
                         ctx.fillRect(0, 0, width, height);
@@ -1772,6 +1783,7 @@
                             ctx.restore(); 
                         }
 
+                        // Tetap ekspor sebagai JPEG dengan kualitas 0.90 (seimbang antara warna akurat & ukuran file kecil)
                         canvas.toBlob((blob) => {
                             URL.revokeObjectURL(img.src);
                             resolve(blob);
@@ -1956,6 +1968,9 @@
                 const textOutputName = outputName.replace(/\.mp4$/i, '.txt');
                 const thumbOutputName = outputName.replace(/\.mp4$/i, `.jpg`);
                 
+                const exportTxtToggle = document.getElementById('export-txt-toggle');
+                const isExportTxt = exportTxtToggle ? exportTxtToggle.checked : false;
+                
                 let renderSubset = videos.filter(v => v.isValid !== false).slice(0, limit);
                 const currentTitles = renderSubset.map((v, idx) => {
                     return `${String(idx + 1).padStart(2, '0')}. ${v.name.replace(/\.[^/.]+$/, "")}`;
@@ -1967,13 +1982,15 @@
                     await writable.write(blob);
                     await writable.close();
                     
-                    try {
-                        const txtHandle = await dirHandle.getFileHandle(textOutputName, { create: true });
-                        const txtWritable = await txtHandle.createWritable();
-                        await txtWritable.write(tracklistContent);
-                        await txtWritable.close();
-                    } catch (e) {
-                        console.warn("Gagal menyimpan file teks", e);
+                    if (isExportTxt) {
+                        try {
+                            const txtHandle = await dirHandle.getFileHandle(textOutputName, { create: true });
+                            const txtWritable = await txtHandle.createWritable();
+                            await txtWritable.write(tracklistContent);
+                            await txtWritable.close();
+                        } catch (e) {
+                            console.warn("Gagal menyimpan file teks", e);
+                        }
                     }
 
                     if (thumbnailFileObj) {
@@ -1988,7 +2005,12 @@
                         } catch (e) { console.warn("Gagal menyimpan file thumbnail", e); }
                     }
 
-                    if (!isAutoMode) showModal("Berhasil!", `Video, File Teks (List Lagu), dan Thumbnail berhasil disimpan di "${dirHandle.name || 'Folder Anda'}".`);
+                    if (!isAutoMode) {
+                        let itemsSaved = "Video";
+                        if (isExportTxt) itemsSaved += ", File Teks (List Lagu)";
+                        if (thumbnailFileObj) itemsSaved += ", dan Thumbnail";
+                        showModal("Berhasil!", `${itemsSaved} berhasil disimpan di "${dirHandle.name || 'Folder Anda'}".`);
+                    }
                 } else {
                     const a = document.createElement('a');
                     a.style.display = 'none';
@@ -1999,16 +2021,18 @@
                     document.body.removeChild(a);
                     setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
 
-                    const txtBlob = new Blob([tracklistContent], { type: 'text/plain' });
-                    const txtUrl = URL.createObjectURL(txtBlob);
-                    const txtA = document.createElement('a');
-                    txtA.style.display = 'none';
-                    txtA.href = txtUrl;
-                    txtA.download = textOutputName;
-                    document.body.appendChild(txtA);
-                    txtA.click();
-                    document.body.removeChild(txtA);
-                    setTimeout(() => URL.revokeObjectURL(txtUrl), 10000);
+                    if (isExportTxt) {
+                        const txtBlob = new Blob([tracklistContent], { type: 'text/plain' });
+                        const txtUrl = URL.createObjectURL(txtBlob);
+                        const txtA = document.createElement('a');
+                        txtA.style.display = 'none';
+                        txtA.href = txtUrl;
+                        txtA.download = textOutputName;
+                        document.body.appendChild(txtA);
+                        txtA.click();
+                        document.body.removeChild(txtA);
+                        setTimeout(() => URL.revokeObjectURL(txtUrl), 10000);
+                    }
 
                     if (thumbnailFileObj) {
                         try {
@@ -2027,7 +2051,12 @@
                         } catch (e) {}
                     }
 
-                    if (!isAutoMode) showModal("Berhasil!", `Video, File Teks (List Lagu), dan Thumbnail berhasil diunduh.`);
+                    if (!isAutoMode) {
+                        let itemsSaved = "Video";
+                        if (isExportTxt) itemsSaved += ", File Teks (List Lagu)";
+                        if (thumbnailFileObj) itemsSaved += ", dan Thumbnail";
+                        showModal("Berhasil!", `${itemsSaved} berhasil diunduh.`);
+                    }
                 }
                 
                 return true;
@@ -2134,7 +2163,11 @@
                 if(autoRenderBtn) autoRenderBtn.disabled = validCount < 2;
                 
                 if (!isRenderCancelled && !isAutoRenderFailed) {
-                    showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!`);
+                    const exportTxtToggle = document.getElementById('export-txt-toggle');
+                    const isExportTxt = exportTxtToggle ? exportTxtToggle.checked : false;
+                    const txtMsg = isExportTxt ? "\nFile teks (.txt) dan Thumbnail untuk MASING-MASING video telah otomatis tersimpan!" : "\nThumbnail untuk MASING-MASING video telah otomatis tersimpan!";
+                    
+                    showModal("Auto Render Selesai!", `Berhasil merender ${totalCycles} variasi video.\n\nSetiap video dipastikan berada di urutan pertama tepat 1 kali.${txtMsg}`);
                 }
             } catch (err) {
                 console.error("Auto render global error:", err);
@@ -2189,7 +2222,7 @@
                 if (!blob) return;
                 
                 const validVideos = videos.filter(v => v.isValid !== false);
-                const thumbExt = 'jpg';
+                const thumbExt = 'webp';
                 const link = document.createElement('a');
                 let downloadName = `TNC7_Thumbnail_${Date.now()}.${thumbExt}`;
                 if (validVideos.length > 0) {
